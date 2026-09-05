@@ -1,0 +1,335 @@
+import { useQuery } from "@tanstack/react-query";
+import { Link, useOutletContext } from "react-router-dom";
+import {
+  AlertTriangle,
+  BellRing,
+  CalendarCheck2,
+  ChefHat,
+  ClipboardCheck,
+  CookingPot,
+  PackageCheck,
+  Settings,
+} from "lucide-react";
+import { sellerService } from "@/services/sellerService";
+import PageHeader from "@/components/ui/PageHeader";
+import StatCard from "@/components/ui/StatCard";
+import StatusBadge from "@/components/ui/StatusBadge";
+import EmptyState from "@/components/ui/EmptyState";
+import Button from "@/components/ui/Button";
+import type { Store as StoreType } from "@/types";
+
+export default function SellerDashboard() {
+  const { storeId, store } = useOutletContext<{
+    storeId: number;
+    store?: StoreType;
+  }>();
+  const revenueQuery = useQuery({
+    queryKey: ["seller-revenue-summary", storeId],
+    queryFn: () => sellerService.getRevenueStats(storeId),
+    enabled: !!storeId,
+  });
+  const deliveriesQuery = useQuery({
+    queryKey: ["seller-deliveries-today", storeId],
+    queryFn: () => sellerService.getTodaysDeliveries(storeId),
+    enabled: !!storeId,
+  });
+  const pendingSubsQuery = useQuery({
+    queryKey: ["seller-subs-pending", storeId],
+    queryFn: () =>
+      sellerService.getSubscriptionsForStore(
+        storeId,
+        "PENDING_APPROVAL",
+        0,
+        1,
+      ),
+    enabled: !!storeId,
+  });
+  const activeSubsQuery = useQuery({
+    queryKey: ["seller-subs-active", storeId],
+    queryFn: () =>
+      sellerService.getSubscriptionsForStore(storeId, "ACTIVE", 0, 1),
+    enabled: !!storeId,
+  });
+  const revenue = revenueQuery.data;
+  const deliveries = deliveriesQuery.data ?? [];
+  const pendingSubs = pendingSubsQuery.data;
+  const activeSubs = activeSubsQuery.data;
+  const hasDataError =
+    revenueQuery.isError ||
+    deliveriesQuery.isError ||
+    pendingSubsQuery.isError ||
+    activeSubsQuery.isError;
+  const retryData = () => {
+    void revenueQuery.refetch();
+    void deliveriesQuery.refetch();
+    void pendingSubsQuery.refetch();
+    void activeSubsQuery.refetch();
+  };
+  const totalPortions = deliveries.reduce(
+    (sum, delivery) => sum + delivery.personCount,
+    0,
+  );
+  const operationSlots = [
+    {
+      label: "Sabah",
+      count: deliveries.filter(
+        (delivery) => Number(delivery.deliveryTime.slice(0, 2)) < 12,
+      ).length,
+      tone: "bg-info-500",
+    },
+    {
+      label: "Öğle",
+      count: deliveries.filter((delivery) => {
+        const hour = Number(delivery.deliveryTime.slice(0, 2));
+        return hour >= 12 && hour < 17;
+      }).length,
+      tone: "bg-warning-500",
+    },
+    {
+      label: "Akşam",
+      count: deliveries.filter(
+        (delivery) => Number(delivery.deliveryTime.slice(0, 2)) >= 17,
+      ).length,
+      tone: "bg-info-500",
+    },
+  ];
+  const criticalDeliveries = deliveries
+    .filter(
+      (delivery) =>
+        delivery.delayMinutes ||
+        ["FAILED", "DELIVERY_ATTEMPTED"].includes(delivery.status),
+    )
+    .sort(
+      (left, right) => (right.delayMinutes || 0) - (left.delayMinutes || 0),
+    );
+
+  return (
+    <div className="mf-page">
+      <PageHeader
+        eyebrow={store?.name ? `${store.name} · Günlük operasyon` : "Günlük operasyon"}
+        title="Bugünün kontrol merkezi"
+        description="Teslimatları, abonelik taleplerini ve üretim ihtiyacını tek bakışta yönetin."
+        actions={
+          <Link to={`/seller/stores/${storeId}/settings`}>
+            <Button variant="outline" leftIcon={<Settings className="h-4 w-4" />}>
+              Mağaza ayarları
+            </Button>
+          </Link>
+        }
+      />
+      {hasDataError && (
+        <div
+          role="alert"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-warning-200 bg-warning-50 p-4 text-sm font-semibold text-warning-800"
+        >
+          <span>Bazı operasyon verileri yüklenemedi. Gösterilemeyen değerler “—” olarak işaretlendi.</span>
+          <Button variant="outline" size="sm" onClick={retryData}>
+            Tekrar dene
+          </Button>
+        </div>
+      )}
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <StatCard
+          label="Bugünkü teslimatlar"
+          value={deliveriesQuery.isError ? "—" : deliveries.length}
+          icon={<PackageCheck className="h-5 w-5" />}
+          detail="Teslimat planındaki kayıtlar"
+          tone="primary"
+        />
+        <StatCard
+          label="Aktif abonelik"
+          value={activeSubsQuery.isError ? "—" : (activeSubs?.totalElements ?? 0)}
+          icon={<CalendarCheck2 className="h-5 w-5" />}
+          detail="Devam eden müşteri abonelikleri"
+          tone="success"
+        />
+        <StatCard
+          label="Onay bekleyen"
+          value={pendingSubsQuery.isError ? "—" : (pendingSubs?.totalElements ?? 0)}
+          icon={<ClipboardCheck className="h-5 w-5" />}
+          detail="Hızlı karar gerektiren talepler"
+          tone="warning"
+        />
+        <StatCard
+          label="Hazırlanacak porsiyon"
+          value={deliveriesQuery.isError ? "—" : totalPortions}
+          icon={<ChefHat className="h-5 w-5" />}
+          detail="Bugünün toplam üretim ihtiyacı"
+          tone="danger"
+        />
+        <StatCard
+          label="Toplam gelir"
+          value={
+            revenueQuery.isError
+              ? "—"
+              : `${(revenue?.totalRevenue ?? 0).toLocaleString("tr-TR")} ₺`
+          }
+          icon={<CalendarCheck2 className="h-5 w-5" />}
+          detail="Bu mağazanın abonelik geliri"
+          tone="success"
+        />
+      </section>
+
+      <section className="space-y-3" aria-label="Kritik operasyon uyarıları">
+        {!deliveriesQuery.isError && criticalDeliveries.slice(0, 3).map((delivery) => (
+          <Link
+            key={delivery.id}
+            to={`/seller/stores/${storeId}/operations`}
+            className="flex flex-col gap-3 rounded-2xl border border-danger-100 bg-danger-50 p-4 transition hover:shadow-card sm:flex-row sm:items-center"
+          >
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-danger-600 text-white">
+              <AlertTriangle className="h-5 w-5" />
+            </span>
+            <div className="flex-1">
+              <p className="text-sm font-black text-danger-700">
+                Öncelikli teslimat: {delivery.customerName}
+              </p>
+              <p className="mt-1 text-sm text-danger-700/80">
+                {delivery.delayMinutes
+                  ? `${delivery.delayMinutes} dk gecikme`
+                  : "Teslimat istisnası"}{" "}
+                · {delivery.deliveryTime}
+              </p>
+            </div>
+            <span className="text-sm font-black text-danger-700">
+              Operasyonu aç →
+            </span>
+          </Link>
+        ))}
+        {!pendingSubsQuery.isError && pendingSubs?.totalElements ? (
+          <Link
+            to={`/seller/stores/${storeId}/pending`}
+            className="flex flex-col gap-3 rounded-2xl border border-warning-100 bg-warning-50 p-4 transition hover:shadow-card sm:flex-row sm:items-center"
+          >
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-warning-600 text-white">
+              <BellRing className="h-5 w-5" />
+            </span>
+            <div className="flex-1">
+              <p className="text-sm font-black text-warning-700">
+                Onay bekleyen abonelik talepleri var
+              </p>
+              <p className="mt-1 text-sm text-warning-700/80">
+                Müşterilerin taleplerini zamanında değerlendirmek için mağaza
+                operasyon sayfasına gidin.
+              </p>
+            </div>
+            <span className="text-sm font-black text-warning-700">
+              Talepleri aç →
+            </span>
+          </Link>
+        ) : null}
+      </section>
+
+      <section className="mf-surface p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="mf-section-title">Günlük operasyon özeti</h2>
+            <p className="mf-muted mt-1">
+              Teslimat yoğunluğunu saat dilimlerine göre planlayın.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link
+              to={`/seller/stores/${storeId}/pending`}
+              className="rounded-lg border border-primary-200 px-3 py-2 text-xs font-bold text-primary-700"
+            >
+              Talepleri aç
+            </Link>
+            <Link
+              to={`/seller/stores/${storeId}/operations`}
+              className="rounded-lg bg-primary-600 px-3 py-2 text-xs font-bold text-white"
+            >
+              Teslimatları yönet
+            </Link>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          {operationSlots.map((slot) => (
+            <div key={slot.label} className="rounded-xl bg-slate-50 p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-slate-700">
+                  {slot.label}
+                </span>
+                <strong className="text-xl text-ink">{slot.count}</strong>
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
+                <div
+                  className={`h-full ${slot.tone}`}
+                  style={{
+                    width: `${deliveries.length ? Math.max(8, (slot.count / deliveries.length) * 100) : 0}%`,
+                  }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-slate-500">planlı teslimat</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="mf-surface overflow-hidden">
+          <div className="flex items-center justify-between border-b border-slate-100 p-5">
+            <div>
+              <h2 className="mf-section-title">Bugünün teslimatları</h2>
+              <p className="mf-muted mt-1">
+                Yaklaşan teslimatları ve anlık durumlarını takip edin.
+              </p>
+            </div>
+            <span className="rounded-lg bg-primary-50 px-2.5 py-1.5 text-xs font-black text-primary-700">
+              {deliveriesQuery.isError ? "Veri alınamadı" : `${deliveries.length} kayıt`}
+            </span>
+          </div>
+          {deliveriesQuery.isError ? (
+            <div className="p-6">
+              <EmptyState
+                className="border-0 shadow-none"
+                title="Teslimatlar yüklenemedi"
+                description="Bağlantıyı kontrol edip tekrar deneyin."
+                icon={<PackageCheck className="h-6 w-6" />}
+                action={<Button variant="outline" onClick={() => deliveriesQuery.refetch()}>Tekrar dene</Button>}
+              />
+            </div>
+          ) : deliveries.length ? (
+            <div className="divide-y divide-slate-100">
+              {deliveries.slice(0, 6).map((delivery) => (
+                <div
+                  key={delivery.id}
+                  className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-slate-100 text-slate-600">
+                      <CookingPot className="h-5 w-5" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate font-black text-ink">
+                        {delivery.customerName}
+                      </p>
+                      <p className="mt-1 truncate text-sm text-slate-500">
+                        {delivery.menuName} · {delivery.personCount} kişi
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 sm:justify-end">
+                    <span className="text-sm font-black text-slate-700">
+                      {delivery.deliveryTime}
+                    </span>
+                    <StatusBadge domain="delivery" status={delivery.status} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-6">
+              <EmptyState
+                className="border-0 shadow-none"
+                title="Bugün planlanmış teslimat yok"
+                description="Yeni teslimatlar geldiğinde burada görünecek."
+                icon={<PackageCheck className="h-6 w-6" />}
+              />
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}

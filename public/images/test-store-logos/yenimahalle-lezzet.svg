@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-labelledby="title desc">
+  <title id="title">Yenimahalle Lezzet Mutfağı logosu</title>
+  <desc id="desc">YL baş harfleri ve servis tabağı simgesi</desc>
+  <defs>
+    <linearGradient id="background" x1="80" y1="60" x2="730" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f97316"/>
+      <stop offset="1" stop-color="#c2410c"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" rx="180" fill="url(#background)"/>
+  <circle cx="400" cy="330" r="185" fill="#fff7ed" opacity=".18"/>
+  <path d="M230 385c0-94 76-170 170-170s170 76 170 170" fill="none" stroke="#fff7ed" stroke-width="34" stroke-linecap="round"/>
+  <path d="M196 414h408" stroke="#fff7ed" stroke-width="34" stroke-linecap="round"/>
+  <path d="M292 475h216" stroke="#fff7ed" stroke-width="25" stroke-linecap="round"/>
+  <circle cx="400" cy="160" r="16" fill="#fff7ed"/>
+  <text x="400" y="630" fill="#fff" font-family="Arial, sans-serif" font-size="154" font-weight="800" text-anchor="middle" letter-spacing="-12">YL</text>
+</svg>

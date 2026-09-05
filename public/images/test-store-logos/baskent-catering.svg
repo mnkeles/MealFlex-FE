@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-labelledby="title desc">
+  <title id="title">Başkent Catering logosu</title>
+  <desc id="desc">BC baş harfleri ve tabak simgesi</desc>
+  <defs>
+    <linearGradient id="background" x1="70" y1="70" x2="730" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0f766e"/>
+      <stop offset="1" stop-color="#164e63"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" rx="180" fill="url(#background)"/>
+  <circle cx="400" cy="325" r="184" fill="#ecfeff" opacity=".16"/>
+  <path d="M248 366c16-91 81-145 152-145s136 54 152 145" fill="none" stroke="#ecfeff" stroke-width="32" stroke-linecap="round"/>
+  <path d="M208 402h384" stroke="#ecfeff" stroke-width="32" stroke-linecap="round"/>
+  <path d="M300 469h200" stroke="#ecfeff" stroke-width="24" stroke-linecap="round"/>
+  <path d="M400 166v-48M365 166l-24-42M435 166l24-42" stroke="#ecfeff" stroke-width="18" stroke-linecap="round"/>
+  <text x="400" y="630" fill="#fff" font-family="Arial, sans-serif" font-size="154" font-weight="800" text-anchor="middle" letter-spacing="-12">BC</text>
+</svg>

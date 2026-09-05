@@ -1,0 +1,17 @@
+{
+  "name": "MealFlex",
+  "short_name": "MealFlex",
+  "description": "Esnek yemek aboneliği",
+  "lang": "tr",
+  "display": "standalone",
+  "background_color": "#fffaf2",
+  "theme_color": "#dc3626",
+  "icons": [
+    {
+      "src": "/mealflex-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
