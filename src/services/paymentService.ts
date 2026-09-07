@@ -73,6 +73,7 @@ export interface Payout {
   periodStart: string;
   periodEnd: string;
   currency: string;
+  adjustmentAmount?: number;
   netAmount: number;
   scheduledAt?: string;
   paidAt?: string;

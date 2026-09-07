@@ -198,6 +198,7 @@ export interface AdminPayout {
   grossAmount: number;
   commissionAmount: number;
   refundAmount: number;
+  adjustmentAmount: number;
   netAmount: number;
   scheduledAt?: string;
   paidAt?: string;

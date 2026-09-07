@@ -261,6 +261,7 @@ export default function AdminFinancePage() {
                   <th className="px-4 py-3">Brüt</th>
                   <th className="px-4 py-3">Komisyon</th>
                   <th className="px-4 py-3">İade</th>
+                  <th className="px-4 py-3">Mahsup</th>
                   <th className="px-4 py-3">Net hakediş</th>
                   <th className="px-4 py-3">Durum</th>
                 </tr>
@@ -268,7 +269,7 @@ export default function AdminFinancePage() {
               <tbody className="divide-y divide-slate-100">
                 {payouts.isLoading && (
                   <tr>
-                    <td colSpan={7} className="p-10 text-center text-slate-500">
+                    <td colSpan={8} className="p-10 text-center text-slate-500">
                       Hakedişler yükleniyor…
                     </td>
                   </tr>
@@ -284,6 +285,7 @@ export default function AdminFinancePage() {
                       {money(item.commissionAmount)}
                     </td>
                     <td className="px-4 py-3">{money(item.refundAmount)}</td>
+                    <td className="px-4 py-3">{money(item.adjustmentAmount)}</td>
                     <td className="px-4 py-3 font-black">
                       {money(item.netAmount)}
                     </td>
