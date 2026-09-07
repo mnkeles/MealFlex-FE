@@ -94,6 +94,7 @@ export default function StoreSettingsPage() {
     name: "",
     description: "",
     maxPersonCount: "",
+    dailyCapacity: "",
     changeCutoffHours: "24",
     logoUrl: "",
     coverImageUrl: "",
@@ -141,6 +142,7 @@ export default function StoreSettingsPage() {
         maxPersonCount: store.maxPersonCount
           ? String(store.maxPersonCount)
           : "",
+        dailyCapacity: store.dailyCapacity ? String(store.dailyCapacity) : "",
         changeCutoffHours: String(store.changeCutoffHours || 24),
         productionAddress: store.productionAddress || "",
         addressTitle: store.addressTitle || "",
@@ -389,6 +391,7 @@ export default function StoreSettingsPage() {
       maxPersonCount: form.maxPersonCount
         ? Number(form.maxPersonCount)
         : undefined,
+      dailyCapacity: form.dailyCapacity ? Number(form.dailyCapacity) : undefined,
       changeCutoffHours: Number(form.changeCutoffHours),
       productionAddress: form.productionAddress || undefined,
       addressTitle: form.addressTitle || undefined,
@@ -416,6 +419,7 @@ export default function StoreSettingsPage() {
         maxPersonCount: form.maxPersonCount
           ? Number(form.maxPersonCount)
           : undefined,
+        dailyCapacity: form.dailyCapacity ? Number(form.dailyCapacity) : undefined,
         changeCutoffHours: Number(form.changeCutoffHours),
         productionAddress: form.productionAddress || undefined,
         addressTitle: form.addressTitle || undefined,
@@ -611,6 +615,25 @@ export default function StoreSettingsPage() {
                 }
                 className="w-full px-3 py-2 border rounded-lg text-sm"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Günlük Toplam Kapasite (Kişi)
+              </label>
+              <input
+                type="number"
+                min={1}
+                value={form.dailyCapacity}
+                onChange={(e) =>
+                  setForm({ ...form, dailyCapacity: e.target.value })
+                }
+                placeholder="Sınırsız"
+                className="w-full px-3 py-2 border rounded-lg text-sm"
+              />
+              <p className="mt-1 text-xs text-slate-500">
+                Bir günde tüm aboneliklerin toplam kişi sayısı bu sınırı aşarsa yeni talepler
+                kabul edilemez. Boş bırakılırsa günlük kapasite sınırlanmaz.
+              </p>
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-slate-700 mb-1">

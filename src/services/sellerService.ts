@@ -318,6 +318,7 @@ export const sellerService = {
       name: string;
       description?: string;
       maxPersonCount?: number;
+      dailyCapacity?: number;
       changeCutoffHours?: number;
       logoUrl?: string;
       coverImageUrl?: string;
