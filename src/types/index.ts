@@ -108,6 +108,11 @@ export interface BusinessHour {
   closeTime?: string;
 }
 
+export interface DeliverySlot {
+  id: number;
+  deliveryTime: string;
+}
+
 export type SubscriptionStatus =
   | "PENDING_APPROVAL"
   | "APPROVED"

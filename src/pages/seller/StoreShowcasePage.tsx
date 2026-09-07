@@ -303,7 +303,7 @@ export default function StoreShowcasePage() {
     mutationFn: ({ menuId, imageId }: { menuId: number; imageId: number }) =>
       sellerService.setMenuGalleryCover(menuId, imageId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["seller-menus", storeId] }),
+      queryClient.invalidateQueries({ queryKey: ["seller-menus", storeId] });
       reportAction("Vitrin kapak fotoğrafı güncellendi.");
     },
     onError: (error) =>

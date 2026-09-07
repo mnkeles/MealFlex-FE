@@ -3,6 +3,7 @@ import type {
   Store,
   Menu,
   BusinessHour,
+  DeliverySlot,
   Subscription,
   Delivery,
   DeliveryStatus,
@@ -360,6 +361,24 @@ export const sellerService = {
   async getBusinessHours(storeId: number): Promise<BusinessHour[]> {
     const response = await api.get(
       `/v1/seller/stores/${storeId}/business-hours`,
+    );
+    return response.data;
+  },
+
+  async getDeliverySlots(storeId: number): Promise<DeliverySlot[]> {
+    const response = await api.get(
+      `/v1/seller/stores/${storeId}/delivery-slots`,
+    );
+    return response.data;
+  },
+
+  async setDeliverySlots(
+    storeId: number,
+    deliveryTimes: string[],
+  ): Promise<DeliverySlot[]> {
+    const response = await api.put(
+      `/v1/seller/stores/${storeId}/delivery-slots`,
+      deliveryTimes.map((deliveryTime) => ({ deliveryTime })),
     );
     return response.data;
   },

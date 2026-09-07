@@ -10,7 +10,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Clock3,
   CreditCard,
   MapPin,
   Users,
@@ -59,34 +58,13 @@ const quickDurations = [
   { amount: 18, unit: "month", label: "18 ay" },
 ] as const;
 
-type SubscriptionDraft = {
-  step: number;
-  personCount: number;
-  startDate: string;
-  endDate: string;
-  addressId?: number;
-  deliveryTime: string;
-  couponCode: string;
-};
-
-const subscriptionDraftKey = (storeId: number, menuId: number) =>
-  `mealflex:subscription-draft:${storeId}:${menuId}`;
-
-function readSubscriptionDraft(storeId: number, menuId: number) {
-  try {
-    const value = sessionStorage.getItem(subscriptionDraftKey(storeId, menuId));
-    return value ? (JSON.parse(value) as SubscriptionDraft) : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
 function selectedDates(
   startDate: string,
   endDate: string,
   openDays?: ReadonlySet<string>,
 ) {
   if (!startDate || !endDate || endDate < startDate) return [];
+  if (Date.parse(endDate) - Date.parse(startDate) >= 730 * 86400000) return [];
   const values: string[] = [];
   const cursor = new Date(`${startDate}T12:00:00`);
   const end = new Date(`${endDate}T12:00:00`);
@@ -267,69 +245,31 @@ export default function CreateSubscriptionPage() {
   const [params] = useSearchParams();
   const storeId = Number(params.get("storeId"));
   const menuId = Number(params.get("menuId"));
-  const restoredDraft = useRef(
-    readSubscriptionDraft(storeId, menuId),
-  ).current;
   const { addresses, activeAddressId, setActiveAddressId } =
     useCustomerAddress();
   const initialAddress =
-    restoredDraft?.addressId ||
     Number(params.get("addressId")) ||
     activeAddressId;
-  const [step, setStep] = useState(
-    Math.min(Math.max(restoredDraft?.step ?? 0, 0), 2),
-  );
-  const [personCount, setPersonCount] = useState(
-    restoredDraft?.personCount ?? 1,
-  );
-  const [startDate, setStartDate] = useState(restoredDraft?.startDate ?? "");
-  const [endDate, setEndDate] = useState(restoredDraft?.endDate ?? "");
+  const [step, setStep] = useState(0);
+  const [personCount, setPersonCount] = useState(1);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [addressId, setAddressId] = useState<number | undefined>(
     initialAddress,
   );
-  const [deliveryTime, setDeliveryTime] = useState(
-    restoredDraft?.deliveryTime ?? "12:00",
-  );
+  const [deliveryTime, setDeliveryTime] = useState("12:00");
   const [paymentMethodId, setPaymentMethodId] = useState<number>();
   const [commercialTermsAccepted, setCommercialTermsAccepted] = useState(false);
-  const [couponCode, setCouponCode] = useState(
-    restoredDraft?.couponCode ?? "",
-  );
+  const [couponCode, setCouponCode] = useState("");
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [createdId, setCreatedId] = useState<number>();
   const [mobileSummaryOpen, setMobileSummaryOpen] = useState(false);
+  const [lastPreview, setLastPreview] = useState<Awaited<ReturnType<typeof subscriptionService.preview>>>();
 
   useEffect(() => {
     if (!addressId && activeAddressId) setAddressId(activeAddressId);
   }, [activeAddressId, addressId]);
-  useEffect(() => {
-    if (!storeId || !menuId || createdId) return;
-    const draft: SubscriptionDraft = {
-      step,
-      personCount,
-      startDate,
-      endDate,
-      addressId,
-      deliveryTime,
-      couponCode,
-    };
-    sessionStorage.setItem(
-      subscriptionDraftKey(storeId, menuId),
-      JSON.stringify(draft),
-    );
-  }, [
-    addressId,
-    couponCode,
-    createdId,
-    deliveryTime,
-    endDate,
-    menuId,
-    personCount,
-    startDate,
-    step,
-    storeId,
-  ]);
   const { data: store, isError: storeError } = useQuery({
     queryKey: ["store", storeId, addressId],
     queryFn: () => storeService.getStore(storeId, addressId),
@@ -340,6 +280,12 @@ export default function CreateSubscriptionPage() {
     queryFn: () => storeService.getMenu(storeId, menuId),
     enabled: !!storeId && !!menuId,
   });
+  const deliveryTimesQuery = useQuery({
+    queryKey: ["store-delivery-times", storeId, startDate, endDate],
+    queryFn: () => storeService.getDeliveryTimes(storeId, startDate, endDate),
+    enabled: !!storeId && !!startDate && !!endDate && endDate >= startDate,
+  });
+  const availableDeliveryTimes = deliveryTimesQuery.data;
   const { data: businessHours = [], isSuccess: businessHoursLoaded } =
     useQuery({
       queryKey: ["store-hours", storeId],
@@ -371,13 +317,13 @@ export default function CreateSubscriptionPage() {
     if (!startDate && store.nextAvailableDeliveryDate)
       setStartDate(store.nextAvailableDeliveryDate);
     if (
-      store.availableDeliveryTimes?.length &&
-      !store.availableDeliveryTimes.some(
+      availableDeliveryTimes?.length &&
+      !availableDeliveryTimes.some(
         (time) => time.slice(0, 5) === deliveryTime,
       )
     )
-      setDeliveryTime(store.availableDeliveryTimes[0].slice(0, 5));
-  }, [store, startDate, deliveryTime]);
+      setDeliveryTime(availableDeliveryTimes[0].slice(0, 5));
+  }, [store, startDate, deliveryTime, availableDeliveryTimes]);
 
   const input: SubscriptionInput = {
     storeId,
@@ -393,7 +339,8 @@ export default function CreateSubscriptionPage() {
   };
   const previewMutation = useMutation({
     mutationFn: subscriptionService.preview,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setLastPreview(data);
       setError("");
       setFieldErrors({});
       setStep(3);
@@ -408,7 +355,6 @@ export default function CreateSubscriptionPage() {
     mutationFn: (data: SubscriptionInput) =>
       subscriptionService.create(data, idempotencyKey.current),
     onSuccess: (subscription) => {
-      sessionStorage.removeItem(subscriptionDraftKey(storeId, menuId));
       setCreatedId(subscription.id);
     },
     onError: (err: unknown) => {
@@ -418,8 +364,18 @@ export default function CreateSubscriptionPage() {
     },
   });
 
+  const previewIsCurrent = previewMutation.isSuccess && !previewMutation.isPending
+    && previewMutation.variables?.storeId === storeId
+    && previewMutation.variables?.menuId === menuId
+    && previewMutation.variables?.addressId === addressId
+    && previewMutation.variables?.personCount === personCount
+    && previewMutation.variables?.deliveryTime === deliveryTime
+    && previewMutation.variables?.startDate === startDate
+    && previewMutation.variables?.endDate === endDate
+    && (previewMutation.variables?.couponCode || "") === couponCode;
+
   useEffect(() => {
-    if (step !== 3 || !previewMutation.data) return;
+    if (step !== 3) return;
     const timer = window.setTimeout(() => previewMutation.mutate(input), 450);
     return () => window.clearTimeout(timer);
     // Kupon değiştiğinde fiyatı tekrar sunucudan hesaplatır; diğer alanlar adımlarda güncellenir.
@@ -439,9 +395,23 @@ export default function CreateSubscriptionPage() {
         return setError("Başlangıç ve bitiş tarihlerini seçin.");
       if (endDate < startDate)
         return setError("Bitiş tarihi başlangıç tarihinden önce olamaz.");
+      if (Date.parse(endDate) - Date.parse(startDate) >= 730 * 86400000)
+        return setError("Tek abonelik dönemi en fazla 730 takvim günü olabilir.");
       setStep(2);
     } else if (step === 2) {
       if (!addressId) return setError("Teslimat adresini seçin.");
+      if (!availableDeliveryTimes?.length || deliveryTimesQuery.isFetching || deliveryTimesQuery.isError) {
+        return setError(
+          "Seçilen dönem için uygun teslimat saati bulunamadı. Tarihleri veya işletmeyi değiştirebilirsiniz.",
+        );
+      }
+      if (
+        !availableDeliveryTimes.some(
+          (time) => time.slice(0, 5) === deliveryTime,
+        )
+      ) {
+        return setError("Lütfen işletmenin sunduğu teslimat saatlerinden birini seçin.");
+      }
       previewMutation.mutate(input);
     }
   };
@@ -472,6 +442,10 @@ export default function CreateSubscriptionPage() {
 
   const submitSubscription = () => {
     setError("");
+    if (!previewIsCurrent) {
+      setError("Güncel tutar hesaplanmadan talep gönderilemez. Önizlemeyi yenileyin.");
+      return;
+    }
     if (!paymentMethodId) {
       setError("Devam etmek için kayıtlı bir ödeme yöntemi seçin.");
       return;
@@ -524,7 +498,7 @@ export default function CreateSubscriptionPage() {
     );
   if (!store || !menu || !addressId)
     return <div className="h-80 animate-pulse rounded-3xl bg-slate-200" />;
-  const preview = previewMutation.data;
+  const preview = previewMutation.data ?? lastPreview;
   const selectedAddress = addresses.find((address) => address.id === addressId);
   const selectedPaymentMethod = paymentMethods.find(
     (method) => method.id === paymentMethodId,
@@ -607,12 +581,6 @@ export default function CreateSubscriptionPage() {
               )}
             </div>
           )}
-          {restoredDraft && !error && (
-            <div className="mt-6 rounded-xl border border-primary-100 bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-800">
-              Daha önce başladığınız abonelik taslağı geri yüklendi.
-            </div>
-          )}
-
           <div className="mt-8 min-h-72">
             {step === 3 && (
               <section className="mb-7">
@@ -867,8 +835,14 @@ export default function CreateSubscriptionPage() {
                   <label className="block text-sm font-semibold text-slate-700">
                     Uygun teslimat saati
                     <div className="relative mt-2">
-                      <Clock3 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
-                      {store.availableDeliveryTimes?.length ? (
+                      {deliveryTimesQuery.isPending || deliveryTimesQuery.isFetching ? (
+                        <p role="status" className="py-3 text-sm text-slate-600">Uygun teslimat saatleri yükleniyor...</p>
+                      ) : deliveryTimesQuery.isError ? (
+                        <div role="alert" className="rounded-xl bg-danger-50 p-3 text-danger-700">
+                          Teslimat saatleri yüklenemedi.
+                          <button type="button" onClick={() => deliveryTimesQuery.refetch()} className="ml-2 underline">Tekrar dene</button>
+                        </div>
+                      ) : availableDeliveryTimes?.length ? (
                         <select
                           value={deliveryTime}
                           onChange={(event) =>
@@ -876,21 +850,17 @@ export default function CreateSubscriptionPage() {
                           }
                           className="h-12 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 font-normal"
                         >
-                          {store.availableDeliveryTimes.map((time) => (
+                          {availableDeliveryTimes.map((time) => (
                             <option key={time} value={time.slice(0, 5)}>
                               {time.slice(0, 5)}
                             </option>
                           ))}
                         </select>
                       ) : (
-                        <input
-                          type="time"
-                          value={deliveryTime}
-                          onChange={(event) =>
-                            setDeliveryTime(event.target.value)
-                          }
-                          className="h-12 w-full rounded-xl border border-slate-200 pl-10 pr-3 font-normal"
-                        />
+                        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                          Seçilen dönemin tüm hizmet günlerine uygun teslimat
+                          saati bulunmuyor. Tarihleri veya işletmeyi değiştirebilirsiniz.
+                        </div>
                       )}
                     </div>
                   </label>
@@ -900,6 +870,19 @@ export default function CreateSubscriptionPage() {
             {step === 3 && preview && (
               <section>
                 <h2 className="text-xl font-black">Abonelik özetiniz</h2>
+                {!previewIsCurrent && (
+                  <div role="status" className="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
+                    Güncel tutar henüz doğrulanmadı.
+                    <button
+                      type="button"
+                      disabled={previewMutation.isPending}
+                      onClick={() => previewMutation.mutate(input)}
+                      className="ml-2 font-semibold underline disabled:opacity-50"
+                    >
+                      {previewMutation.isPending ? "Hesaplanıyor..." : "Önizlemeyi yenile"}
+                    </button>
+                  </div>
+                )}
                 <div className="mt-6 divide-y rounded-2xl border border-slate-200 px-5">
                   {[
                     ["Menü", menu.name],
@@ -1048,7 +1031,7 @@ export default function CreateSubscriptionPage() {
           <div className="mt-7 flex items-center justify-between border-t pt-5">
             <button
               onClick={() => setStep((value) => Math.max(0, value - 1))}
-              disabled={step === 0}
+              disabled={step === 0 || previewMutation.isPending || createMutation.isPending}
               className="flex items-center gap-1 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-600 disabled:invisible"
             >
               <ArrowLeft className="h-4 w-4" /> Geri
@@ -1056,7 +1039,10 @@ export default function CreateSubscriptionPage() {
             {step < 3 ? (
               <button
                 onClick={next}
-                disabled={previewMutation.isPending}
+                disabled={
+                  previewMutation.isPending ||
+                  (step === 2 && (!availableDeliveryTimes?.length || deliveryTimesQuery.isFetching || deliveryTimesQuery.isError))
+                }
                 className="flex items-center gap-1 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50"
               >
                 {previewMutation.isPending ? "Hesaplanıyor..." : "Devam Et"}{" "}
@@ -1065,7 +1051,7 @@ export default function CreateSubscriptionPage() {
             ) : (
               <button
                 onClick={submitSubscription}
-                disabled={createMutation.isPending}
+                disabled={createMutation.isPending || !previewIsCurrent}
                 className="rounded-xl bg-primary-600 px-6 py-3 text-sm font-bold text-white disabled:opacity-50"
               >
                 {createMutation.isPending

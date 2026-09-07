@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   ArrowRight,
   CalendarDays,
@@ -395,7 +396,7 @@ export default function CustomerAccessPage() {
             <li className="py-7 md:pr-8">
               <div className="flex items-center justify-between">
                 <MapPin className="h-6 w-6 text-primary-300" />
-                <span className="text-xs font-black tracking-[.18em] text-slate-500">
+                <span className="text-xs font-black tracking-[.18em] text-slate-400">
                   01
                 </span>
               </div>
@@ -408,7 +409,7 @@ export default function CustomerAccessPage() {
             <li className="border-t border-white/15 py-7 md:border-l md:border-t-0 md:px-8">
               <div className="flex items-center justify-between">
                 <WalletCards className="h-6 w-6 text-primary-300" />
-                <span className="text-xs font-black tracking-[.18em] text-slate-500">
+                <span className="text-xs font-black tracking-[.18em] text-slate-400">
                   02
                 </span>
               </div>
@@ -421,7 +422,7 @@ export default function CustomerAccessPage() {
             <li className="border-t border-white/15 py-7 md:border-l md:border-t-0 md:pl-8">
               <div className="flex items-center justify-between">
                 <Truck className="h-6 w-6 text-primary-300" />
-                <span className="text-xs font-black tracking-[.18em] text-slate-500">
+                <span className="text-xs font-black tracking-[.18em] text-slate-400">
                   03
                 </span>
               </div>
@@ -451,6 +452,18 @@ export default function CustomerAccessPage() {
           </div>
         </div>
       </section>
+
+      <footer className="border-t border-slate-200 bg-white px-4 py-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 text-sm text-slate-700">
+          <a href="#how-it-works" onClick={(event) => {
+            event.preventDefault();
+            scrollToSection("how-it-works");
+          }} className="font-semibold hover:underline">Nasıl çalışır?</a>
+          <Link to="/seller/login" className="font-semibold text-primary-700 hover:underline">
+            Catering firması mısınız? MealFlex Satıcısı Ol →
+          </Link>
+        </div>
+      </footer>
 
       {accessMode && (
         <AccessModal

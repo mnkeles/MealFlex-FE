@@ -12,9 +12,9 @@ import HomePage from "@/pages/customer/HomePage";
 import AddressesPage from "@/pages/customer/AddressesPage";
 import StoreListPage from "@/pages/customer/StoreListPage";
 import StoreDetailPage from "@/pages/customer/StoreDetailPage";
-import CreateSubscriptionPage from "@/pages/customer/CreateSubscriptionPage";
+const CreateSubscriptionPage = lazy(() => import("@/pages/customer/CreateSubscriptionPage"));
 import SubscriptionsPage from "@/pages/customer/SubscriptionsPage";
-import SubscriptionDetailPage from "@/pages/customer/SubscriptionDetailPage";
+const SubscriptionDetailPage = lazy(() => import("@/pages/customer/SubscriptionDetailPage"));
 import ProfilePage from "@/pages/customer/ProfilePage";
 import NotificationsPage from "@/pages/customer/NotificationsPage";
 import FavoritesPage from "@/pages/customer/FavoritesPage";
@@ -29,7 +29,7 @@ const SellerDashboard = lazy(() => import("@/pages/seller/SellerDashboard"));
 import SellerDashboardEntryPage from "@/pages/seller/SellerDashboardEntryPage";
 import SellerStoresListPage from "@/pages/seller/SellerStoresListPage";
 import SellerStoreDetailLayout from "@/pages/seller/SellerStoreDetailLayout";
-import StoreShowcasePage from "@/pages/seller/StoreShowcasePage";
+const StoreShowcasePage = lazy(() => import("@/pages/seller/StoreShowcasePage"));
 import StorePendingPage from "@/pages/seller/StorePendingPage";
 const StoreSubscriptionsPage = lazy(
   () => import("@/pages/seller/StoreSubscriptionsPage"),

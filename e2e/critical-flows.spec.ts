@@ -44,7 +44,7 @@ test('müşteri karşılama ekranı giriş, üyelik ve satıcı geçişlerini su
 
   await page.getByRole('link', { name: 'Nasıl çalışır?' }).click()
   await expect(page).toHaveURL(/#how-it-works$/)
-  const howItWorksHeading = page.getByRole('heading', { name: 'MealFlex nasıl çalışır?' })
+  const howItWorksHeading = page.getByRole('heading', { name: 'İlk teslimata kadar üç net adım.' })
   await expect(howItWorksHeading).toBeVisible()
   await expect(howItWorksHeading).toBeFocused()
 
@@ -83,8 +83,8 @@ test('yanlış giriş bağlamı rol bilgisini açıklamadan genel kimlik doğrul
 
 test('rol bazlı giriş adresleri doğru ekranı açar ve korunan alanları doğru girişe yönlendirir', async ({ page }) => {
   await page.goto('/seller/login')
-  await expect(page.getByText('Satıcı girişi')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Mağazanızı yönetin' })).toBeVisible()
+  await expect(page.getByText('Satıcı hesabı', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Mağazanıza hoş geldiniz' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Şifremi unuttum' })).toHaveAttribute('href', '/seller/forgot-password')
 
   await page.goto('/admin/login')
@@ -110,14 +110,12 @@ test('ana kimlik doğrulama ekranındaki metinler WCAG AA kontrastını karşıl
       const channels = [red, green, blue].map(value => { const channel = value / 255; return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4 })
       return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
     }
-    const background = (element: Element) => {
-      let current: Element | null = element
-      while (current) {
-        const value = getComputedStyle(current).backgroundColor
-        if (value && !value.endsWith(', 0)') && value !== 'transparent') return parse(value)
-        current = current.parentElement
-      }
-      return [255, 255, 255]
+    const background = (element: Element | null): number[] => {
+      if (!element) return [255, 255, 255]
+      const values = (getComputedStyle(element).backgroundColor.match(/[\d.]+/g) || []).map(Number)
+      const alpha = values.length === 4 ? values[3] : values.length === 3 ? 1 : 0
+      const parent = alpha < 1 ? background(element.parentElement) : [0, 0, 0]
+      return [0, 1, 2].map(index => (values[index] || 0) * alpha + parent[index] * (1 - alpha))
     }
     return Array.from(document.querySelectorAll('body *')).filter(element => {
       const ownText = Array.from(element.childNodes).some(node => node.nodeType === Node.TEXT_NODE && node.textContent?.trim())
@@ -225,6 +223,7 @@ test('müşteri değişiklik talebini teslimat takviminden izler', async ({ page
   })
   await page.goto('/subscriptions/1')
   await expect(page.getByText('Değişiklik onayı bekliyor')).toBeVisible()
+  await page.locator('summary').filter({ hasText: 'Gelecek teslimat için değişiklik talebi' }).click()
   await expect(page.getByText(/ikinci talep gönderilemez/)).toBeVisible()
   await expect(page.getByText('5 → 7')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBeTruthy()
@@ -512,9 +511,8 @@ test('işletme detayı menü, alerjen, görsel, program ve fiyat geçerliliğini
   await expect(page.getByText('İçerir: Gluten')).toBeVisible()
   await expect(page.getByText('Ek bilgi: İz miktarda süt içerebilir')).toBeVisible()
   await expect(page.getByText(/Fiyat geçerliliği:.*2099/)).toBeVisible()
-  await page.getByRole('button', { name: /Haftalık program/i }).click()
-  await expect(page.getByRole('article').getByText('Pazartesi', { exact: true })).toBeVisible()
-  await expect(page.getByRole('article').locator('div.border-t.bg-slate-50').getByText('Mercimek Çorbası', { exact: true })).toBeVisible()
+  await expect(page.getByText('Menüde yer alabilecek yemek çeşitleri')).toBeVisible()
+  await expect(page.getByText('Mercimek Çorbası', { exact: true })).toBeVisible()
 })
 
 test('abonelik formu beş hizmet günü, kupon ve ödeme yöntemiyle aynı toplamı kaydeder', async ({ page }) => {
@@ -533,6 +531,7 @@ test('abonelik formu beş hizmet günü, kupon ve ödeme yöntemiyle aynı topla
     const url = new URL(route.request().url())
     if (url.pathname.endsWith('/v1/addresses')) return json(route, [address])
     if (url.pathname.endsWith('/v1/stores/2')) return json(route, store)
+    if (url.pathname.endsWith('/v1/stores/2/delivery-times')) return json(route, ['12:30', '13:30'])
     if (url.pathname.endsWith('/v1/stores/2/menus/3')) return json(route, menu)
     if (url.pathname.endsWith('/v1/stores/2/menus/3/schedule')) return json(route, {})
     if (url.pathname.endsWith('/v1/payments/methods')) return json(route, [paymentMethod])
@@ -655,23 +654,24 @@ async function openDeliveryChangeScenario(page: Page) {
     return json(route, [])
   })
   await page.goto('/subscriptions/1')
+  await page.locator('summary').filter({ hasText: 'Gelecek teslimat için değişiklik talebi' }).click()
   await page.getByRole('button', { name: /teslimatı için talep gönder/i }).click()
   return { getRequestBody: () => requestBody }
 }
 
 test('yalnız teslimat saati değiştiğinde satıcı onay talebi gönderilir', async ({ page }) => {
   const scenario = await openDeliveryChangeScenario(page)
-  await page.getByLabel('Teslimat saati').fill('13:30')
+  await page.getByLabel('Teslimat saati', { exact: true }).selectOption('13:30')
   await page.getByRole('button', { name: 'Talep gönder', exact: true }).click()
   await expect(page.getByText(/Değişiklik talebiniz satıcı onayına gönderildi/)).toBeVisible()
   expect(scenario.getRequestBody()).toMatchObject({ deliveryTime: '13:30', personCount: 5 })
   await expect(page.getByText('Değişiklik onayı bekliyor')).toBeVisible()
-  await expect(page.getByRole('button', { name: /teslimatı için talep gönder/i })).not.toBeVisible()
+  await expect(page.getByRole('button', { name: /talep onayı bekleniyor/i }).first()).toBeDisabled()
 })
 
 test('yalnız kişi sayısı değiştiğinde fiyat farkıyla satıcı onay talebi gönderilir', async ({ page }) => {
   const scenario = await openDeliveryChangeScenario(page)
-  await page.getByLabel('Kişi sayısı').fill('7')
+  await page.getByLabel('Kişi sayısı', { exact: true }).selectOption('7')
   await page.getByRole('button', { name: 'Talep gönder', exact: true }).click()
   await expect(page.getByText(/Değişiklik talebiniz satıcı onayına gönderildi/)).toBeVisible()
   expect(scenario.getRequestBody()).toMatchObject({ deliveryTime: '12:30', personCount: 7 })

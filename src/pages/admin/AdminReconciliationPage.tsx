@@ -10,8 +10,8 @@ import PageHeader from "@/components/ui/PageHeader";
 import QueryBoundary from "@/components/ui/QueryBoundary";
 import StatusBadge from "@/components/ui/StatusBadge";
 
-const money = (value: number) =>
-  new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(
+const money = (value: number | null) =>
+  value == null ? "Veri yok" : new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(
     value,
   );
 
@@ -106,14 +106,15 @@ export default function AdminReconciliationPage() {
                       <td className="px-4 py-3">
                         <StatusBadge
                           tone={
-                            item.status === "REVIEW_REQUIRED"
-                              ? "warning"
-                              : "success"
+                            item.status === "MATCHED" || item.status === "RESOLVED"
+                              ? "success"
+                              : "warning"
                           }
                         >
-                          {item.status === "REVIEW_REQUIRED"
-                            ? "İnceleme gerekli"
-                            : "Mutabık"}
+                          {item.status === "MATCHED" ? "Mutabık"
+                            : item.status === "RESOLVED" ? "İnceleme kapatıldı"
+                            : item.status === "PROVIDER_UNAVAILABLE" ? "Sağlayıcı verisi bekleniyor"
+                            : "İnceleme gerekli"}
                         </StatusBadge>
                         {item.resolutionNote && (
                           <p className="mt-1 max-w-xs text-xs text-slate-500">

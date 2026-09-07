@@ -263,10 +263,10 @@ export interface AdminOperationsSummary {
 export interface FinanceReconciliation {
   id: number;
   date: string;
-  providerCollectedAmount: number;
+  providerCollectedAmount: number | null;
   ledgerCollectedAmount: number;
   paidPayoutAmount: number;
-  discrepancyAmount: number;
+  discrepancyAmount: number | null;
   status: string;
   assignedAdmin: string;
   resolutionNote: string;

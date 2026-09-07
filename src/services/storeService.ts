@@ -67,6 +67,13 @@ export const storeService = {
     return response.data;
   },
 
+  async getDeliveryTimes(storeId: number, startDate: string, endDate: string): Promise<string[]> {
+    const response = await api.get(`/v1/stores/${storeId}/delivery-times`, {
+      params: { startDate, endDate },
+    });
+    return response.data;
+  },
+
   async getMenu(storeId: number, menuId: number): Promise<Menu> {
     const response = await api.get(`/v1/stores/${storeId}/menus/${menuId}`);
     return response.data;

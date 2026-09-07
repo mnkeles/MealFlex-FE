@@ -68,7 +68,7 @@ export default function StoreDailyOrdersPage() {
     queryFn: () => sellerService.getTodaysDeliveries(storeId),
     enabled: !!storeId,
   });
-  const deliveries = deliveriesQuery.data ?? [];
+  const deliveries = useMemo(() => deliveriesQuery.data ?? [], [deliveriesQuery.data]);
   const { data: routePlan } = useQuery({
     queryKey: ["seller-route-plan", storeId],
     queryFn: () =>

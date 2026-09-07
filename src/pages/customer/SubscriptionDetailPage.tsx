@@ -1114,6 +1114,7 @@ export default function SubscriptionDetailPage() {
               <label className="text-xs font-bold text-slate-600">
                 Teslimat saati
                 <select
+                  aria-label="Teslimat saati"
                   value={modifyForm.deliveryTime}
                   onChange={(event) => {
                     setModifyForm({
@@ -1141,6 +1142,7 @@ export default function SubscriptionDetailPage() {
               <label className="text-xs font-bold text-slate-600">
                 Kişi sayısı
                 <select
+                  aria-label="Kişi sayısı"
                   value={modifyForm.personCount}
                   onChange={(event) => {
                     setModifyForm({
