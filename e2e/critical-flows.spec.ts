@@ -215,7 +215,7 @@ test('müşteri değişiklik talebini teslimat takviminden izler', async ({ page
     const url = route.request().url()
     if (url.includes('/delivery-change-requests')) return json(route, [{ id: 9, subscriptionId: 1, deliveryId: 11, deliveryDate: '2026-09-10', oldDeliveryTime: '12:00', requestedDeliveryTime: '13:00', oldPersonCount: 5, requestedPersonCount: 7, priceDifference: 200, status: 'PENDING', requestedAt: '2026-08-29T12:00:00Z' }])
     if (url.endsWith('/v1/subscriptions/1/events')) return json(route, [])
-    if (url.endsWith('/v1/subscriptions/1')) return json(route, { subscription: { id: 1, storeId: 2, storeName: 'Test Mutfağı', menuId: 3, menuName: 'Ev Menüsü', addressId: 4, personCount: 5, pricePerPerson: 100, deliveryTime: '12:00', startDate: '2026-09-10', endDate: '2026-09-14', serviceDayCount: 5, totalAmount: 2500, status: 'ACTIVE', postponedCount: 0, createdAt: '2026-08-20T10:00:00Z' }, deliveries: [{ id: 11, subscriptionId: 1, deliveryDate: '2026-09-10', deliveryTime: '12:00', personCount: 5, menuName: 'Ev Menüsü', customerName: 'Test Kullanıcı', deliveryAddress: 'Ankara', status: 'SCHEDULED' }], reviewed: false })
+    if (url.endsWith('/v1/subscriptions/1')) return json(route, { subscription: { id: 1, storeId: 2, storeName: 'Test Mutfağı', menuId: 3, menuName: 'Ev Menüsü', addressId: 4, personCount: 5, pricePerPerson: 100, deliveryTime: '12:00', startDate: '2026-09-10', endDate: '2026-09-14', serviceDayCount: 5, totalAmount: 2500, status: 'ACTIVE', createdAt: '2026-08-20T10:00:00Z' }, deliveries: [{ id: 11, subscriptionId: 1, deliveryDate: '2026-09-10', deliveryTime: '12:00', personCount: 5, menuName: 'Ev Menüsü', customerName: 'Test Kullanıcı', deliveryAddress: 'Ankara', status: 'SCHEDULED' }], reviewed: false })
     if (url.includes('/v1/payments/subscriptions/1')) return json(route, null)
     if (url.includes('unread-count')) return json(route, { count: 0 })
     if (url.includes('/addresses')) return json(route, [])
@@ -577,7 +577,7 @@ test('müşteri abonelik listesindeki her yaşam döngüsü durumunu doğru gör
     ['REJECTED', 'Reddedildi'],
     ['CANCELLED', 'İptal edildi'],
   ] as const
-  const subscriptions = statuses.map(([status], index) => ({ id: index + 1, storeId: 2, storeName: 'Test Mutfağı ' + (index + 1), menuId: 3, menuName: 'Ev Menüsü', addressId: 11, personCount: 3, pricePerPerson: 120, deliveryTime: '12:30', startDate: '2099-09-01', endDate: '2099-09-05', serviceDayCount: 5, totalAmount: 1800, status, postponedCount: 0, createdAt: '2099-08-20T10:00:00Z' }))
+  const subscriptions = statuses.map(([status], index) => ({ id: index + 1, storeId: 2, storeName: 'Test Mutfağı ' + (index + 1), menuId: 3, menuName: 'Ev Menüsü', addressId: 11, personCount: 3, pricePerPerson: 120, deliveryTime: '12:30', startDate: '2099-09-01', endDate: '2099-09-05', serviceDayCount: 5, totalAmount: 1800, status, createdAt: '2099-08-20T10:00:00Z' }))
   await page.route('**/api/**', route => {
     const url = new URL(route.request().url())
     if (url.pathname.endsWith('/v1/subscriptions')) return json(route, pageResult(subscriptions))
@@ -593,7 +593,7 @@ test('müşteri abonelik listesindeki her yaşam döngüsü durumunu doğru gör
 
 test('tamamlanan abonelik bildirimi ayrıntıya gider ve yenileme bilgilerini taşır', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
-  const subscription = { id: 1, storeId: 2, storeName: 'Test Mutfağı', menuId: 3, menuName: 'Ev Menüsü', addressId: 11, addressTitle: 'Ofis', deliveryAddress: 'Test adresi', personCount: 3, pricePerPerson: 120, deliveryTime: '12:30', startDate: '2099-09-01', endDate: '2099-09-05', serviceDayCount: 5, totalAmount: 1800, status: 'COMPLETED', postponedCount: 0, createdAt: '2099-08-20T10:00:00Z', completedAt: '2099-09-06T12:00:00Z' }
+  const subscription = { id: 1, storeId: 2, storeName: 'Test Mutfağı', menuId: 3, menuName: 'Ev Menüsü', addressId: 11, addressTitle: 'Ofis', deliveryAddress: 'Test adresi', personCount: 3, pricePerPerson: 120, deliveryTime: '12:30', startDate: '2099-09-01', endDate: '2099-09-05', serviceDayCount: 5, totalAmount: 1800, status: 'COMPLETED', createdAt: '2099-08-20T10:00:00Z', completedAt: '2099-09-06T12:00:00Z' }
   await page.route('**/api/**', route => {
     const url = new URL(route.request().url())
     if (url.pathname.endsWith('/v1/notifications')) return json(route, pageResult([{ id: 9, title: 'Aboneliğiniz Tamamlandı', message: 'Test Mutfağı aboneliğiniz tamamlandı.', read: false, createdAt: '2099-09-06T12:00:00Z', referenceType: 'SUBSCRIPTION', referenceId: 1 }]))
@@ -634,7 +634,7 @@ async function openDeliveryChangeScenario(page: Page) {
   await loginAs(page, 'CUSTOMER')
   const deliveryDate = new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10)
   const address = { id: 11, title: 'Ofis', city: 'Ankara', district: 'Etimesgut', fullAddress: 'Test adresi', latitude: 39.94, longitude: 32.86, defaultAddress: true }
-  const subscription = { id: 1, storeId: 2, storeName: 'Test Mutfağı', menuId: 3, menuName: 'Ev Menüsü', addressId: 11, addressTitle: 'Ofis', deliveryAddress: 'Test adresi', personCount: 5, pricePerPerson: 50, deliveryTime: '12:30', startDate: deliveryDate, endDate: deliveryDate, serviceDayCount: 1, totalAmount: 250, status: 'ACTIVE', postponedCount: 0, createdAt: '2099-08-20T10:00:00Z' }
+  const subscription = { id: 1, storeId: 2, storeName: 'Test Mutfağı', menuId: 3, menuName: 'Ev Menüsü', addressId: 11, addressTitle: 'Ofis', deliveryAddress: 'Test adresi', personCount: 5, pricePerPerson: 50, deliveryTime: '12:30', startDate: deliveryDate, endDate: deliveryDate, serviceDayCount: 1, totalAmount: 250, status: 'ACTIVE', createdAt: '2099-08-20T10:00:00Z' }
   const delivery = { id: 11, subscriptionId: 1, deliveryDate, deliveryTime: '12:30', personCount: 5, menuName: 'Ev Menüsü', customerName: 'Test Kullanıcı', deliveryAddress: 'Test adresi', addressId: 11, menuId: 3, status: 'SCHEDULED' }
   const changes: Record<string, unknown>[] = []
   let requestBody: Record<string, unknown> | undefined

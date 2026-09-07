@@ -45,7 +45,7 @@ export default function HomePage() {
     enabled: !!activeAddressId,
   });
   const ongoing = subscriptions?.content.find((item) =>
-    ["APPROVED", "ACTIVE", "PAYMENT_SUSPENDED", "POSTPONED"].includes(item.status),
+    ["APPROVED", "ACTIVE", "PAYMENT_SUSPENDED"].includes(item.status),
   );
   const completed = subscriptions?.content.find(
     (item) => item.status === "COMPLETED",

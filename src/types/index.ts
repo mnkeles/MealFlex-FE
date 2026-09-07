@@ -120,7 +120,6 @@ export type SubscriptionStatus =
   | "ACTIVE"
   | "PAYMENT_SUSPENDED"
   | "REJECTED"
-  | "POSTPONED"
   | "COMPLETED"
   | "CANCELLED";
 
@@ -142,7 +141,6 @@ export interface Subscription {
   serviceDayCount: number;
   totalAmount: number;
   status: SubscriptionStatus;
-  postponedCount: number;
   nextDeliveryDate?: string;
   cancellationReason?: string;
   approvedAt?: string;
