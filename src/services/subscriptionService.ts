@@ -117,6 +117,16 @@ export const subscriptionService = {
     ).data;
   },
 
+  async extend(id: number, newEndDate: string): Promise<Subscription> {
+    return (await api.post(`/v1/subscriptions/${id}/extend`, { newEndDate }))
+      .data;
+  },
+
+  async setAutoRenew(id: number, enabled: boolean): Promise<Subscription> {
+    return (await api.patch(`/v1/subscriptions/${id}/auto-renew`, { enabled }))
+      .data;
+  },
+
   async getSubscriptionEvents(id: number): Promise<SubscriptionEvent[]> {
     const response = await api.get(`/v1/subscriptions/${id}/events`);
     return response.data;

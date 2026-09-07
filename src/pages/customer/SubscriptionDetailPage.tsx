@@ -31,6 +31,11 @@ const eventLabels: Record<string, string> = {
   SUBSCRIPTION_AUTO_CANCELLED: "Onay süresi dolduğu için talep iptal edildi",
   SUBSCRIPTION_ACTIVATED: "Abonelik başladı",
   SUBSCRIPTION_COMPLETED: "Abonelik tamamlandı",
+  SUBSCRIPTION_EXTENDED: "Abonelik dönemi uzatıldı",
+  SUBSCRIPTION_AUTO_RENEW_ENABLED: "Otomatik yenileme açıldı",
+  SUBSCRIPTION_AUTO_RENEW_DISABLED: "Otomatik yenileme kapatıldı",
+  SUBSCRIPTION_AUTO_RENEWED: "Abonelik otomatik yenilendi",
+  SUBSCRIPTION_CANCELLED_BY_SELLER: "İşletme aboneliği iptal etti",
 };
 
 function eventDetail(event: SubscriptionEvent) {
@@ -196,6 +201,8 @@ export default function SubscriptionDetailPage() {
   const [newPaymentMethodId, setNewPaymentMethodId] = useState<number>();
   const [skipDeliveryId, setSkipDeliveryId] = useState<number>();
   const [showFreeze, setShowFreeze] = useState(false);
+  const [showExtend, setShowExtend] = useState(false);
+  const [extensionEndDate, setExtensionEndDate] = useState("");
   const [freezeForm, setFreezeForm] = useState({
     startDate: "",
     endDate: "",
@@ -266,6 +273,35 @@ export default function SubscriptionDetailPage() {
       refresh();
     },
     onError: () => setMessage("Ödeme yöntemi güncellenemedi."),
+  });
+  const extendSubscription = useMutation({
+    mutationFn: () => subscriptionService.extend(id, extensionEndDate),
+    onSuccess: (subscription) => {
+      setShowExtend(false);
+      setExtensionEndDate("");
+      setMessage(
+        `Aboneliğiniz ${new Date(`${subscription.endDate}T00:00:00`).toLocaleDateString("tr-TR")} tarihine kadar uzatıldı.`,
+      );
+      refresh();
+    },
+    onError: (error: unknown) =>
+      setMessage(
+        (error as { response?: { data?: { message?: string } } }).response
+          ?.data?.message || "Abonelik uzatılamadı.",
+      ),
+  });
+  const autoRenewMutation = useMutation({
+    mutationFn: (enabled: boolean) =>
+      subscriptionService.setAutoRenew(id, enabled),
+    onSuccess: (subscription) => {
+      setMessage(
+        subscription.autoRenew
+          ? "Otomatik yenileme açıldı. Fiyat değişirse yenilemeden 7 gün önce bildirim alacaksınız."
+          : "Otomatik yenileme kapatıldı.",
+      );
+      refresh();
+    },
+    onError: () => setMessage("Otomatik yenileme tercihi güncellenemedi."),
   });
   const skipDelivery = useMutation({
     mutationFn: (deliveryId: number) =>
@@ -571,6 +607,21 @@ export default function SubscriptionDetailPage() {
               <RefreshCw className="h-4 w-4" />
               Yenile
             </Link>
+          )}
+          {["APPROVED", "ACTIVE"].includes(sub.status) && (
+            <button
+              type="button"
+              onClick={() => {
+                const suggested = new Date(`${sub.endDate}T12:00:00`);
+                suggested.setDate(suggested.getDate() + 7);
+                setExtensionEndDate(suggested.toISOString().slice(0, 10));
+                extendSubscription.reset();
+                setShowExtend(true);
+              }}
+              className="inline-flex items-center gap-2 rounded-xl border border-primary-200 px-4 py-2 text-sm font-bold text-primary-700"
+            >
+              <CalendarDays className="h-4 w-4" /> Dönemi uzat
+            </button>
           )}
           <StatusBadge domain="subscription" status={sub.status} />
         </div>
@@ -1153,6 +1204,21 @@ export default function SubscriptionDetailPage() {
                   Aboneliği iptal et
                 </button>
               )}
+              {["PENDING_APPROVAL", "APPROVED", "ACTIVE", "PAYMENT_SUSPENDED"].includes(
+                sub.status,
+              ) && (
+                <button
+                  type="button"
+                  onClick={() => autoRenewMutation.mutate(!sub.autoRenew)}
+                  disabled={autoRenewMutation.isPending}
+                  className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold disabled:opacity-50 ${sub.autoRenew ? "bg-success-50 text-success-700" : "bg-slate-100 text-slate-700"}`}
+                >
+                  <span className="flex items-center gap-2">
+                    <RefreshCw className="h-4 w-4" /> Otomatik yenileme
+                  </span>
+                  <span>{sub.autoRenew ? "Açık" : "Kapalı"}</span>
+                </button>
+              )}
               <Link
                 to={`/subscribe?storeId=${sub.storeId}&menuId=${sub.menuId}&addressId=${sub.addressId}`}
                 className="flex w-full items-center gap-2 rounded-xl border px-4 py-3 text-sm font-bold text-slate-700"
@@ -1377,6 +1443,56 @@ export default function SubscriptionDetailPage() {
                 className="rounded-xl bg-info-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
               >
                 Dondur
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showExtend && (
+        <div
+          className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="extend-subscription-title"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            <h2 id="extend-subscription-title" className="text-xl font-black">
+              Abonelik dönemini uzat
+            </h2>
+            <p className="mt-2 text-sm text-slate-500">
+              Mevcut menü, kişi sayısı, adres ve teslimat saati korunur. Yeni
+              hizmet günleri haftalık ödeme planına eklenir.
+            </p>
+            <label className="mt-5 block text-sm font-bold text-slate-700">
+              Yeni bitiş tarihi
+              <input
+                type="date"
+                min={new Date(
+                  new Date(`${sub.endDate}T12:00:00`).getTime() + 86_400_000,
+                )
+                  .toISOString()
+                  .slice(0, 10)}
+                value={extensionEndDate}
+                onChange={(event) => setExtensionEndDate(event.target.value)}
+                className="mt-2 h-11 w-full rounded-xl border border-slate-200 px-3 font-normal"
+              />
+            </label>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowExtend(false)}
+                className="rounded-xl px-4 py-2 text-sm font-bold"
+              >
+                Vazgeç
+              </button>
+              <button
+                type="button"
+                onClick={() => extendSubscription.mutate()}
+                disabled={!extensionEndDate || extendSubscription.isPending}
+                className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                Dönemi uzat
               </button>
             </div>
           </div>

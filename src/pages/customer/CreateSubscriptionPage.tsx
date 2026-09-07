@@ -245,6 +245,8 @@ export default function CreateSubscriptionPage() {
   const [params] = useSearchParams();
   const storeId = Number(params.get("storeId"));
   const menuId = Number(params.get("menuId"));
+  const renewFromId = Number(params.get("renewFrom"));
+  const renewalPrefilled = useRef(false);
   const { addresses, activeAddressId, setActiveAddressId } =
     useCustomerAddress();
   const initialAddress =
@@ -279,6 +281,11 @@ export default function CreateSubscriptionPage() {
     queryKey: ["menu", storeId, menuId],
     queryFn: () => storeService.getMenu(storeId, menuId),
     enabled: !!storeId && !!menuId,
+  });
+  const renewalQuery = useQuery({
+    queryKey: ["subscription-renewal-source", renewFromId],
+    queryFn: () => subscriptionService.getSubscription(renewFromId),
+    enabled: Number.isFinite(renewFromId) && renewFromId > 0,
   });
   const deliveryTimesQuery = useQuery({
     queryKey: ["store-delivery-times", storeId, startDate, endDate],
@@ -324,6 +331,35 @@ export default function CreateSubscriptionPage() {
     )
       setDeliveryTime(availableDeliveryTimes[0].slice(0, 5));
   }, [store, startDate, deliveryTime, availableDeliveryTimes]);
+  useEffect(() => {
+    if (renewalPrefilled.current || !renewalQuery.data || !store) return;
+    const previous = renewalQuery.data.subscription;
+    const earliest = tomorrowPlusTwo();
+    const afterPrevious = new Date(`${previous.endDate}T12:00:00`);
+    afterPrevious.setDate(afterPrevious.getDate() + 1);
+    const possibleStarts = [
+      earliest,
+      afterPrevious.toISOString().slice(0, 10),
+      store.nextAvailableDeliveryDate || earliest,
+    ].sort();
+    const newStart = possibleStarts[possibleStarts.length - 1];
+    const durationDays = Math.max(
+      1,
+      Math.round(
+        (Date.parse(previous.endDate) - Date.parse(previous.startDate)) /
+          86_400_000,
+      ) + 1,
+    );
+    const newEnd = new Date(`${newStart}T12:00:00`);
+    newEnd.setDate(newEnd.getDate() + durationDays - 1);
+    setPersonCount(previous.personCount);
+    setAddressId(previous.addressId);
+    setActiveAddressId(previous.addressId);
+    setDeliveryTime(previous.deliveryTime.slice(0, 5));
+    setStartDate(newStart);
+    setEndDate(newEnd.toISOString().slice(0, 10));
+    renewalPrefilled.current = true;
+  }, [renewalQuery.data, setActiveAddressId, store]);
 
   const input: SubscriptionInput = {
     storeId,

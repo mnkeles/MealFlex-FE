@@ -152,6 +152,9 @@ export interface Subscription {
   createdAt: string;
   approvalDeadlineAt?: string;
   sellerViewedAt?: string;
+  autoRenew: boolean;
+  renewalPeriodDays: number;
+  lastAutoRenewedAt?: string;
   customerName?: string;
   customerPhone?: string;
   distanceKm?: number;
