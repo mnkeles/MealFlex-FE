@@ -1,5 +1,5 @@
 import { Link, useOutletContext, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { sellerService } from "@/services/sellerService";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -8,6 +8,7 @@ const eventLabels: Record<string, string> = {
   SUBSCRIPTION_APPROVED: "Abonelik onaylandı",
   SUBSCRIPTION_REJECTED: "Talep reddedildi",
   SUBSCRIPTION_CANCELLED: "Müşteri aboneliği iptal etti",
+  SUBSCRIPTION_CANCELLED_BY_SELLER: "İşletme aboneliği iptal etti",
   SUBSCRIPTION_POSTPONED: "Onay süresi dolduğu için tarihler ertelendi",
   SUBSCRIPTION_AUTO_CANCELLED: "Onay süresi dolduğu için talep iptal edildi",
   SUBSCRIPTION_ACTIVATED: "Abonelik başladı",
@@ -24,12 +25,15 @@ function postponedDateChange(oldValue?: string, newValue?: string) {
 }
 
 export default function StoreSubscriptionDetailPage() {
+  const queryClient = useQueryClient();
   const { storeId } = useOutletContext<{ storeId: number }>();
   const { subscriptionId } = useParams<{ subscriptionId: string }>();
   const id = Number(subscriptionId);
   const [activeTab, setActiveTab] = useState<
     "summary" | "deliveries" | "history" | "contact"
   >("summary");
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
   const { data, isLoading } = useQuery({
     queryKey: ["seller-subscription-detail", id],
     queryFn: () => sellerService.getSellerSubscriptionDetail(id),
@@ -39,6 +43,20 @@ export default function StoreSubscriptionDetailPage() {
     queryKey: ["seller-subscription-events", id],
     queryFn: () => sellerService.getSubscriptionEvents(id),
     enabled: Number.isFinite(id),
+  });
+  const cancelMutation = useMutation({
+    mutationFn: () => sellerService.cancelSubscription(id, cancelReason.trim()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["seller-subscription-detail", id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["seller-subscription-events", id],
+      });
+      queryClient.invalidateQueries({ queryKey: ["seller-subscriptions"] });
+      setCancelDialogOpen(false);
+      setCancelReason("");
+    },
   });
 
   if (isLoading)
@@ -64,7 +82,23 @@ export default function StoreSubscriptionDetailPage() {
       </Link>
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Abonelik #{sub.id}</h2>
-        <StatusBadge domain="subscription" status={sub.status} />
+        <div className="flex items-center gap-3">
+          <StatusBadge domain="subscription" status={sub.status} />
+          {["APPROVED", "ACTIVE", "PAYMENT_SUSPENDED"].includes(
+            sub.status,
+          ) && (
+            <button
+              type="button"
+              onClick={() => {
+                cancelMutation.reset();
+                setCancelDialogOpen(true);
+              }}
+              className="rounded-lg border border-danger-200 px-3 py-2 text-sm font-bold text-danger-700 hover:bg-danger-50"
+            >
+              Aboneliği iptal et
+            </button>
+          )}
+        </div>
       </div>
       <div
         role="tablist"
@@ -212,6 +246,60 @@ export default function StoreSubscriptionDetailPage() {
           </div>
         )}
         </section>
+      )}
+      {cancelDialogOpen && (
+        <div
+          className="fixed inset-0 z-[70] grid place-items-center bg-slate-950/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="seller-cancel-title"
+        >
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+            <h3 id="seller-cancel-title" className="text-xl font-black">
+              Aboneliği iptal et
+            </h3>
+            <p className="mt-2 text-sm text-slate-600">
+              Gelecek teslimatlar iptal edilir, tahsil edilmiş kullanılmayan
+              hizmetler otomatik iade edilir ve işlem satıcı performans kaydına
+              eklenir. Bu işlem geri alınamaz.
+            </p>
+            <label className="mt-5 block text-sm font-bold text-slate-700">
+              Müşteriye iletilecek gerekçe
+              <textarea
+                autoFocus
+                rows={4}
+                maxLength={500}
+                value={cancelReason}
+                onChange={(event) => setCancelReason(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-slate-200 p-3 font-normal"
+                placeholder="Örn. Mutfak ekipmanındaki arıza nedeniyle hizmete devam edemiyoruz."
+              />
+            </label>
+            {cancelMutation.isError && (
+              <p className="mt-3 text-sm font-semibold text-danger-700">
+                {(cancelMutation.error as { response?: { data?: { message?: string } } })
+                  .response?.data?.message || "Abonelik iptal edilemedi."}
+              </p>
+            )}
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setCancelDialogOpen(false)}
+                className="rounded-xl px-4 py-2 text-sm font-bold text-slate-700"
+              >
+                Vazgeç
+              </button>
+              <button
+                type="button"
+                onClick={() => cancelMutation.mutate()}
+                disabled={!cancelReason.trim() || cancelMutation.isPending}
+                className="rounded-xl bg-danger-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                İptal ve iadeyi başlat
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

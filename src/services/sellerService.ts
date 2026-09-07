@@ -508,6 +508,13 @@ export const sellerService = {
     return response.data;
   },
 
+  async cancelSubscription(id: number, reason: string): Promise<Subscription> {
+    const response = await api.post(`/v1/seller/subscriptions/${id}/cancel`, {
+      reason,
+    });
+    return response.data;
+  },
+
   async getTodaysDeliveries(storeId: number): Promise<Delivery[]> {
     const response = await api.get(
       `/v1/seller/stores/${storeId}/deliveries/today`,
