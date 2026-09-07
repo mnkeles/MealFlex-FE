@@ -45,14 +45,12 @@ export const subscriptionStatuses: Record<string, UiStatus> = {
 
 export const deliveryStatuses: Record<string, UiStatus> = {
   SCHEDULED: status("Planlandı", "info", "Teslimat sırasını bekliyor."),
-  PENDING: status("Planlandı", "info", "Teslimat sırasını bekliyor."),
   PREPARING: status(
     "Hazırlanıyor",
     "warning",
     "Sipariş mutfakta hazırlanıyor.",
   ),
   IN_TRANSIT: status("Yolda", "info", "Kurye teslimata çıktı."),
-  ON_THE_WAY: status("Yolda", "info", "Kurye teslimata çıktı."),
   DELIVERY_ATTEMPTED: status(
     "Teslim edilemedi",
     "warning",
@@ -72,7 +70,6 @@ export const paymentStatuses: Record<string, UiStatus> = {
   ),
   PROCESSING: status("İşleniyor", "info", "Ödeme işleme alındı."),
   SUCCEEDED: status("Başarılı", "success", "Ödeme alındı."),
-  PAID: status("Ödendi", "success", "Ödeme tamamlandı."),
   FAILED: status("Başarısız", "danger", "Ödeme alınamadı."),
   PARTIALLY_REFUNDED: status(
     "Kısmi iade",

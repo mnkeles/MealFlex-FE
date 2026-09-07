@@ -239,7 +239,7 @@ export interface AdminSellerDocument {
   fileName: string;
   fileUrl: string;
   expiryDate?: string;
-  verificationStatus: "PENDING" | "VERIFIED" | "REJECTED";
+  verificationStatus: "PENDING" | "VERIFIED" | "REJECTED" | "EXPIRED";
   rejectionReason?: string;
   fileSize?: number;
   contentType?: string;

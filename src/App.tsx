@@ -64,6 +64,9 @@ import SellerOnboardingPage from "@/pages/seller/SellerOnboardingPage";
 import SellerSupportPage from "@/pages/seller/SellerSupportPage";
 import SellerAccountSecurityPage from "@/pages/seller/SellerAccountSecurityPage";
 import CourierWorkspacePage from "@/pages/courier/CourierWorkspacePage";
+const AcceptStaffInvitationPage = lazy(
+  () => import("@/pages/staff/AcceptStaffInvitationPage"),
+);
 const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
 const AdminUsersPage = lazy(() => import("@/pages/admin/AdminUsersPage"));
 import AdminUserDetailPage from "@/pages/admin/AdminUserDetailPage";
@@ -214,6 +217,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <CourierWorkspacePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/staff/invitations/accept"
+            element={
+              <ProtectedRoute>
+                <AcceptStaffInvitationPage />
               </ProtectedRoute>
             }
           />

@@ -46,20 +46,19 @@ export default function StoreComplaintsPage() {
   const [page, setPage] = useState(0);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [response, setResponse] = useState("");
-  const [status, setStatus] = useState("IN_REVIEW");
-  const [attachments, setAttachments] = useState("");
+  const [escalate, setEscalate] = useState(false);
   const [slaOnly, setSlaOnly] = useState(false);
   const client = useQueryClient();
   const respond = useMutation({
     mutationFn: ({ id }: { id: number }) =>
       sellerService.respondComplaint(id, {
         response,
-        status,
-        attachmentUrls: attachments,
-        escalate: status === "CLOSED",
+        status: "IN_REVIEW",
+        escalate,
       }),
     onSuccess: () => {
       setEditingId(null);
+      setEscalate(false);
       client.invalidateQueries({ queryKey: ["store-complaints", storeId] });
     },
   });
@@ -193,25 +192,14 @@ export default function StoreComplaintsPage() {
                             className="w-full rounded border p-2 text-sm"
                             rows={3}
                           />
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            <select
-                              value={status}
-                              onChange={(e) => setStatus(e.target.value)}
-                              className="rounded border p-2 text-sm"
-                            >
-                              <option value="IN_REVIEW">İnceleniyor</option>
-                              <option value="RESOLVED">Çözüldü</option>
-                              <option value="CLOSED">
-                                Yöneticiye eskale et / kapat
-                              </option>
-                            </select>
+                          <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
                             <input
-                              value={attachments}
-                              onChange={(e) => setAttachments(e.target.value)}
-                              placeholder="Ek dosya bağlantıları"
-                              className="rounded border p-2 text-sm"
+                              type="checkbox"
+                              checked={escalate}
+                              onChange={(event) => setEscalate(event.target.checked)}
                             />
-                          </div>
+                            Yönetici incelemesine gönder
+                          </label>
                           <p className="mt-3 flex items-start gap-1.5 text-xs text-slate-500">
                             <BellRing className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary-500" />
                             Yanıtı kaydettiğinizde müşteriye uygulama içi
@@ -240,7 +228,7 @@ export default function StoreComplaintsPage() {
                           onClick={() => {
                             setEditingId(c.id);
                             setResponse(c.sellerResponse || "");
-                            setStatus(c.status);
+                            setEscalate(Boolean(c.escalatedAt));
                           }}
                           className="mt-3 text-sm font-bold text-primary-600"
                         >

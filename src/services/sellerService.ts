@@ -87,7 +87,7 @@ export interface DocumentItem {
   fileUrl: string;
   expiryDate?: string;
   verified: boolean;
-  verificationStatus: "PENDING" | "VERIFIED" | "REJECTED";
+  verificationStatus: "PENDING" | "VERIFIED" | "REJECTED" | "EXPIRED";
   rejectionReason?: string;
   fileSize?: number;
   contentType?: string;
@@ -110,6 +110,8 @@ export interface StoreStaff {
   status: string;
   permissions: string[];
   invitationExpiresAt?: string;
+  /** Yalnız davet oluşturma yanıtında bulunur. */
+  invitationToken?: string;
 }
 export interface Campaign {
   id: number;
@@ -274,11 +276,6 @@ export const sellerService = {
     return response.data;
   },
 
-  async getMyStore(): Promise<Store> {
-    const response = await api.get("/v1/seller/store");
-    return response.data;
-  },
-
   async getMyStores(): Promise<Store[]> {
     const response = await api.get("/v1/seller/stores");
     return response.data;
@@ -302,16 +299,6 @@ export const sellerService = {
     return response.data;
   },
 
-  async updateStore(
-    data: StoreAddressPayload & {
-      name: string;
-      description?: string;
-    },
-  ): Promise<Store> {
-    const response = await api.put("/v1/seller/store", data);
-    return response.data;
-  },
-
   async updateStoreById(
     storeId: number,
     data: StoreAddressPayload & {
@@ -328,18 +315,6 @@ export const sellerService = {
     },
   ): Promise<Store> {
     const response = await api.put(`/v1/seller/stores/${storeId}`, data);
-    return response.data;
-  },
-
-  async setBusinessHours(
-    hours: {
-      dayOfWeek: string;
-      open: boolean;
-      openTime?: string;
-      closeTime?: string;
-    }[],
-  ): Promise<BusinessHour[]> {
-    const response = await api.put("/v1/seller/store/business-hours", hours);
     return response.data;
   },
 
@@ -382,13 +357,6 @@ export const sellerService = {
       deliveryTimes.map((deliveryTime) => ({ deliveryTime })),
     );
     return response.data;
-  },
-
-  async addServiceArea(data: {
-    city: string;
-    district: string;
-  }): Promise<void> {
-    await api.post("/v1/seller/store/service-areas", data);
   },
 
   async addServiceAreaForStore(
@@ -540,11 +508,10 @@ export const sellerService = {
     return response.data;
   },
 
-  async getTodaysDeliveries(storeId?: number): Promise<Delivery[]> {
-    const path = storeId
-      ? `/v1/seller/stores/${storeId}/deliveries/today`
-      : "/v1/seller/deliveries/today";
-    const response = await api.get(path);
+  async getTodaysDeliveries(storeId: number): Promise<Delivery[]> {
+    const response = await api.get(
+      `/v1/seller/stores/${storeId}/deliveries/today`,
+    );
     return response.data;
   },
   async getRoutePlan(storeId: number, date: string): Promise<RoutePlan> {
@@ -568,37 +535,6 @@ export const sellerService = {
   },
   async getMenuVersions(id: number): Promise<MenuVersion[]> {
     const response = await api.get(`/v1/seller/menus/${id}/versions`);
-    return response.data;
-  },
-
-  async getDeliveriesByDate(
-    date: string,
-    storeId?: number,
-  ): Promise<Delivery[]> {
-    const path = storeId
-      ? `/v1/seller/stores/${storeId}/deliveries`
-      : "/v1/seller/deliveries";
-    const response = await api.get(path, { params: { date } });
-    return response.data;
-  },
-
-  async markInTransit(id: number, storeId?: number): Promise<Delivery> {
-    const path = storeId
-      ? `/v1/seller/stores/${storeId}/deliveries/${id}/in-transit`
-      : `/v1/seller/deliveries/${id}/in-transit`;
-    const response = await api.post(path);
-    return response.data;
-  },
-
-  async markAsDelivered(
-    id: number,
-    deliveryCode: string,
-    storeId?: number,
-  ): Promise<Delivery> {
-    const path = storeId
-      ? `/v1/seller/stores/${storeId}/deliveries/${id}/deliver`
-      : `/v1/seller/deliveries/${id}/deliver`;
-    const response = await api.post(path, { deliveryCode });
     return response.data;
   },
 
@@ -915,7 +851,6 @@ export const sellerService = {
       response: string;
       status: string;
       escalate?: boolean;
-      attachmentUrls?: string;
     },
   ): Promise<ComplaintItem> {
     const response = await api.patch(
@@ -1016,6 +951,10 @@ export const sellerService = {
   },
   async deactivateStoreStaff(storeId: number, staffId: number): Promise<void> {
     await api.delete(`/v1/seller/stores/${storeId}/staff/${staffId}`);
+  },
+  async acceptStoreStaffInvitation(token: string): Promise<StoreStaff> {
+    const response = await api.post("/v1/staff/invitations/accept", { token });
+    return response.data;
   },
   async getCampaigns(storeId: number): Promise<Campaign[]> {
     return (await api.get(`/v1/seller/stores/${storeId}/campaigns`)).data;

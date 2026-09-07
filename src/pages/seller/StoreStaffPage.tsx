@@ -39,6 +39,7 @@ export default function StoreStaffPage() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("OPERATIONS");
   const [pendingDeactivate, setPendingDeactivate] = useState<number>();
+  const [invitationLink, setInvitationLink] = useState("");
   const { data: staff = [], isLoading } = useQuery({
     queryKey: ["store-staff", storeId],
     queryFn: () => sellerService.getStoreStaff(storeId),
@@ -47,8 +48,13 @@ export default function StoreStaffPage() {
     queryClient.invalidateQueries({ queryKey: ["store-staff", storeId] });
   const invite = useMutation({
     mutationFn: () => sellerService.inviteStoreStaff(storeId, email, role),
-    onSuccess: () => {
+    onSuccess: (member) => {
       setEmail("");
+      setInvitationLink(
+        member.invitationToken
+          ? `${window.location.origin}/staff/invitations/accept?token=${encodeURIComponent(member.invitationToken)}`
+          : "",
+      );
       refresh();
     },
   });
@@ -109,6 +115,19 @@ export default function StoreStaffPage() {
             <p className="mt-3 text-sm text-danger-700">
               Davet oluşturulamadı.
             </p>
+          )}
+          {invitationLink && (
+            <div className="mt-3 rounded-xl border border-success-200 bg-success-50 p-3 text-sm text-success-900">
+              <p className="font-bold">Davet bağlantısı yalnız bir kez gösterilir.</p>
+              <p className="mt-1 break-all text-xs">{invitationLink}</p>
+              <button
+                type="button"
+                className="mt-2 rounded-lg border border-success-300 bg-white px-3 py-1.5 text-xs font-bold"
+                onClick={() => navigator.clipboard.writeText(invitationLink)}
+              >
+                Bağlantıyı kopyala
+              </button>
+            </div>
           )}
         </form>
         <aside className="rounded-xl border border-primary-100 bg-primary-50 p-4">

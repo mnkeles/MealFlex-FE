@@ -206,7 +206,6 @@ export interface CustomerComplaint {
   status: import("@/constants/complaintStatus").ComplaintStatus;
   response?: string;
   sellerResponse?: string;
-  customerMessage?: string;
   resolutionType?:
     | "NO_COMPENSATION"
     | "FULL_REFUND"
