@@ -27,6 +27,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 import Drawer from "@/components/ui/Drawer";
+import PersonCountSelector from "@/components/subscription/PersonCountSelector";
 
 const steps = [
   "Menü",
@@ -712,41 +713,12 @@ export default function CreateSubscriptionPage() {
                     </p>
                   </div>
                 </div>
-                <div className="mt-10 flex items-center justify-center gap-5">
-                  <button
-                    onClick={() =>
-                      setPersonCount((value) =>
-                        Math.max(
-                          store.effectiveMinPersonCount ?? store.minPersonCount,
-                          value - 1,
-                        ),
-                      )
-                    }
-                    className="grid h-12 w-12 place-items-center rounded-full border text-2xl font-light"
-                  >
-                    −
-                  </button>
-                  <input
-                    type="number"
-                    min={store.effectiveMinPersonCount ?? store.minPersonCount}
-                    max={store.maxPersonCount || 999}
-                    value={personCount}
-                    onChange={(event) =>
-                      setPersonCount(Number(event.target.value))
-                    }
-                    className="w-28 border-0 text-center text-5xl font-black outline-none"
-                  />
-                  <button
-                    onClick={() =>
-                      setPersonCount((value) =>
-                        Math.min(store.maxPersonCount || 999, value + 1),
-                      )
-                    }
-                    className="grid h-12 w-12 place-items-center rounded-full bg-slate-900 text-2xl font-light text-white"
-                  >
-                    +
-                  </button>
-                </div>
+                <PersonCountSelector
+                  value={personCount}
+                  minimum={store.effectiveMinPersonCount ?? store.minPersonCount}
+                  maximum={store.maxPersonCount || 999}
+                  onChange={setPersonCount}
+                />
                 {store.maxPersonCount && (
                   <p className="mt-5 text-center text-sm text-slate-500">
                     Maksimum {store.maxPersonCount} kişi

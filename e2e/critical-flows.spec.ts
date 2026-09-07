@@ -9,6 +9,55 @@ async function loginAs(page: Page, role: 'CUSTOMER' | 'SELLER' | 'ADMIN') {
 }
 const json = (route: Route, body: unknown) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) })
 
+test('kurye davetini kabul eder, atanan teslimatı çalışma alanında görür', async ({ page }) => {
+  await loginAs(page, 'CUSTOMER')
+  let invitationAccepted = false
+  let assigned = false
+  await page.route('**/api/v1/staff/invitations/accept', async route => {
+    invitationAccepted = true
+    return json(route, { id: 7, email: 'kurye@mealflex.local', role: 'COURIER', status: 'ACTIVE', permissions: ['DELIVERY_VIEW', 'DELIVERY_UPDATE'] })
+  })
+  await page.route('**/api/v1/seller/stores/5/couriers/deliveries/20', async route => {
+    assigned = route.request().method() === 'PATCH'
+    return route.fulfill({ status: 204, body: '' })
+  })
+  await page.route('**/api/v1/courier/deliveries/today', route => json(route, assigned ? [{
+    id: 20,
+    subscriptionId: 11,
+    deliveryDate: '2026-09-08',
+    deliveryTime: '12:30',
+    personCount: 8,
+    menuId: 4,
+    addressId: 6,
+    menuName: 'Kurumsal Öğle Menüsü',
+    deliveryAddress: 'Yenimahalle, Ankara',
+    deliveryAddressDetails: 'Test Caddesi No: 1 · Yenimahalle · Ankara',
+    courierId: 9,
+    courierName: 'Test Kurye',
+    routeSequence: 1,
+    status: 'SCHEDULED',
+  }] : []))
+
+  await page.goto('/staff/invitations/accept?token=tek-kullanimlik-token')
+  await page.getByRole('button', { name: 'Daveti kabul et' }).click()
+  await expect(page.getByText('Davet kabul edildi')).toBeVisible()
+  expect(invitationAccepted).toBeTruthy()
+
+  await page.evaluate(async () => {
+    await fetch('/api/v1/seller/stores/5/couriers/deliveries/20', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ courierId: 9, routeSequence: 1 }),
+    })
+  })
+  expect(assigned).toBeTruthy()
+  await page.getByRole('link', { name: 'Kurye çalışma alanına git' }).click()
+  await expect(page).toHaveURL(/\/courier$/)
+  await expect(page.getByRole('heading', { name: 'Bugünkü rotam' })).toBeVisible()
+  await expect(page.getByText('Kurumsal Öğle Menüsü')).toBeVisible()
+  await expect(page.getByText(/Test Caddesi No: 1/)).toBeVisible()
+})
+
 test('giriş ve kayıt formları alan bazlı Zod doğrulaması gösterir ve klavyeyle kullanılabilir', async ({ page }) => {
   await page.goto('/login')
   await page.getByRole('button', { name: 'Giriş Yap', exact: true }).click()
