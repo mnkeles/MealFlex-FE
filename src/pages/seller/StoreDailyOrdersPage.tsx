@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useOutletContext } from "react-router-dom";
 import {
   AlertTriangle,
+  CalendarClock,
   CheckCircle2,
   Clock3,
   CookingPot,
@@ -32,6 +33,7 @@ const deliveryStatusOptions: DeliveryStatus[] = [
 ];
 
 type DialogState = { delivery: Delivery; target: DeliveryStatus };
+type CompensationDialogState = { delivery: Delivery };
 
 const emptyForm = {
   estimatedDeliveryAt: "",
@@ -52,6 +54,12 @@ export default function StoreDailyOrdersPage() {
   const queryClient = useQueryClient();
   const { storeId } = useOutletContext<{ storeId: number }>();
   const [dialog, setDialog] = useState<DialogState>();
+  const [compensationDialog, setCompensationDialog] =
+    useState<CompensationDialogState>();
+  const [compensationForm, setCompensationForm] = useState({
+    deliveryDate: "",
+    deliveryTime: "",
+  });
   const [form, setForm] = useState(emptyForm);
   const [statusFilter, setStatusFilter] = useState<"ALL" | DeliveryStatus>(
     "ALL",
@@ -69,6 +77,11 @@ export default function StoreDailyOrdersPage() {
     enabled: !!storeId,
   });
   const deliveries = useMemo(() => deliveriesQuery.data ?? [], [deliveriesQuery.data]);
+  const deliverySlotsQuery = useQuery({
+    queryKey: ["seller-delivery-slots", storeId],
+    queryFn: () => sellerService.getDeliverySlots(storeId),
+    enabled: !!storeId,
+  });
   const { data: routePlan } = useQuery({
     queryKey: ["seller-route-plan", storeId],
     queryFn: () =>
@@ -101,6 +114,30 @@ export default function StoreDailyOrdersPage() {
       queryClient.invalidateQueries({
         queryKey: ["seller-deliveries-today", storeId],
       }),
+  });
+  const compensationMutation = useMutation({
+    mutationFn: ({
+      deliveryId,
+      deliveryDate,
+      deliveryTime,
+    }: {
+      deliveryId: number;
+      deliveryDate: string;
+      deliveryTime: string;
+    }) =>
+      sellerService.rescheduleFailedDelivery(
+        storeId,
+        deliveryId,
+        deliveryDate,
+        deliveryTime,
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["seller-deliveries-today", storeId],
+      });
+      setCompensationDialog(undefined);
+      setCompensationForm({ deliveryDate: "", deliveryTime: "" });
+    },
   });
   const courierOptions = useMemo(
     () => [
@@ -188,6 +225,22 @@ export default function StoreDailyOrdersPage() {
           ? Number(form.courierLongitude)
           : undefined,
       },
+    });
+  };
+  const openCompensationDialog = (delivery: Delivery) => {
+    setCompensationForm({
+      deliveryDate: delivery.suggestedCompensationDate || "",
+      deliveryTime: delivery.deliveryTime.slice(0, 5),
+    });
+    setCompensationDialog({ delivery });
+    compensationMutation.reset();
+  };
+  const submitCompensation = () => {
+    if (!compensationDialog) return;
+    compensationMutation.mutate({
+      deliveryId: compensationDialog.delivery.id,
+      deliveryDate: compensationForm.deliveryDate,
+      deliveryTime: compensationForm.deliveryTime,
     });
   };
 
@@ -500,6 +553,21 @@ export default function StoreDailyOrdersPage() {
                         {delivery.failureReason}
                       </p>
                     )}
+                    {delivery.compensationStatus === "OFFERED" && (
+                      <p className="mt-2 flex items-center gap-1 text-xs font-semibold text-info-700">
+                        <CalendarClock className="h-3.5 w-3.5" />
+                        Telafi bekliyor
+                        {delivery.suggestedCompensationDate
+                          ? ` · Önerilen gün: ${new Date(`${delivery.suggestedCompensationDate}T00:00:00`).toLocaleDateString("tr-TR")}`
+                          : ""}
+                      </p>
+                    )}
+                    {delivery.compensationStatus === "RESCHEDULED" && (
+                      <p className="mt-2 flex items-center gap-1 text-xs font-semibold text-success-700">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Telafi teslimatı
+                        planlandı
+                      </p>
+                    )}
                     {delivery.notes && (
                       <p className="mt-1 text-xs text-info-600">
                         Not: {delivery.notes}
@@ -597,6 +665,15 @@ export default function StoreDailyOrdersPage() {
                         </button>
                       </>
                     )}
+                    {delivery.status === "FAILED" &&
+                      delivery.compensationStatus === "OFFERED" && (
+                        <button
+                          onClick={() => openCompensationDialog(delivery)}
+                          className="flex items-center gap-1 rounded-lg bg-info-600 px-4 py-2 text-sm font-medium text-white"
+                        >
+                          <CalendarClock className="h-4 w-4" /> Telafiyi planla
+                        </button>
+                      )}
                   </div>
                 </div>
               </div>
@@ -754,6 +831,88 @@ export default function StoreDailyOrdersPage() {
                 {requiresDeliveryCode
                   ? "Teslim edildi olarak işaretle"
                   : "Durumu güncelle"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {compensationDialog && (
+        <div
+          className="fixed inset-0 z-[70] grid place-items-center bg-slate-950/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="compensation-dialog-title"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            <h3 id="compensation-dialog-title" className="text-xl font-black">
+              Ücretsiz telafi teslimatı
+            </h3>
+            <p className="mt-1 text-sm text-slate-500">
+              #{compensationDialog.delivery.id} numaralı başarısız teslimat için
+              müşteriden ek ücret alınmadan yeni gün ve saat seçin.
+            </p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <label className="text-xs font-bold text-slate-600">
+                Telafi günü
+                <input
+                  type="date"
+                  min={new Date(Date.now() + 86_400_000)
+                    .toISOString()
+                    .slice(0, 10)}
+                  value={compensationForm.deliveryDate}
+                  onChange={(event) =>
+                    setCompensationForm({
+                      ...compensationForm,
+                      deliveryDate: event.target.value,
+                    })
+                  }
+                  className="mt-1 h-11 w-full rounded-xl border px-3 text-sm font-normal"
+                />
+              </label>
+              <label className="text-xs font-bold text-slate-600">
+                Teslimat saati
+                <select
+                  value={compensationForm.deliveryTime}
+                  onChange={(event) =>
+                    setCompensationForm({
+                      ...compensationForm,
+                      deliveryTime: event.target.value,
+                    })
+                  }
+                  className="mt-1 h-11 w-full rounded-xl border px-3 text-sm font-normal"
+                >
+                  <option value="">Saat seçin</option>
+                  {(deliverySlotsQuery.data ?? []).map((slot) => (
+                    <option key={slot.id} value={slot.deliveryTime.slice(0, 5)}>
+                      {slot.deliveryTime.slice(0, 5)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            {compensationMutation.isError && (
+              <p className="mt-3 text-sm font-semibold text-danger-600">
+                {errorMessage(compensationMutation.error)}
+              </p>
+            )}
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                onClick={() => setCompensationDialog(undefined)}
+                className="rounded-xl px-4 py-2 text-sm font-bold"
+              >
+                Vazgeç
+              </button>
+              <button
+                onClick={submitCompensation}
+                disabled={
+                  !compensationForm.deliveryDate ||
+                  !compensationForm.deliveryTime ||
+                  compensationMutation.isPending
+                }
+                className="rounded-xl bg-info-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                Telafiyi planla
               </button>
             </div>
           </div>

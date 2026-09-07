@@ -261,6 +261,9 @@ export interface Delivery {
   delayMinutes?: number;
   courierLatitude?: number;
   courierLongitude?: number;
+  compensationStatus?: "OFFERED" | "RESCHEDULED";
+  suggestedCompensationDate?: string;
+  makeupSourceDeliveryId?: number;
 }
 
 export interface Page<T> {

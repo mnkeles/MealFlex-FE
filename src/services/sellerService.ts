@@ -550,6 +550,19 @@ export const sellerService = {
     return response.data;
   },
 
+  async rescheduleFailedDelivery(
+    storeId: number,
+    deliveryId: number,
+    deliveryDate: string,
+    deliveryTime: string,
+  ): Promise<Delivery> {
+    const response = await api.post(
+      `/v1/seller/stores/${storeId}/deliveries/${deliveryId}/reschedule`,
+      { deliveryDate, deliveryTime },
+    );
+    return response.data;
+  },
+
   async getProductionSummary(
     storeId: number,
     startDate: string,
