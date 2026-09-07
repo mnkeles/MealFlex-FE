@@ -90,6 +90,11 @@ export default function PaymentsPage({
                       {method.expiryYear}
                       {method.defaultMethod ? " · Varsayılan" : ""}
                     </p>
+                    {method.expiringSoon && (
+                      <p className="mt-1 text-xs font-bold text-warning-700">
+                        Kartınızın süresi yakında dolacak
+                      </p>
+                    )}
                   </div>
                   <button
                     aria-label="Kartı sil"
@@ -107,6 +112,12 @@ export default function PaymentsPage({
               queryClient.invalidateQueries({ queryKey: ["payment-methods"] })
             }
           />
+          {remove.isError && (
+            <p className="mt-3 rounded-xl bg-danger-50 p-3 text-sm font-semibold text-danger-700">
+              Bu kart aktif bir abonelikte kullanılıyor olabilir. Önce ilgili
+              aboneliğin ödeme yöntemini değiştirin.
+            </p>
+          )}
         </section>
       )}
       {showHistory && (

@@ -193,6 +193,7 @@ export default function SubscriptionDetailPage() {
     description: "",
   });
   const [message, setMessage] = useState("");
+  const [newPaymentMethodId, setNewPaymentMethodId] = useState<number>();
   const [skipDeliveryId, setSkipDeliveryId] = useState<number>();
   const [showFreeze, setShowFreeze] = useState(false);
   const [freezeForm, setFreezeForm] = useState({
@@ -228,6 +229,10 @@ export default function SubscriptionDetailPage() {
     queryFn: () => paymentService.summary(id),
     enabled: !!id,
   });
+  const { data: paymentMethods = [] } = useQuery({
+    queryKey: ["payment-methods"],
+    queryFn: paymentService.methods,
+  });
   const refresh = () => {
     queryClient.invalidateQueries({ queryKey: ["subscription", id] });
     queryClient.invalidateQueries({ queryKey: ["subscription-events", id] });
@@ -239,12 +244,28 @@ export default function SubscriptionDetailPage() {
   };
   const retryPayment = useMutation({
     mutationFn: (paymentId: number) => paymentService.retry(paymentId),
-    onSuccess: () => {
-      setMessage("Ödeme başarıyla alındı.");
+    onSuccess: (payment) => {
+      setMessage(
+        payment.status === "SUCCEEDED"
+          ? "Ödeme başarıyla alındı."
+          : "Ödeme tekrar alınamadı. Kartınızı değiştirebilir veya yeniden deneyebilirsiniz.",
+      );
       refresh();
     },
     onError: () =>
       setMessage("Ödeme tekrar alınamadı. Kartınızı kontrol edin."),
+  });
+  const changePaymentMethod = useMutation({
+    mutationFn: (paymentMethodId: number) =>
+      subscriptionService.changePaymentMethod(id, paymentMethodId),
+    onSuccess: (method) => {
+      setNewPaymentMethodId(undefined);
+      setMessage(
+        `Ödeme yöntemi ${method.brand} •••• ${method.lastFour} olarak güncellendi.`,
+      );
+      refresh();
+    },
+    onError: () => setMessage("Ödeme yöntemi güncellenemedi."),
   });
   const skipDelivery = useMutation({
     mutationFn: (deliveryId: number) =>
@@ -841,6 +862,58 @@ export default function SubscriptionDetailPage() {
                       {paymentSummary.payment.failureMessage}
                     </p>
                   )}
+                </div>
+              )}
+              {["PENDING_APPROVAL", "APPROVED", "ACTIVE", "PAYMENT_SUSPENDED"].includes(
+                sub.status,
+              ) && (
+                <div className="mt-4 rounded-2xl border border-slate-200 p-4">
+                  <label
+                    htmlFor="subscription-payment-method"
+                    className="text-sm font-bold text-slate-700"
+                  >
+                    Aboneliğin ödeme yöntemini değiştir
+                  </label>
+                  <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                    <select
+                      id="subscription-payment-method"
+                      value={newPaymentMethodId ?? ""}
+                      onChange={(event) =>
+                        setNewPaymentMethodId(
+                          event.target.value
+                            ? Number(event.target.value)
+                            : undefined,
+                        )
+                      }
+                      className="min-h-11 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-sm"
+                    >
+                      <option value="">Yeni kartı seçin</option>
+                      {paymentMethods.map((method) => (
+                        <option key={method.id} value={method.id}>
+                          {method.brand} •••• {method.lastFour} · {method.expiryMonth}/
+                          {method.expiryYear}
+                          {method.expiringSoon ? " · Süresi yakında dolacak" : ""}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      disabled={!newPaymentMethodId || changePaymentMethod.isPending}
+                      onClick={() =>
+                        newPaymentMethodId &&
+                        changePaymentMethod.mutate(newPaymentMethodId)
+                      }
+                      className="min-h-11 rounded-xl bg-slate-900 px-4 text-sm font-bold text-white disabled:opacity-40"
+                    >
+                      Kartı güncelle
+                    </button>
+                  </div>
+                  <Link
+                    to="/payment-methods"
+                    className="mt-2 inline-block text-xs font-bold text-primary-700 underline"
+                  >
+                    Yeni kart ekle
+                  </Link>
                 </div>
               )}
               {paymentSummary.refunds.map((refund) => (

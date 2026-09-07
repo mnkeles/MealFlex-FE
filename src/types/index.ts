@@ -118,6 +118,7 @@ export type SubscriptionStatus =
   | "PENDING_APPROVAL"
   | "APPROVED"
   | "ACTIVE"
+  | "PAYMENT_SUSPENDED"
   | "REJECTED"
   | "POSTPONED"
   | "COMPLETED"

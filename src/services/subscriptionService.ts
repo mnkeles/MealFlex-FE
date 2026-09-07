@@ -1,4 +1,5 @@
 import api from "./api";
+import type { PaymentMethod } from "./paymentService";
 import type {
   Subscription,
   SubscriptionStatus,
@@ -103,6 +104,17 @@ export const subscriptionService = {
   async getSubscription(id: number): Promise<CustomerSubscriptionDetail> {
     const response = await api.get(`/v1/subscriptions/${id}`);
     return response.data;
+  },
+
+  async changePaymentMethod(
+    subscriptionId: number,
+    paymentMethodId: number,
+  ): Promise<PaymentMethod> {
+    return (
+      await api.patch(`/v1/subscriptions/${subscriptionId}/payment-method`, {
+        paymentMethodId,
+      })
+    ).data;
   },
 
   async getSubscriptionEvents(id: number): Promise<SubscriptionEvent[]> {

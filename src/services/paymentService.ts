@@ -7,6 +7,7 @@ export interface PaymentMethod {
   expiryMonth: number;
   expiryYear: number;
   defaultMethod: boolean;
+  expiringSoon?: boolean;
 }
 export interface Payment {
   id: number;

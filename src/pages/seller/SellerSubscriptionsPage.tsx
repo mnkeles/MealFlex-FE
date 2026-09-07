@@ -37,6 +37,7 @@ export default function SellerSubscriptionsPage() {
     { label: "Onay Bekleyen", value: "PENDING_APPROVAL" },
     { label: "Onaylanan", value: "APPROVED" },
     { label: "Aktif", value: "ACTIVE" },
+    { label: "Ödeme bekleyen", value: "PAYMENT_SUSPENDED" },
     { label: "Tümü", value: undefined },
   ];
 

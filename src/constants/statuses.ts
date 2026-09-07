@@ -33,6 +33,11 @@ export const subscriptionStatuses: Record<string, UiStatus> = {
   ),
   APPROVED: status("Onaylandı", "info", "İlk teslimat için hazırlanıyor."),
   ACTIVE: status("Devam ediyor", "success", "Abonelik aktif."),
+  PAYMENT_SUSPENDED: status(
+    "Ödeme bekleniyor",
+    "danger",
+    "Haftalık ödeme tamamlanana kadar teslimatlar beklemede.",
+  ),
   POSTPONED: status("Ertelendi", "warning", "Teslimat planı ertelendi."),
   COMPLETED: status("Tamamlandı", "neutral", "Abonelik süresi tamamlandı."),
   CANCELLED: status("İptal edildi", "danger", "Abonelik sonlandırıldı."),
