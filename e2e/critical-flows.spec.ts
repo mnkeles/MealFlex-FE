@@ -322,6 +322,38 @@ test('teslimat durum penceresi erişilebilir, Escape ile kapanır ve odağı ger
   await expect(opener).toBeFocused()
 })
 
+test('satıcı teslimat konumunu cihazdan alır ve koordinatları gelişmiş alanda tutar', async ({ page }) => {
+  await loginAs(page, 'SELLER')
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'geolocation', {
+      configurable: true,
+      value: {
+        getCurrentPosition: (success: PositionCallback) => success({ coords: { latitude: 39.933365, longitude: 32.859742 } } as GeolocationPosition),
+      },
+    })
+  })
+  const delivery = { id: 25, subscriptionId: 1, deliveryDate: '2026-09-08', deliveryTime: '12:30', personCount: 8, menuName: 'Kurumsal Menü', customerName: 'Test Müşteri', deliveryAddress: 'Ankara', status: 'DELIVERY_ATTEMPTED', failureReason: 'Adres kapalı' }
+  await page.route('**/api/**', route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/v1/seller/stores/2')) return json(route, { id: 2, name: 'Test Mutfağı', status: 'ACTIVE', temporarilyClosed: false, rating: 5, reviewCount: 1, categories: [], availableDeliveryTimes: [] })
+    if (path.endsWith('/v1/seller/stores/2/deliveries/today')) return json(route, [delivery])
+    if (path.endsWith('/v1/seller/stores/2/deliveries/route-plan')) return json(route, { method: '', stops: [] })
+    if (path.endsWith('/v1/seller/stores/2/delivery-slots')) return json(route, [])
+    if (path.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/seller/stores/2/operations')
+  await page.getByRole('button', { name: 'Yeniden dene' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Yolda' })
+  await expect(dialog.getByLabel('Kurye enlemi')).toBeHidden()
+  await dialog.getByRole('button', { name: 'Konumumu kullan' }).click()
+  await expect(dialog.getByText('Konumunuz teslimat kaydına eklendi.')).toBeVisible()
+  await dialog.getByText('Gelişmiş konum bilgileri').click()
+  await expect(dialog.getByLabel('Kurye enlemi')).toHaveValue('39.933365')
+  await expect(dialog.getByLabel('Kurye boylamı')).toHaveValue('32.859742')
+})
+
 test('toplu teslimat güncellemesi onay ister ve kısmi hata sonucunu açıklar', async ({ page }) => {
   await loginAs(page, 'SELLER')
   const deliveries = [20, 21, 22].map(id => ({ id, subscriptionId: id, deliveryDate: '2026-09-08', deliveryTime: '12:30', personCount: 8, menuName: 'Kurumsal Menü', customerName: `Müşteri ${id}`, deliveryAddress: 'Ankara', status: 'SCHEDULED' }))

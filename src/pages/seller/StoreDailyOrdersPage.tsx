@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Clock3,
   CookingPot,
+  LocateFixed,
   MapPin,
   Printer,
   Truck,
@@ -98,6 +99,8 @@ export default function StoreDailyOrdersPage() {
   const [presentation, setPresentation] = useState<"LIST" | "KANBAN">("LIST");
   const [bulkDialog, setBulkDialog] = useState<BulkDialogState>();
   const [bulkResult, setBulkResult] = useState<BulkResult>();
+  const [locationPending, setLocationPending] = useState(false);
+  const [locationMessage, setLocationMessage] = useState("");
 
   const deliveriesQuery = useQuery({
     queryKey: ["seller-deliveries-today", storeId],
@@ -300,7 +303,37 @@ export default function StoreDailyOrdersPage() {
       courierLongitude: delivery.courierLongitude?.toString() || "",
     });
     setDialog({ delivery, target });
+    setLocationMessage("");
+    setLocationPending(false);
     updateMutation.reset();
+  };
+  const useCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationMessage("Bu cihaz konum paylaşımını desteklemiyor.");
+      return;
+    }
+    setLocationPending(true);
+    setLocationMessage("");
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setForm((current) => ({
+          ...current,
+          courierLatitude: coords.latitude.toFixed(6),
+          courierLongitude: coords.longitude.toFixed(6),
+        }));
+        setLocationPending(false);
+        setLocationMessage("Konumunuz teslimat kaydına eklendi.");
+      },
+      (error) => {
+        setLocationPending(false);
+        setLocationMessage(
+          error.code === error.PERMISSION_DENIED
+            ? "Konum izni verilmedi. Tarayıcı izinlerini kontrol edin."
+            : "Konum alınamadı. Bağlantınızı kontrol edip tekrar deneyin.",
+        );
+      },
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 30_000 },
+    );
   };
   const submitDialog = () => {
     if (!dialog) return;
@@ -1002,38 +1035,63 @@ export default function StoreDailyOrdersPage() {
               )}
               {(dialog.target === "IN_TRANSIT" ||
                 dialog.target === "DELIVERY_ATTEMPTED") && (
-                <>
-                  <label className="text-xs font-bold text-slate-600">
-                    Kurye enlemi
-                    <input
-                      type="number"
-                      step="any"
-                      value={form.courierLatitude}
-                      onChange={(event) =>
-                        setForm({
-                          ...form,
-                          courierLatitude: event.target.value,
-                        })
-                      }
-                      className="mt-1 h-11 w-full rounded-xl border px-3 text-sm font-normal"
-                    />
-                  </label>
-                  <label className="text-xs font-bold text-slate-600">
-                    Kurye boylamı
-                    <input
-                      type="number"
-                      step="any"
-                      value={form.courierLongitude}
-                      onChange={(event) =>
-                        setForm({
-                          ...form,
-                          courierLongitude: event.target.value,
-                        })
-                      }
-                      className="mt-1 h-11 w-full rounded-xl border px-3 text-sm font-normal"
-                    />
-                  </label>
-                </>
+                <div className="sm:col-span-2">
+                  <button
+                    type="button"
+                    onClick={useCurrentLocation}
+                    disabled={locationPending}
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-info-200 bg-info-50 text-sm font-bold text-info-800 disabled:opacity-50"
+                  >
+                    <LocateFixed className="h-4 w-4" aria-hidden="true" />
+                    {locationPending ? "Konum alınıyor..." : "Konumumu kullan"}
+                  </button>
+                  {locationMessage && (
+                    <p
+                      role="status"
+                      aria-live="polite"
+                      className="mt-2 text-xs font-semibold text-slate-600"
+                    >
+                      {locationMessage}
+                    </p>
+                  )}
+                  <details className="mt-3 rounded-xl border border-slate-200 bg-slate-50">
+                    <summary className="cursor-pointer px-3 py-2.5 text-xs font-bold text-slate-600">
+                      Gelişmiş konum bilgileri
+                    </summary>
+                    <div className="grid gap-3 border-t border-slate-200 p-3 sm:grid-cols-2">
+                      <label className="text-xs font-bold text-slate-600">
+                        Kurye enlemi
+                        <input
+                          type="number"
+                          step="any"
+                          value={form.courierLatitude}
+                          onChange={(event) =>
+                            setForm({
+                              ...form,
+                              courierLatitude: event.target.value,
+                            })
+                          }
+                          className="mt-1 h-11 w-full rounded-xl border bg-white px-3 text-sm font-normal"
+                        />
+                      </label>
+                      <label className="text-xs font-bold text-slate-600">
+                        Kurye boylamı
+                        <input
+                          type="number"
+                          step="any"
+                          value={form.courierLongitude}
+                          onChange={(event) =>
+                            setForm({
+                              ...form,
+                              courierLongitude: event.target.value,
+                            })
+                          }
+                          className="mt-1 h-11 w-full rounded-xl border bg-white px-3 text-sm font-normal"
+                        />
+                      </label>
+                    </div>
+                  </details>
+                </div>
               )}
               <label className="text-xs font-bold text-slate-600 sm:col-span-2">
                 Operasyon notu
