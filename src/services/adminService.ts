@@ -204,6 +204,20 @@ export interface AdminPayout {
   scheduledAt?: string;
   paidAt?: string;
 }
+export interface CommissionRule {
+  id: number;
+  storeId?: number;
+  storeName: string;
+  commissionRate: number;
+  commissionVatRate: number;
+  effectiveFrom: string;
+  effectiveTo?: string;
+  active: boolean;
+}
+export interface PlatformSettings {
+  SUBSCRIPTION_APPROVAL_SLA_HOURS: number;
+  MIN_SUBSCRIPTION_SERVICE_DAYS: number;
+}
 
 export interface AdminComplaintContext {
   delivery?: { id: number; date: string; time: string; status: string };
@@ -509,6 +523,44 @@ export const adminService = {
       .get<Blob>(`/v1/admin/payouts/${id}/statement`, {
         responseType: "blob",
       })
+      .then((r) => r.data),
+  getCommissionRules: () =>
+    api
+      .get<CommissionRule[]>(
+        "/v1/admin/platform-configuration/commission-rules",
+      )
+      .then((r) => r.data),
+  createCommissionRule: (
+    data: {
+      storeId?: number;
+      commissionRate: number;
+      commissionVatRate: number;
+      effectiveFrom: string;
+    },
+    reauthToken: string,
+  ) =>
+    api
+      .post<CommissionRule>(
+        "/v1/admin/platform-configuration/commission-rules",
+        data,
+        { headers: { "X-Reauth-Token": reauthToken } },
+      )
+      .then((r) => r.data),
+  getPlatformSettings: () =>
+    api
+      .get<PlatformSettings>("/v1/admin/platform-configuration/settings")
+      .then((r) => r.data),
+  updatePlatformSetting: (
+    key: keyof PlatformSettings,
+    value: number,
+    reauthToken: string,
+  ) =>
+    api
+      .put<PlatformSettings>(
+        `/v1/admin/platform-configuration/settings/${key}`,
+        { value },
+        { headers: { "X-Reauth-Token": reauthToken } },
+      )
       .then((r) => r.data),
   getFinanceReconciliations: () =>
     api

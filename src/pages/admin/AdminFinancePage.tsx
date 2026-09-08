@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Landmark, Search, WalletCards } from "lucide-react";
+import { Landmark, Search, Settings, WalletCards } from "lucide-react";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import {
   adminService,
@@ -26,7 +26,7 @@ const money = (value: number) =>
 export default function AdminFinancePage() {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<
-    "payments" | "refunds" | "disputes" | "payouts"
+    "payments" | "refunds" | "disputes" | "payouts" | "configuration"
   >("payments");
   const [search, setSearch] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
@@ -37,6 +37,17 @@ export default function AdminFinancePage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [payoutToPay, setPayoutToPay] = useState<AdminPayout | null>(null);
   const [payoutPassword, setPayoutPassword] = useState("");
+  const [configurationPassword, setConfigurationPassword] = useState("");
+  const [commissionForm, setCommissionForm] = useState({
+    storeId: "",
+    commissionPercent: "12",
+    vatPercent: "20",
+    effectiveFrom: new Date().toISOString().slice(0, 10),
+  });
+  const [settingForm, setSettingForm] = useState({
+    approvalHours: "72",
+    minimumServiceDays: "5",
+  });
   const payments = useQuery({
     queryKey: ["admin-payments", appliedSearch],
     queryFn: () =>
@@ -47,6 +58,23 @@ export default function AdminFinancePage() {
     queryFn: adminService.getPayouts,
     enabled: tab === "payouts",
   });
+  const commissionRules = useQuery({
+    queryKey: ["admin-commission-rules"],
+    queryFn: adminService.getCommissionRules,
+    enabled: tab === "configuration",
+  });
+  const platformSettings = useQuery({
+    queryKey: ["admin-platform-settings"],
+    queryFn: adminService.getPlatformSettings,
+    enabled: tab === "configuration",
+  });
+  useEffect(() => {
+    if (!platformSettings.data) return;
+    setSettingForm({
+      approvalHours: String(platformSettings.data.SUBSCRIPTION_APPROVAL_SLA_HOURS),
+      minimumServiceDays: String(platformSettings.data.MIN_SUBSCRIPTION_SERVICE_DAYS),
+    });
+  }, [platformSettings.data]);
   const refund = useMutation({
     mutationFn: async () =>
       adminService.refundPayment(
@@ -76,6 +104,44 @@ export default function AdminFinancePage() {
       setPayoutPassword("");
     },
   });
+  const saveCommission = useMutation({
+    mutationFn: async () =>
+      adminService.createCommissionRule(
+        {
+          storeId: commissionForm.storeId
+            ? Number(commissionForm.storeId)
+            : undefined,
+          commissionRate: Number(commissionForm.commissionPercent) / 100,
+          commissionVatRate: Number(commissionForm.vatPercent) / 100,
+          effectiveFrom: commissionForm.effectiveFrom,
+        },
+        await accountService.reauthenticate(configurationPassword),
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-commission-rules"] });
+      setConfigurationPassword("");
+    },
+  });
+  const saveSettings = useMutation({
+    mutationFn: async () => {
+      const approvalToken = await accountService.reauthenticate(configurationPassword);
+      await adminService.updatePlatformSetting(
+        "SUBSCRIPTION_APPROVAL_SLA_HOURS",
+        Number(settingForm.approvalHours),
+        approvalToken,
+      );
+      const serviceDayToken = await accountService.reauthenticate(configurationPassword);
+      return adminService.updatePlatformSetting(
+        "MIN_SUBSCRIPTION_SERVICE_DAYS",
+        Number(settingForm.minimumServiceDays),
+        serviceDayToken,
+      );
+    },
+    onSuccess: (values) => {
+      queryClient.setQueryData(["admin-platform-settings"], values);
+      setConfigurationPassword("");
+    },
+  });
   const downloadStatement = async (item: AdminPayout) => {
     const blob = await adminService.getPayoutStatement(item.id);
     const url = URL.createObjectURL(blob);
@@ -98,6 +164,7 @@ export default function AdminFinancePage() {
     { value: "refunds", label: "İadeler", icon: WalletCards },
     { value: "disputes", label: "Uyuşmazlıklar", icon: WalletCards },
     { value: "payouts", label: "Hakedişler", icon: Landmark },
+    { value: "configuration", label: "Platform ayarları", icon: Settings },
   ];
   const visiblePayments = (payments.data?.content || []).filter((item) =>
     tab === "refunds"
@@ -128,7 +195,7 @@ export default function AdminFinancePage() {
           );
         })}
       </div>
-      {tab !== "payouts" && (
+      {tab !== "payouts" && tab !== "configuration" && (
         <>
           {payments.isError ? (
             <EmptyState
@@ -384,6 +451,163 @@ export default function AdminFinancePage() {
             </table>
           </div>
         ))}
+      {tab === "configuration" && (
+        <div className="grid gap-6 xl:grid-cols-2">
+          <section className="mf-surface p-6">
+            <h2 className="text-lg font-black">Platform kuralları</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Değişiklikler yalnız yeni abonelik taleplerine uygulanır.
+            </p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <label className="mf-label">
+                Satıcı onay süresi (saat)
+                <input
+                  type="number"
+                  min={1}
+                  max={168}
+                  value={settingForm.approvalHours}
+                  onChange={(event) =>
+                    setSettingForm({
+                      ...settingForm,
+                      approvalHours: event.target.value,
+                    })
+                  }
+                  className="mf-input mt-2 w-full"
+                />
+              </label>
+              <label className="mf-label">
+                Minimum hizmet günü
+                <input
+                  type="number"
+                  min={1}
+                  max={90}
+                  value={settingForm.minimumServiceDays}
+                  onChange={(event) =>
+                    setSettingForm({
+                      ...settingForm,
+                      minimumServiceDays: event.target.value,
+                    })
+                  }
+                  className="mf-input mt-2 w-full"
+                />
+              </label>
+            </div>
+            {platformSettings.data && (
+              <p className="mt-3 text-xs text-slate-500">
+                Kayıtlı: {platformSettings.data.SUBSCRIPTION_APPROVAL_SLA_HOURS}
+                {" saat · "}
+                {platformSettings.data.MIN_SUBSCRIPTION_SERVICE_DAYS} hizmet günü
+              </p>
+            )}
+            <Button
+              className="mt-4"
+              disabled={!configurationPassword || saveSettings.isPending}
+              onClick={() => saveSettings.mutate()}
+            >
+              Kuralları kaydet
+            </Button>
+          </section>
+          <section className="mf-surface p-6">
+            <h2 className="text-lg font-black">Yeni komisyon kuralı</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Mağaza boş bırakılırsa oran tüm mağazalar için geçerlidir.
+            </p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <label className="mf-label">
+                Mağaza no (isteğe bağlı)
+                <input
+                  type="number"
+                  min={1}
+                  value={commissionForm.storeId}
+                  onChange={(event) =>
+                    setCommissionForm({ ...commissionForm, storeId: event.target.value })
+                  }
+                  className="mf-input mt-2 w-full"
+                />
+              </label>
+              <label className="mf-label">
+                Geçerlilik başlangıcı
+                <input
+                  type="date"
+                  value={commissionForm.effectiveFrom}
+                  onChange={(event) =>
+                    setCommissionForm({ ...commissionForm, effectiveFrom: event.target.value })
+                  }
+                  className="mf-input mt-2 w-full"
+                />
+              </label>
+              <label className="mf-label">
+                Komisyon (%)
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step="0.01"
+                  value={commissionForm.commissionPercent}
+                  onChange={(event) => setCommissionForm({ ...commissionForm, commissionPercent: event.target.value })}
+                  className="mf-input mt-2 w-full"
+                />
+              </label>
+              <label className="mf-label">
+                Komisyon KDV (%)
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step="0.01"
+                  value={commissionForm.vatPercent}
+                  onChange={(event) => setCommissionForm({ ...commissionForm, vatPercent: event.target.value })}
+                  className="mf-input mt-2 w-full"
+                />
+              </label>
+            </div>
+            <label className="mf-label mt-4 block">
+              İşlem şifreniz
+              <input
+                type="password"
+                value={configurationPassword}
+                onChange={(event) => setConfigurationPassword(event.target.value)}
+                autoComplete="current-password"
+                className="mf-input mt-2 w-full"
+              />
+            </label>
+            <Button
+              className="mt-4"
+              disabled={!configurationPassword || !commissionForm.effectiveFrom || saveCommission.isPending}
+              onClick={() => saveCommission.mutate()}
+            >
+              Komisyon kuralını ekle
+            </Button>
+            {(saveCommission.isError || saveSettings.isError) && (
+              <p className="mt-3 text-sm text-danger-600">
+                Ayar kaydedilemedi. Şifreyi ve değer aralıklarını kontrol edin.
+              </p>
+            )}
+          </section>
+          <section className="mf-surface overflow-x-auto p-6 xl:col-span-2">
+            <h2 className="text-lg font-black">Komisyon geçmişi</h2>
+            <table className="mt-4 w-full min-w-[700px] text-left text-sm">
+              <thead className="border-b text-xs uppercase text-slate-500">
+                <tr>
+                  <th className="py-3">Kapsam</th><th>Komisyon</th><th>KDV</th>
+                  <th>Başlangıç</th><th>Bitiş</th><th>Durum</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {commissionRules.data?.map((rule) => (
+                  <tr key={rule.id}>
+                    <td className="py-3 font-bold">{rule.storeName}</td>
+                    <td>%{(rule.commissionRate * 100).toLocaleString("tr-TR")}</td>
+                    <td>%{(rule.commissionVatRate * 100).toLocaleString("tr-TR")}</td>
+                    <td>{rule.effectiveFrom}</td><td>{rule.effectiveTo || "–"}</td>
+                    <td>{rule.active ? "Aktif" : "Geçmiş"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        </div>
+      )}
       {payment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
           <section className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
