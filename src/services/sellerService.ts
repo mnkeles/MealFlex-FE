@@ -459,8 +459,10 @@ export const sellerService = {
     allergenInfo?: string;
     imageUrl?: string;
     dietTags?: string[];
-    allergens?: string[];
-    items?: { id?: number; name: string; description?: string; imageUrl?: string; sortOrder?: number }[];
+      allergens?: string[];
+      availableFrom?: string;
+      availableUntil?: string;
+      items?: { id?: number; name: string; description?: string; imageUrl?: string; sortOrder?: number }[];
   }): Promise<Menu> {
     const response = await api.post("/v1/seller/menus", data);
     return response.data;
@@ -477,6 +479,8 @@ export const sellerService = {
       dietTags?: string[];
       allergens?: string[];
       priceEffectiveFrom?: string;
+      availableFrom?: string;
+      availableUntil?: string;
       items?: { id?: number; name: string; description?: string; imageUrl?: string; sortOrder?: number }[];
     },
   ): Promise<Menu> {
@@ -684,6 +688,8 @@ export const sellerService = {
       dietTags?: string[];
       allergens?: string[];
       priceEffectiveFrom?: string;
+      availableFrom?: string;
+      availableUntil?: string;
       items?: { id?: number; name: string; description?: string; imageUrl?: string; sortOrder?: number }[];
     },
   ): Promise<Menu> {
@@ -725,6 +731,17 @@ export const sellerService = {
   ): Promise<ClosedDate> {
     const response = await api.post(
       `/v1/seller/stores/${storeId}/closed-dates`,
+      data,
+    );
+    return response.data;
+  },
+
+  async addClosedDateRange(
+    storeId: number,
+    data: { startDate: string; endDate: string; reason?: string },
+  ): Promise<ClosedDate[]> {
+    const response = await api.post(
+      `/v1/seller/stores/${storeId}/closed-date-ranges`,
       data,
     );
     return response.data;

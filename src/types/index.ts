@@ -78,6 +78,8 @@ export interface Menu {
   description?: string;
   pricePerPerson: number;
   priceEffectiveFrom?: string;
+  availableFrom?: string;
+  availableUntil?: string;
   imageUrl?: string;
   galleryImages?: MenuGalleryImage[];
   allergenInfo?: string;

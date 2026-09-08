@@ -329,20 +329,33 @@ export default function StoreSettingsPage() {
 
   const [closedDateForm, setClosedDateForm] = useState({
     closedDate: "",
+    endDate: "",
     reason: "",
   });
+  const [closedDateMode, setClosedDateMode] = useState<"single" | "range">("single");
   const [closedDateError, setClosedDateError] = useState("");
+  const [closedDateSuccess, setClosedDateSuccess] = useState("");
   const earliestClosedDate = minimumClosedDate();
 
   const addClosedDateMutation = useMutation({
     mutationFn: () =>
-      sellerService.addClosedDate(storeId, {
-        closedDate: closedDateForm.closedDate,
-        reason: closedDateForm.reason || undefined,
-      }),
-    onSuccess: () => {
-      setClosedDateForm({ closedDate: "", reason: "" });
+      closedDateMode === "range"
+        ? sellerService.addClosedDateRange(storeId, {
+            startDate: closedDateForm.closedDate,
+            endDate: closedDateForm.endDate,
+            reason: closedDateForm.reason || undefined,
+          })
+        : sellerService.addClosedDate(storeId, {
+            closedDate: closedDateForm.closedDate,
+            reason: closedDateForm.reason || undefined,
+          }).then((result) => [result]),
+    onSuccess: (result) => {
+      const addedCount = result.length;
+      setClosedDateForm({ closedDate: "", endDate: "", reason: "" });
       setClosedDateError("");
+      setClosedDateSuccess(
+        addedCount === 1 ? "Kapalı gün eklendi." : `${addedCount} kapalı gün eklendi.`,
+      );
       queryClient.invalidateQueries({
         queryKey: ["store-closed-dates", storeId],
       });
@@ -405,7 +418,9 @@ export default function StoreSettingsPage() {
               })),
             ),
       ),
-    "closed-days": Boolean(closedDateForm.closedDate || closedDateForm.reason),
+    "closed-days": Boolean(
+      closedDateForm.closedDate || closedDateForm.endDate || closedDateForm.reason,
+    ),
     "store-status": false,
   };
   const hasUnsavedChanges = Object.values(dirtySections).some(Boolean);
@@ -1062,7 +1077,34 @@ export default function StoreSettingsPage() {
           Kapalı Günler
         </h2>
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex gap-2 mb-4">
+          <div className="mb-4 flex w-fit rounded-xl bg-slate-100 p-1">
+            <button
+              type="button"
+              onClick={() => {
+                setClosedDateMode("single");
+                setClosedDateForm((current) => ({ ...current, endDate: "" }));
+                setClosedDateError("");
+                setClosedDateSuccess("");
+              }}
+              className={`rounded-lg px-3 py-2 text-sm font-bold ${closedDateMode === "single" ? "bg-white shadow-sm" : "text-slate-500"}`}
+            >
+              Tek gün
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setClosedDateMode("range");
+                setClosedDateError("");
+                setClosedDateSuccess("");
+              }}
+              className={`rounded-lg px-3 py-2 text-sm font-bold ${closedDateMode === "range" ? "bg-white shadow-sm" : "text-slate-500"}`}
+            >
+              Tarih aralığı
+            </button>
+          </div>
+          <div className="mb-4 grid gap-2 sm:grid-cols-[auto_auto_minmax(12rem,1fr)_auto] sm:items-end">
+            <label className="text-xs font-bold text-slate-600">
+              {closedDateMode === "range" ? "Başlangıç" : "Kapalı gün"}
             <input
               type="date"
               aria-label="Kapalı gün tarihi"
@@ -1074,8 +1116,29 @@ export default function StoreSettingsPage() {
                   closedDate: e.target.value,
                 })
               }
-              className="px-3 py-2 border rounded-lg text-sm"
+              className="mt-1 block w-full px-3 py-2 border rounded-lg text-sm"
             />
+            </label>
+            {closedDateMode === "range" && (
+              <label className="text-xs font-bold text-slate-600">
+                Bitiş
+                <input
+                  type="date"
+                  aria-label="Kapalı gün bitiş tarihi"
+                  min={closedDateForm.closedDate || earliestClosedDate}
+                  value={closedDateForm.endDate}
+                  onChange={(event) =>
+                    setClosedDateForm({
+                      ...closedDateForm,
+                      endDate: event.target.value,
+                    })
+                  }
+                  className="mt-1 block w-full px-3 py-2 border rounded-lg text-sm"
+                />
+              </label>
+            )}
+            <label className="text-xs font-bold text-slate-600">
+              Sebep
             <input
               type="text"
               aria-label="Kapalı gün sebebi"
@@ -1084,20 +1147,24 @@ export default function StoreSettingsPage() {
                 setClosedDateForm({ ...closedDateForm, reason: e.target.value })
               }
               placeholder="Sebep (opsiyonel)"
-              className="px-3 py-2 border rounded-lg text-sm flex-1"
+              className="mt-1 block w-full px-3 py-2 border rounded-lg text-sm"
             />
+            </label>
             <button
               onClick={() =>
                 closedDateForm.closedDate && addClosedDateMutation.mutate()
               }
               disabled={
                 !closedDateForm.closedDate ||
+                (closedDateMode === "range" &&
+                  (!closedDateForm.endDate ||
+                    closedDateForm.endDate < closedDateForm.closedDate)) ||
                 closedDateForm.closedDate < earliestClosedDate ||
                 addClosedDateMutation.isPending
               }
               className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
             >
-              Ekle
+              {closedDateMode === "range" ? "Aralığı ekle" : "Ekle"}
             </button>
           </div>
           <p className="mb-3 text-xs text-slate-500">
@@ -1110,6 +1177,11 @@ export default function StoreSettingsPage() {
               className="mb-4 rounded-lg bg-danger-50 px-4 py-3 text-sm text-danger-700"
             >
               {closedDateError}
+            </p>
+          )}
+          {closedDateSuccess && (
+            <p role="status" className="mb-4 rounded-lg bg-success-50 px-4 py-3 text-sm text-success-700">
+              {closedDateSuccess}
             </p>
           )}
           {closedDates.length > 0 && (

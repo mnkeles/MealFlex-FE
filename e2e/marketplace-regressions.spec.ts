@@ -13,8 +13,16 @@ test('satıcı iki ayrı aralığı çakışmaları tekrarlamadan kaydeder ve ye
   await login(page, 'SELLER')
   const store = { id: 2, name: 'Test Catering', status: 'ACTIVE', categories: [], availableDeliveryTimes: [], rating: 0, reviewCount: 0 }
   let slots: { id: number; deliveryTime: string }[] = []
+  let closedRange: { startDate: string; endDate: string; reason?: string } | undefined
   await page.route('**/api/**', route => {
     const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/seller/stores/2/closed-date-ranges')) {
+      closedRange = route.request().postDataJSON()
+      return json(route, [
+        { id: 41, closedDate: closedRange!.startDate, reason: closedRange!.reason },
+        { id: 42, closedDate: closedRange!.endDate, reason: closedRange!.reason },
+      ])
+    }
     if (path.endsWith('/seller/stores/2/delivery-slots')) {
       if (route.request().method() === 'PUT') slots = route.request().postDataJSON().map((slot: { deliveryTime: string }, index: number) => ({ ...slot, id: index + 1 }))
       return json(route, slots)
@@ -49,6 +57,60 @@ test('satıcı iki ayrı aralığı çakışmaları tekrarlamadan kaydeder ve ye
   await rangeEnd.selectOption('12:00')
   await page.getByRole('button', { name: 'Aralığı ekle' }).click()
   await expect(page.getByText('Bitiş saati başlangıç saatinden önce olamaz.')).toBeVisible()
+  const closedDays = page.locator('#closed-days').locator('..')
+  await closedDays.getByRole('button', { name: 'Tarih aralığı' }).click()
+  await closedDays.getByLabel('Kapalı gün tarihi').fill('2099-09-10')
+  await closedDays.getByLabel('Kapalı gün bitiş tarihi').fill('2099-09-11')
+  await closedDays.getByLabel('Kapalı gün sebebi').fill('Planlı bakım')
+  await closedDays.getByRole('button', { name: 'Aralığı ekle' }).click()
+  await expect(page.getByText('2 kapalı gün eklendi.')).toBeVisible()
+  expect(closedRange).toEqual({ startDate: '2099-09-10', endDate: '2099-09-11', reason: 'Planlı bakım' })
+})
+
+test('satıcı menüyü tarih aralığına uygular ve geçersiz aralığı gönderemez', async ({ page }) => {
+  await login(page, 'SELLER')
+  const store = { id: 2, name: 'Test Catering', status: 'ACTIVE', categories: [], availableDeliveryTimes: [], rating: 0, reviewCount: 0 }
+  let menu = {
+    id: 31,
+    storeId: 2,
+    name: 'Haftalık Kurumsal Menü',
+    description: 'Öğle servisi',
+    pricePerPerson: 175,
+    active: true,
+    dietTags: [],
+    allergens: [],
+    items: [],
+    availableFrom: '2099-09-01',
+    availableUntil: '2099-09-30',
+  }
+  let updatePayload: Record<string, unknown> | undefined
+  await page.route('**/api/**', route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/seller/menus/stores/2')) return json(route, [menu])
+    if (path.endsWith('/seller/menus/31') && route.request().method() === 'PUT') {
+      updatePayload = route.request().postDataJSON()
+      menu = { ...menu, ...updatePayload } as typeof menu
+      return json(route, menu)
+    }
+    if (path.endsWith('/seller/stores/2')) return json(route, store)
+    if (path.endsWith('/seller/stores')) return json(route, [store])
+    if (path.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/seller/stores/2/showcase')
+  await expect(page.getByText('Sunum dönemi: 2099-09-01 — 2099-09-30')).toBeVisible()
+  await page.getByRole('button', { name: 'Düzenle' }).click()
+  await expect(page.getByLabel('Menü sunum başlangıç tarihi')).toHaveValue('2099-09-01')
+  await page.getByLabel('Menü sunum başlangıç tarihi').fill('2099-10-10')
+  await page.getByLabel('Menü sunum bitiş tarihi').fill('2099-10-01')
+  await page.getByRole('button', { name: 'Güncelle' }).click()
+  await expect(page.getByText('Menü bitiş tarihi başlangıç tarihinden önce olamaz.')).toBeVisible()
+  expect(updatePayload).toBeUndefined()
+  await page.getByLabel('Menü sunum bitiş tarihi').fill('2099-10-31')
+  await page.getByRole('button', { name: 'Güncelle' }).click()
+  await expect.poll(() => updatePayload?.availableFrom).toBe('2099-10-10')
+  expect(updatePayload?.availableUntil).toBe('2099-10-31')
 })
 
 test('mağaza ayarları taslağı korunur ve mesafe kaydı yalnız sunucudaki mağaza verisini kullanır', async ({ page }) => {

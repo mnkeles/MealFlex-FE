@@ -65,6 +65,8 @@ type MenuForm = {
   description: string;
   pricePerPerson: string;
   priceEffectiveFrom: string;
+  availableFrom: string;
+  availableUntil: string;
   allergenInfo: string;
   dietTags: string[];
   allergens: string[];
@@ -101,6 +103,8 @@ export default function StoreShowcasePage() {
     description: "",
     pricePerPerson: "",
     priceEffectiveFrom: "",
+    availableFrom: "",
+    availableUntil: "",
     allergenInfo: "",
     dietTags: [],
     allergens: [],
@@ -335,6 +339,8 @@ export default function StoreShowcasePage() {
       description: "",
       pricePerPerson: "",
       priceEffectiveFrom: "",
+      availableFrom: "",
+      availableUntil: "",
       allergenInfo: "",
       dietTags: [],
       allergens: [],
@@ -361,6 +367,8 @@ export default function StoreShowcasePage() {
       description: menu.description || "",
       pricePerPerson: String(menu.pricePerPerson),
       priceEffectiveFrom: "",
+      availableFrom: menu.availableFrom || "",
+      availableUntil: menu.availableUntil || "",
       allergenInfo: menu.allergenInfo || "",
       dietTags: menu.dietTags || [],
       allergens: menu.allergens || [],
@@ -419,11 +427,21 @@ export default function StoreShowcasePage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSaveError("");
+    if (
+      form.availableFrom &&
+      form.availableUntil &&
+      form.availableUntil < form.availableFrom
+    ) {
+      setSaveError("Menü bitiş tarihi başlangıç tarihinden önce olamaz.");
+      return;
+    }
     const data = {
       name: form.name,
       description: form.description || undefined,
       pricePerPerson: Number(form.pricePerPerson),
       priceEffectiveFrom: form.priceEffectiveFrom || undefined,
+      availableFrom: form.availableFrom || undefined,
+      availableUntil: form.availableUntil || undefined,
       allergenInfo: form.allergenInfo || undefined,
       dietTags: form.dietTags,
       allergens: form.allergens,
@@ -757,6 +775,39 @@ export default function StoreShowcasePage() {
                 className="w-full px-3 py-2 border rounded-lg text-sm"
               />
             </div>
+            <fieldset className="grid gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 md:col-span-2 md:grid-cols-2">
+              <legend className="px-1 text-sm font-bold text-slate-700">
+                Menünün sunulacağı tarih aralığı
+              </legend>
+              <label className="block text-sm font-medium text-slate-700">
+                Başlangıç tarihi
+                <input
+                  type="date"
+                  aria-label="Menü sunum başlangıç tarihi"
+                  value={form.availableFrom}
+                  onChange={(event) =>
+                    setForm({ ...form, availableFrom: event.target.value })
+                  }
+                  className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                />
+              </label>
+              <label className="block text-sm font-medium text-slate-700">
+                Bitiş tarihi
+                <input
+                  type="date"
+                  aria-label="Menü sunum bitiş tarihi"
+                  value={form.availableUntil}
+                  onChange={(event) =>
+                    setForm({ ...form, availableUntil: event.target.value })
+                  }
+                  className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                />
+              </label>
+              <p className="text-xs leading-5 text-slate-500 md:col-span-2">
+                Boş bırakırsanız menü süresiz sunulur. Tarih aralığı dışındaki
+                abonelikler bu menüyü kullanamaz.
+              </p>
+            </fieldset>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Alerjen Bilgisi
@@ -1132,6 +1183,13 @@ export default function StoreShowcasePage() {
                       {menu.description && (
                         <p className="text-sm text-slate-500 mt-1">
                           {menu.description}
+                        </p>
+                      )}
+                      {(menu.availableFrom || menu.availableUntil) && (
+                        <p className="mt-2 text-xs font-semibold text-info-700">
+                          Sunum dönemi: {menu.availableFrom || "Başlangıç sınırı yok"}
+                          {" — "}
+                          {menu.availableUntil || "Bitiş sınırı yok"}
                         </p>
                       )}
                       {menuPhotos(menu).length > 0 && (
