@@ -248,7 +248,12 @@ export default function CreateSubscriptionPage() {
   const menuId = Number(params.get("menuId"));
   const renewFromId = Number(params.get("renewFrom"));
   const renewalPrefilled = useRef(false);
-  const { addresses, activeAddressId, setActiveAddressId } =
+  const {
+    addresses,
+    activeAddressId,
+    setActiveAddressId,
+    isLoading: addressesLoading,
+  } =
     useCustomerAddress();
   const initialAddress =
     Number(params.get("addressId")) ||
@@ -519,6 +524,21 @@ export default function CreateSubscriptionPage() {
         </div>
       </div>
     );
+  if (!addressesLoading && !addresses.length)
+    return (
+      <div className="mf-page">
+        <EmptyState
+          title="Önce teslimat adresi ekleyin"
+          description="Abonelik seçeneklerini ve uygun teslimat saatlerini adresinize göre belirliyoruz. Devam etmek için bir iş yeri adresi ekleyin."
+          icon={<MapPin className="h-6 w-6" />}
+          action={
+            <Link to="/addresses">
+              <Button>Adres ekle</Button>
+            </Link>
+          }
+        />
+      </div>
+    );
   if (storeError)
     return (
       <div className="mf-page">
@@ -533,7 +553,7 @@ export default function CreateSubscriptionPage() {
         />
       </div>
     );
-  if (!store || !menu || !addressId)
+  if (addressesLoading || !store || !menu || !addressId)
     return <div className="h-80 animate-pulse rounded-3xl bg-slate-200" />;
   const preview = previewMutation.data ?? lastPreview;
   const selectedAddress = addresses.find((address) => address.id === addressId);

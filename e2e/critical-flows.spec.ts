@@ -499,6 +499,21 @@ test('aktif teslimat adresi ana sayfa, keşif ve abonelikte aynı adresle kullan
   expect(requestedAddressIds.filter(value => value === '11').length).toBeGreaterThanOrEqual(3)
 })
 
+test('adresi olmayan müşteri abonelik ekranından adres eklemeye yönlendirilir', async ({ page }) => {
+  await loginAs(page, 'CUSTOMER')
+  await page.route('**/api/**', route => {
+    const url = new URL(route.request().url())
+    if (url.pathname.endsWith('/v1/addresses')) return json(route, [])
+    if (url.pathname.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/subscribe?storeId=2&menuId=3')
+  await expect(page.getByRole('heading', { name: 'Önce teslimat adresi ekleyin' })).toBeVisible()
+  await page.getByRole('link', { name: 'Adres ekle' }).click()
+  await expect(page).toHaveURL(/\/addresses$/)
+})
+
 test('keşif kategori filtresi URL ve adres parametresiyle çalışır, işletme favoriye eklenir', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
   await page.addInitScript(() => localStorage.setItem('mealflex-active-address-id', '11'))
