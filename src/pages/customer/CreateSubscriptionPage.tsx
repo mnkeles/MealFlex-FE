@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -58,6 +58,32 @@ const quickDurations = [
   { amount: 12, unit: "month", label: "12 ay" },
   { amount: 18, unit: "month", label: "18 ay" },
 ] as const;
+
+type SubscriptionDraft = {
+  menuId: number;
+  step: number;
+  personCount: number;
+  startDate: string;
+  endDate: string;
+  addressId?: number;
+  deliveryTime: string;
+  paymentMethodId?: number;
+  couponCode: string;
+};
+
+const draftKey = (storeId: number) =>
+  `mealflex-subscription-draft:${storeId}`;
+
+function readDraft(storeId: number): SubscriptionDraft | undefined {
+  if (!storeId || typeof window === "undefined") return undefined;
+  try {
+    const value = sessionStorage.getItem(draftKey(storeId));
+    return value ? (JSON.parse(value) as SubscriptionDraft) : undefined;
+  } catch {
+    sessionStorage.removeItem(draftKey(storeId));
+    return undefined;
+  }
+}
 
 function selectedDates(
   startDate: string,
@@ -244,6 +270,7 @@ function weeklyChargePlan(serviceDates: string[], totalAmount: number) {
 export default function CreateSubscriptionPage() {
   const idempotencyKey = useRef(crypto.randomUUID());
   const [params] = useSearchParams();
+  const navigate = useNavigate();
   const storeId = Number(params.get("storeId"));
   const menuId = Number(params.get("menuId"));
   const renewFromId = Number(params.get("renewFrom"));
@@ -258,22 +285,65 @@ export default function CreateSubscriptionPage() {
   const initialAddress =
     Number(params.get("addressId")) ||
     activeAddressId;
-  const [step, setStep] = useState(0);
-  const [personCount, setPersonCount] = useState(1);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const draft = useRef(readDraft(storeId)).current;
+  const restoredStep = draft
+    ? draft.menuId === menuId
+      ? Math.min(draft.step, 3)
+      : Math.min(draft.step, 2)
+    : 0;
+  const [step, setStep] = useState(restoredStep);
+  const [personCount, setPersonCount] = useState(draft?.personCount ?? 1);
+  const [startDate, setStartDate] = useState(draft?.startDate ?? "");
+  const [endDate, setEndDate] = useState(draft?.endDate ?? "");
   const [addressId, setAddressId] = useState<number | undefined>(
-    initialAddress,
+    draft?.addressId || initialAddress,
   );
-  const [deliveryTime, setDeliveryTime] = useState("12:00");
-  const [paymentMethodId, setPaymentMethodId] = useState<number>();
+  const [deliveryTime, setDeliveryTime] = useState(
+    draft?.deliveryTime ?? "12:00",
+  );
+  const [paymentMethodId, setPaymentMethodId] = useState<number | undefined>(
+    draft?.paymentMethodId,
+  );
   const [commercialTermsAccepted, setCommercialTermsAccepted] = useState(false);
-  const [couponCode, setCouponCode] = useState("");
+  const [couponCode, setCouponCode] = useState(draft?.couponCode ?? "");
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [createdId, setCreatedId] = useState<number>();
   const [mobileSummaryOpen, setMobileSummaryOpen] = useState(false);
   const [lastPreview, setLastPreview] = useState<Awaited<ReturnType<typeof subscriptionService.preview>>>();
+
+  const saveDraft = () => {
+    if (!storeId) return;
+    const value: SubscriptionDraft = {
+      menuId,
+      step,
+      personCount,
+      startDate,
+      endDate,
+      addressId,
+      deliveryTime,
+      paymentMethodId,
+      couponCode,
+    };
+    sessionStorage.setItem(draftKey(storeId), JSON.stringify(value));
+  };
+
+  useEffect(() => {
+    saveDraft();
+    // Taslak alanları değiştikçe yalnız aynı tarayıcı oturumunda saklanır.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    storeId,
+    menuId,
+    step,
+    personCount,
+    startDate,
+    endDate,
+    addressId,
+    deliveryTime,
+    paymentMethodId,
+    couponCode,
+  ]);
 
   useEffect(() => {
     if (!addressId && activeAddressId) setAddressId(activeAddressId);
@@ -397,6 +467,7 @@ export default function CreateSubscriptionPage() {
     mutationFn: (data: SubscriptionInput) =>
       subscriptionService.create(data, idempotencyKey.current),
     onSuccess: (subscription) => {
+      sessionStorage.removeItem(draftKey(storeId));
       setCreatedId(subscription.id);
     },
     onError: (err: unknown) => {
@@ -497,6 +568,11 @@ export default function CreateSubscriptionPage() {
       return;
     }
     createMutation.mutate(input);
+  };
+
+  const changeMenu = () => {
+    saveDraft();
+    navigate(`/stores/${storeId}?addressId=${addressId || ""}`);
   };
 
   if (createdId)
@@ -605,8 +681,11 @@ export default function CreateSubscriptionPage() {
                 <li key={label}>
                   <button
                     type="button"
-                    disabled={index === 0 || index > visualStep}
-                    onClick={() => setStep(index - 1)}
+                    disabled={index > visualStep}
+                    onClick={() =>
+                      index === 0 ? changeMenu() : setStep(index - 1)
+                    }
+                    aria-label={`${index + 1}. ${label}`}
                     aria-current={active ? "step" : undefined}
                     className="w-full text-left disabled:cursor-default"
                   >
@@ -1098,6 +1177,13 @@ export default function CreateSubscriptionPage() {
           <p className="mt-1 text-sm font-semibold text-slate-600">
             {menu.name}
           </p>
+          <button
+            type="button"
+            onClick={changeMenu}
+            className="mt-3 text-sm font-bold text-primary-600 underline underline-offset-4"
+          >
+            Menüyü değiştir
+          </button>
           <p className="mt-3 text-2xl font-black text-primary-600">
             {menu.pricePerPerson.toLocaleString("tr-TR")} ₺{" "}
             <span className="text-xs font-normal text-slate-500">
@@ -1144,6 +1230,16 @@ export default function CreateSubscriptionPage() {
         </p>
         <h2 className="mt-1 text-lg font-black">{store.name}</h2>
         <p className="text-sm font-semibold text-slate-600">{menu.name}</p>
+        <button
+          type="button"
+          onClick={() => {
+            setMobileSummaryOpen(false);
+            changeMenu();
+          }}
+          className="mt-3 text-sm font-bold text-primary-600 underline underline-offset-4"
+        >
+          Menüyü değiştir
+        </button>
         <p className="mt-4 text-2xl font-black text-primary-600">
           {menu.pricePerPerson.toLocaleString("tr-TR")} ₺{" "}
           <span className="text-xs font-normal text-slate-500">
