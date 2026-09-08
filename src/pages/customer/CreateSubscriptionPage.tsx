@@ -653,6 +653,16 @@ export default function CreateSubscriptionPage() {
   const weeklyCharges = preview
     ? weeklyChargePlan(preview.serviceDates, preview.totalAmount)
     : [];
+  const mobilePrimaryDisabled =
+    previewMutation.isPending ||
+    createMutation.isPending ||
+    (step === 2 &&
+      (!availableDeliveryTimes?.length ||
+        deliveryTimesQuery.isFetching ||
+        deliveryTimesQuery.isError)) ||
+    (step === 3 && !previewIsCurrent);
+  const runPrimaryAction = () =>
+    step < 3 ? next() : submitSubscription();
 
   return (
     <div className="mf-page max-w-6xl">
@@ -1150,7 +1160,7 @@ export default function CreateSubscriptionPage() {
                   previewMutation.isPending ||
                   (step === 2 && (!availableDeliveryTimes?.length || deliveryTimesQuery.isFetching || deliveryTimesQuery.isError))
                 }
-                className="flex items-center gap-1 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50"
+                className="hidden items-center gap-1 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50 lg:flex"
               >
                 {previewMutation.isPending ? "Hesaplanıyor..." : "Devam Et"}{" "}
                 <ArrowRight className="h-4 w-4" />
@@ -1159,7 +1169,7 @@ export default function CreateSubscriptionPage() {
               <button
                 onClick={submitSubscription}
                 disabled={createMutation.isPending || !previewIsCurrent}
-                className="rounded-xl bg-primary-600 px-6 py-3 text-sm font-bold text-white disabled:opacity-50"
+                className="hidden rounded-xl bg-primary-600 px-6 py-3 text-sm font-bold text-white disabled:opacity-50 lg:block"
               >
                 {createMutation.isPending
                   ? "Gönderiliyor..."
@@ -1205,20 +1215,42 @@ export default function CreateSubscriptionPage() {
           </div>
         </aside>
       </div>
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white p-3 shadow-floating lg:hidden">
-        <button
-          type="button"
-          onClick={() => setMobileSummaryOpen(true)}
-          className="flex min-h-12 w-full items-center justify-between rounded-xl bg-slate-950 px-4 text-left text-white"
-        >
-          <span>
-            <span className="block text-xs text-slate-300">
-              Seçtiğiniz menü
+      <div className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-40 border-t border-slate-200 bg-white/95 p-3 shadow-floating backdrop-blur md:bottom-0 lg:hidden">
+        <div className="mx-auto flex max-w-6xl items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setMobileSummaryOpen(true)}
+            className="min-w-0 flex-1 rounded-xl px-1 py-1 text-left"
+          >
+            <span className="block text-[11px] font-semibold text-slate-500">
+              {preview ? "Toplam tutar" : "Günlük tahmini"}
             </span>
-            <strong className="block text-sm">{menu.name}</strong>
-          </span>
-          <span className="text-sm font-black text-warning-300">Özeti aç</span>
-        </button>
+            <strong className="block truncate text-base text-slate-950">
+              {(preview?.totalAmount ??
+                menu.pricePerPerson * personCount
+              ).toLocaleString("tr-TR")} {" "}
+              ₺
+            </strong>
+            <span className="block text-[10px] font-bold text-primary-600">
+              Özeti aç
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={runPrimaryAction}
+            disabled={mobilePrimaryDisabled}
+            className="flex min-h-12 shrink-0 items-center gap-1 rounded-xl bg-primary-600 px-4 text-sm font-black text-white disabled:opacity-50"
+          >
+            {previewMutation.isPending || createMutation.isPending
+              ? "İşleniyor..."
+              : step < 3
+                ? "Devam Et"
+                : "Talebi gönder"}
+            {!previewMutation.isPending && !createMutation.isPending && (
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            )}
+          </button>
+        </div>
       </div>
       <Drawer
         open={mobileSummaryOpen}

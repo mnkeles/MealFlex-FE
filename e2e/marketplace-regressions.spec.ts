@@ -168,6 +168,19 @@ test('geçersiz kupon sonrası eski toplamla abonelik gönderilemez', async ({ p
   await expect(page.getByRole('button', { name: 'Abonelik Talebini Gönder' })).toBeEnabled()
 })
 
+test('mobil abonelik çubuğu toplamı ve birincil aksiyonu sabit gösterir', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await subscriptionScenario(page, ['12:00'])
+  const stickyBar = page.locator('div.fixed.inset-x-0').filter({ hasText: 'Özeti aç' })
+  await expect(stickyBar).toContainText('Günlük tahmini')
+  await expect(stickyBar).toContainText('300 ₺')
+  await stickyBar.getByRole('button', { name: /Devam Et/ }).click()
+  await expect(stickyBar).toContainText('Toplam tutar')
+  await expect(stickyBar).toContainText('1.500 ₺')
+  await expect(stickyBar.getByRole('button', { name: /Talebi gönder/ })).toBeVisible()
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBeTruthy()
+})
+
 test('abonelik taslağı oturumda ve menü değişiminde korunur', async ({ page }) => {
   await login(page, 'CUSTOMER')
   const start = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10)
