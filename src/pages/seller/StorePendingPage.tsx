@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { sellerService } from "@/services/sellerService";
 import QueryBoundary from "@/components/ui/QueryBoundary";
+import ConfirmModal from "@/components/common/ConfirmModal";
 
 function remaining(deadline: string | undefined, now: number) {
   if (!deadline) return "SLA tanımsız";
@@ -37,6 +38,18 @@ export default function StorePendingPage() {
   const [changeRejectReason, setChangeRejectReason] = useState("");
   const [now, setNow] = useState(Date.now());
   const [alarm, setAlarm] = useState(false);
+  const [slaFilter, setSlaFilter] = useState<"ALL" | "URGENT" | "EXPIRED">(
+    "ALL",
+  );
+  const [sortMode, setSortMode] = useState<"SLA" | "NEWEST" | "OLDEST">(
+    "SLA",
+  );
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [bulkResult, setBulkResult] = useState<{
+    succeeded: number[];
+    failed: number[];
+  }>();
   const pending = useQuery({
     queryKey: ["seller-subscriptions", storeId, "PENDING_APPROVAL"],
     queryFn: () =>
@@ -59,26 +72,47 @@ export default function StorePendingPage() {
     queryFn: () => sellerService.getDeliveryChangeRequests(storeId),
     enabled: !!storeId,
   });
-  const subscriptions = useMemo(
-    () =>
-      [...(pending.data?.content || [])].sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      ),
+  const allSubscriptions = useMemo(
+    () => pending.data?.content || [],
     [pending.data],
   );
+  const subscriptions = useMemo(() => {
+    const urgentLimit = now + 24 * 3_600_000;
+    return allSubscriptions
+      .filter((subscription) => {
+        const deadline = subscription.approvalDeadlineAt
+          ? new Date(subscription.approvalDeadlineAt).getTime()
+          : Number.POSITIVE_INFINITY;
+        if (slaFilter === "EXPIRED") return deadline <= now;
+        if (slaFilter === "URGENT") return deadline > now && deadline <= urgentLimit;
+        return true;
+      })
+      .sort((left, right) => {
+        if (sortMode === "NEWEST")
+          return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+        if (sortMode === "OLDEST")
+          return new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
+        const leftDeadline = left.approvalDeadlineAt
+          ? new Date(left.approvalDeadlineAt).getTime()
+          : Number.POSITIVE_INFINITY;
+        const rightDeadline = right.approvalDeadlineAt
+          ? new Date(right.approvalDeadlineAt).getTime()
+          : Number.POSITIVE_INFINITY;
+        return leftDeadline - rightDeadline;
+      });
+  }, [allSubscriptions, now, slaFilter, sortMode]);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(timer);
   }, []);
   useEffect(() => {
-    if (!subscriptions.length) return;
+    if (!allSubscriptions.length) return;
     sellerService
       .markPendingViewed(storeId)
       .then(() =>
         client.invalidateQueries({ queryKey: ["pending-unread", storeId] }),
       );
-  }, [storeId, subscriptions.length, client]);
+  }, [storeId, allSubscriptions.length, client]);
   useEffect(() => {
     if (!storeId) return;
     const controller = new AbortController();
@@ -144,6 +178,29 @@ export default function StorePendingPage() {
     onSuccess: () => {
       client.invalidateQueries({ queryKey: ["seller-subscriptions"] });
       setAlarm(false);
+    },
+  });
+  const bulkApprove = useMutation({
+    mutationFn: async (ids: number[]) => {
+      const settled = await Promise.allSettled(
+        ids.map((id) => sellerService.approveSubscription(id)),
+      );
+      return settled.reduce(
+        (result, item, index) => {
+          result[item.status === "fulfilled" ? "succeeded" : "failed"].push(
+            ids[index],
+          );
+          return result;
+        },
+        { succeeded: [] as number[], failed: [] as number[] },
+      );
+    },
+    onSuccess: (result) => {
+      setBulkConfirmOpen(false);
+      setBulkResult(result);
+      setSelectedIds(new Set(result.failed));
+      setAlarm(false);
+      client.invalidateQueries({ queryKey: ["seller-subscriptions"] });
     },
   });
   const reject = useMutation({
@@ -323,6 +380,79 @@ export default function StorePendingPage() {
         emptyDescription="Yeni abonelik talepleri geldiğinde burada görünecek."
       >
         {() => (
+        <>
+        <section className="mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              aria-label="Onay SLA filtresi"
+              value={slaFilter}
+              onChange={(event) =>
+                setSlaFilter(event.target.value as typeof slaFilter)
+              }
+              className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold"
+            >
+              <option value="ALL">Tüm talepler</option>
+              <option value="URGENT">24 saatten az kalanlar</option>
+              <option value="EXPIRED">Süresi dolanlar</option>
+            </select>
+            <select
+              aria-label="Onay talebi sıralaması"
+              value={sortMode}
+              onChange={(event) =>
+                setSortMode(event.target.value as typeof sortMode)
+              }
+              className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold"
+            >
+              <option value="SLA">SLA süresi en az</option>
+              <option value="NEWEST">En yeni talep</option>
+              <option value="OLDEST">En eski talep</option>
+            </select>
+            <label className="flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-3 text-sm font-bold text-slate-700">
+              <input
+                type="checkbox"
+                aria-label="Görünen taleplerin tümünü seç"
+                checked={
+                  !!subscriptions.length &&
+                  subscriptions.every((subscription) =>
+                    selectedIds.has(subscription.id),
+                  )
+                }
+                onChange={(event) =>
+                  setSelectedIds((current) => {
+                    const next = new Set(current);
+                    subscriptions.forEach((subscription) =>
+                      event.target.checked
+                        ? next.add(subscription.id)
+                        : next.delete(subscription.id),
+                    );
+                    return next;
+                  })
+                }
+              />
+              Görünenleri seç ({subscriptions.length})
+            </label>
+            <button
+              type="button"
+              onClick={() => setBulkConfirmOpen(true)}
+              disabled={!selectedIds.size || bulkApprove.isPending}
+              className="ml-auto min-h-11 rounded-xl bg-success-600 px-4 text-sm font-black text-white disabled:opacity-40"
+            >
+              Seçilenleri kabul et ({selectedIds.size})
+            </button>
+          </div>
+          {bulkResult && (
+            <p
+              role={bulkResult.failed.length ? "alert" : "status"}
+              className={`mt-3 rounded-xl p-3 text-sm font-semibold ${bulkResult.failed.length ? "bg-warning-50 text-warning-800" : "bg-success-50 text-success-800"}`}
+            >
+              {bulkResult.succeeded.length} talep kabul edildi.
+              {bulkResult.failed.length
+                ? ` ${bulkResult.failed.length} talep kabul edilemedi: #${bulkResult.failed.join(", #")}.`
+                : ""}
+            </p>
+          )}
+        </section>
+        {subscriptions.length ? (
         <div className="space-y-4">
           {subscriptions.map((sub) => {
             const expired =
@@ -333,6 +463,23 @@ export default function StorePendingPage() {
                 key={sub.id}
                 className={`rounded-2xl border bg-white p-5 shadow-sm ${expired ? "border-danger-300" : "border-slate-200"}`}
               >
+                <label className="mb-3 inline-flex items-center gap-2 text-sm font-bold text-slate-600">
+                  <input
+                    type="checkbox"
+                    aria-label={`Talep #${sub.id} seç`}
+                    checked={selectedIds.has(sub.id)}
+                    onChange={(event) =>
+                      setSelectedIds((current) => {
+                        const next = new Set(current);
+                        event.target.checked
+                          ? next.add(sub.id)
+                          : next.delete(sub.id);
+                        return next;
+                      })
+                    }
+                  />
+                  Toplu işlem için seç
+                </label>
                 <div className="flex flex-col justify-between gap-4 lg:flex-row">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -439,6 +586,12 @@ export default function StorePendingPage() {
             );
           })}
         </div>
+        ) : (
+          <p className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+            Seçili SLA filtresine uyan talep bulunmuyor.
+          </p>
+        )}
+        </>
         )}
       </QueryBoundary>
       {(approve.isError || reject.isError) && (
@@ -446,6 +599,17 @@ export default function StorePendingPage() {
           {apiError(approve.error || reject.error)}
         </p>
       )}
+      <ConfirmModal
+        open={bulkConfirmOpen}
+        title="Seçilen talepleri kabul et"
+        message={`${selectedIds.size} abonelik talebi kabul edilecek. Kapasite ve ödeme kontrolleri her talep için ayrı çalışır; uygun olmayanlar kabul edilmez.`}
+        confirmLabel={`${selectedIds.size} talebi kabul et`}
+        pending={bulkApprove.isPending}
+        onClose={() => {
+          if (!bulkApprove.isPending) setBulkConfirmOpen(false);
+        }}
+        onConfirm={() => bulkApprove.mutate([...selectedIds])}
+      />
     </div>
   );
 }

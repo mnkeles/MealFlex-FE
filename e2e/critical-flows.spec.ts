@@ -270,6 +270,47 @@ test('satıcı onay talepleri API hatasını boş liste gibi göstermez', async 
   await expect(page.getByText('Onay bekleyen talep bulunmuyor')).toBeHidden()
 })
 
+test('satıcı talepleri SLA ile süzer ve seçilenleri kısmi sonuçla toplu kabul eder', async ({ page }) => {
+  await loginAs(page, 'SELLER')
+  const now = Date.now()
+  const base = { customerName: 'Test Müşteri', menuName: 'Ev Menüsü', personCount: 5, startDate: '2026-09-10', endDate: '2026-09-20', deliveryTime: '12:00', deliveryAddress: 'Ankara', totalAmount: 5000, status: 'PENDING_APPROVAL', createdAt: new Date(now - 60_000).toISOString() }
+  const subscriptions = [
+    { ...base, id: 101, approvalDeadlineAt: new Date(now + 2 * 3_600_000).toISOString() },
+    { ...base, id: 102, approvalDeadlineAt: new Date(now + 48 * 3_600_000).toISOString() },
+    { ...base, id: 103, approvalDeadlineAt: new Date(now - 3_600_000).toISOString() },
+  ]
+  const approved: number[] = []
+  await page.route('**/api/**', route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/v1/seller/stores/2')) return json(route, { id: 2, name: 'Test Mutfağı', status: 'ACTIVE', temporarilyClosed: false, rating: 5, reviewCount: 1, categories: [], availableDeliveryTimes: [] })
+    if (path.endsWith('/v1/seller/subscriptions/stores/2')) return json(route, { content: subscriptions, totalElements: 3, totalPages: 1, size: 50, number: 0, first: true, last: true })
+    const approveMatch = path.match(/\/seller\/subscriptions\/(\d+)\/approve$/)
+    if (approveMatch) {
+      const id = Number(approveMatch[1])
+      approved.push(id)
+      return id === 102 ? route.fulfill({ status: 409, contentType: 'application/json', body: '{}' }) : json(route, { ...base, id, status: 'ACTIVE' })
+    }
+    if (path.includes('unread-count')) return json(route, { count: 0 })
+    if (path.includes('delivery-change-requests')) return json(route, [])
+    return json(route, [])
+  })
+
+  await page.goto('/seller/stores/2/pending')
+  const cards = page.locator('article').filter({ hasText: 'TALEP #' })
+  await expect(cards.first()).toContainText('TALEP #103')
+  await page.getByLabel('Onay SLA filtresi').selectOption('URGENT')
+  await expect(cards).toHaveCount(1)
+  await expect(cards.first()).toContainText('TALEP #101')
+  await page.getByLabel('Onay SLA filtresi').selectOption('ALL')
+  await page.getByLabel('Görünen taleplerin tümünü seç').check()
+  await page.getByRole('button', { name: 'Seçilenleri kabul et (3)' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Seçilen talepleri kabul et' })
+  await dialog.getByRole('button', { name: '3 talebi kabul et' }).click()
+  await expect(page.getByRole('alert')).toContainText('2 talep kabul edildi')
+  await expect(page.getByRole('alert')).toContainText('1 talep kabul edilemedi: #102')
+  expect(approved.sort()).toEqual([101, 102, 103])
+})
+
 test('onay modalı küçük ekrana sığar, odağı yönetir ve Escape ile açan düğmeye döner', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
   await page.setViewportSize({ width: 360, height: 800 })
