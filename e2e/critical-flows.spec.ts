@@ -349,6 +349,10 @@ test('teslimat durum penceresi erişilebilir, Escape ile kapanır ve odağı ger
   })
 
   await page.goto('/seller/stores/2/daily-orders')
+  await expect(page).toHaveURL('/seller/stores/2/operations')
+  if ((page.viewportSize()?.width || 0) >= 768) {
+    await expect(page.getByRole('link', { name: 'Günlük Operasyon' })).toHaveCount(1)
+  }
   await expect(page.getByLabel('Teslimat durumu filtresi')).toBeVisible()
   await expect(page.getByLabel('Teslimat saati filtresi')).toBeVisible()
   await expect(page.getByLabel('Kurye filtresi')).toBeVisible()

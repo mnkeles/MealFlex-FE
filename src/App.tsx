@@ -302,7 +302,7 @@ export default function App() {
                 path="subscriptions/:subscriptionId"
                 element={<StoreSubscriptionDetailPage />}
               />
-              <Route path="daily-orders" element={<StoreDailyOrdersPage />} />
+              <Route path="daily-orders" element={<Navigate to="../operations" replace />} />
               <Route path="operations" element={<StoreDailyOrdersPage />} />
               <Route path="production" element={<StoreProductionPage />} />
               <Route path="couriers" element={<StoreCouriersPage />} />

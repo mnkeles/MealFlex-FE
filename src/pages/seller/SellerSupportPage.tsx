@@ -41,13 +41,13 @@ const faqs = [
     category: "Operasyon",
     question: "Günlük hazırlanacak porsiyonları nereden görürüm?",
     answer:
-      "Mağazanızın Üretim veya Günlük Sipariş ekranı, seçilen gün için hazırlanması gereken toplam porsiyonları ve teslimat kayıtlarını gösterir.",
+      "Mağazanızın Üretim veya Günlük Operasyon ekranı, seçilen gün için hazırlanması gereken toplam porsiyonları ve teslimat kayıtlarını gösterir.",
   },
   {
     category: "Operasyon",
     question: "Teslimatla ilgili bir sorun olduğunda ne yapmalıyım?",
     answer:
-      "Önce Canlı Operasyon ekranından teslimat durumunu ve kurye kaydını kontrol edin. Müşteri bildirimi varsa Şikâyetler bölümünden yanıtlayın ve teslimat kaydını güncel tutun.",
+      "Önce Günlük Operasyon ekranından teslimat durumunu ve kurye kaydını kontrol edin. Müşteri bildirimi varsa Şikâyetler bölümünden yanıtlayın ve teslimat kaydını güncel tutun.",
   },
   {
     category: "Gelir",

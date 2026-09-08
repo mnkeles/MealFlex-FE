@@ -17,7 +17,6 @@ import {
   PackageCheck,
   Settings,
   ShieldAlert,
-  ShoppingCart,
   Store,
   WalletCards,
 } from "lucide-react";
@@ -35,8 +34,7 @@ const tabs = [
   { path: "showcase", label: "Vitrin", icon: Store },
   { path: "pending", label: "Onay Bekleyenler", icon: ClipboardCheck },
   { path: "subscriptions", label: "Abonelikler", icon: CalendarDays },
-  { path: "daily-orders", label: "Günlük Sipariş", icon: ShoppingCart },
-  { path: "operations", label: "Canlı Operasyon", icon: Gauge },
+  { path: "operations", label: "Günlük Operasyon", icon: Gauge },
   { path: "production", label: "Üretim", icon: ChefHat },
   { path: "couriers", label: "Kuryeler", icon: PackageCheck },
   { path: "order-history", label: "Geçmiş", icon: Clock3 },
@@ -54,7 +52,7 @@ const tabGroups = [
   { label: "Dashboard", paths: ["dashboard"] },
   {
     label: "Operasyon",
-    paths: ["pending", "daily-orders", "operations", "production", "couriers"],
+    paths: ["pending", "operations", "production", "couriers"],
   },
   { label: "Abonelikler", paths: ["subscriptions", "order-history"] },
   { label: "Finans", paths: ["payouts", "analytics"] },
