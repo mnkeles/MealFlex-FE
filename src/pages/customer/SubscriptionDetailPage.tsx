@@ -11,6 +11,7 @@ import {
   Download,
   MapPin,
   MessageSquareWarning,
+  Phone,
   RefreshCw,
   Star,
   Truck,
@@ -104,6 +105,22 @@ function DeliveryLiveTracking({ deliveries }: { deliveries: Delivery[] }) {
                 <StatusBadge domain="delivery" status={delivery.status} />
               </div>
               <div className="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
+                {delivery.courierName && (
+                  <span>
+                    <Truck className="mr-1 inline h-4 w-4 text-info-600" />
+                    Kurye: <strong>{delivery.courierName}</strong>
+                  </span>
+                )}
+                {delivery.courierPhone && delivery.courierPhoneMasked && (
+                  <a
+                    href={`tel:${delivery.courierPhone}`}
+                    className="font-semibold text-info-700 underline"
+                    aria-label={`${delivery.courierName || "Kurye"} adlı kuryeyi ara`}
+                  >
+                    <Phone className="mr-1 inline h-4 w-4" />
+                    {delivery.courierPhoneMasked} · Ara
+                  </a>
+                )}
                 {delivery.estimatedDeliveryAt && (
                   <span>
                     <Clock3 className="mr-1 inline h-4 w-4 text-info-600" />

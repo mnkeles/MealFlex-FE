@@ -246,6 +246,8 @@ export interface Delivery {
   deliveryAddressDetails?: string;
   courierId?: number;
   courierName?: string;
+  courierPhone?: string;
+  courierPhoneMasked?: string;
   routeSequence?: number;
   status: DeliveryStatus;
   notes?: string;
