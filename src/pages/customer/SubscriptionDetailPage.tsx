@@ -212,6 +212,7 @@ export default function SubscriptionDetailPage() {
   const [modifyForm, setModifyForm] = useState({
     deliveryTime: "",
     personCount: "",
+    customerNote: "",
   });
   const [detailTab, setDetailTab] = useState<
     "summary" | "deliveries" | "payments" | "support"
@@ -341,6 +342,7 @@ export default function SubscriptionDetailPage() {
     personCount: modifyForm.personCount
       ? Number(modifyForm.personCount)
       : undefined,
+    customerNote: modifyForm.customerNote.trim() || undefined,
   };
   const changePreview = useMutation({
     mutationFn: () =>
@@ -372,6 +374,7 @@ export default function SubscriptionDetailPage() {
     setModifyForm({
       deliveryTime: toShortTime(delivery.deliveryTime),
       personCount: String(delivery.personCount),
+      customerNote: delivery.customerNote || "",
     });
     changePreview.reset();
     applyChange.reset();
@@ -460,7 +463,8 @@ export default function SubscriptionDetailPage() {
   const hasDeliveryChange = !!modifyingDelivery &&
     (toShortTime(modifyForm.deliveryTime) !==
       toShortTime(modifyingDelivery.deliveryTime) ||
-      Number(modifyForm.personCount) !== modifyingDelivery.personCount);
+      Number(modifyForm.personCount) !== modifyingDelivery.personCount ||
+      modifyForm.customerNote.trim() !== (modifyingDelivery.customerNote || ""));
   const modificationTimeOptions = modifyingDelivery
     ? Array.from(
         new Set(
@@ -730,6 +734,11 @@ export default function SubscriptionDetailPage() {
                         <p className="mt-2 rounded-xl bg-danger-50 p-3 text-sm text-danger-700">
                           <strong>Ret gerekçesi:</strong>{" "}
                           {request.decisionReason}
+                        </p>
+                      )}
+                      {request.customerNote && (
+                        <p className="mt-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-700">
+                          <strong>Teslimat notu:</strong> {request.customerNote}
                         </p>
                       )}
                     </article>
@@ -1278,6 +1287,27 @@ export default function SubscriptionDetailPage() {
                   </span>
                 )}
               </label>
+              <label className="text-xs font-bold text-slate-600 sm:col-span-2">
+                Teslimat notu
+                <textarea
+                  value={modifyForm.customerNote}
+                  onChange={(event) => {
+                    setModifyForm({
+                      ...modifyForm,
+                      customerNote: event.target.value,
+                    });
+                    changePreview.reset();
+                    applyChange.reset();
+                  }}
+                  maxLength={500}
+                  rows={3}
+                  placeholder="Örn. Resepsiyona bırakın veya gelince arayın."
+                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm font-normal"
+                />
+                <span className="mt-1 block text-right font-normal text-slate-400">
+                  {modifyForm.customerNote.length}/500
+                </span>
+              </label>
               <label className="text-xs font-bold text-slate-600">
                 Kişi sayısı
                 <select
@@ -1338,7 +1368,7 @@ export default function SubscriptionDetailPage() {
             )}
             {!hasDeliveryChange && (
               <p className="mt-4 text-sm font-semibold text-slate-500">
-                Talep göndermek için teslimat saati veya kişi sayısını değiştirin.
+                Talep göndermek için teslimat saati, kişi sayısı veya notu değiştirin.
               </p>
             )}
             <div className="mt-5 flex flex-wrap justify-end gap-2">

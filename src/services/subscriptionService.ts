@@ -37,6 +37,7 @@ export interface DeliveryModificationInput {
   addressId?: number;
   deliveryTime?: string;
   personCount?: number;
+  customerNote?: string;
 }
 export interface DeliveryModificationResult {
   deliveryId: number;
@@ -68,6 +69,7 @@ export interface DeliveryModificationRequestResult {
   priceDifference: number;
   status: "PENDING" | "APPROVED" | "REJECTED" | "APPLIED";
   decisionReason?: string;
+  customerNote?: string;
   requestedAt: string;
   decidedAt?: string;
 }

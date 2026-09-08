@@ -573,6 +573,11 @@ export default function StoreDailyOrdersPage() {
                         Not: {delivery.notes}
                       </p>
                     )}
+                    {delivery.customerNote && (
+                      <p className="mt-2 rounded-lg bg-warning-50 p-2 text-xs font-semibold text-warning-800">
+                        Müşteri teslimat notu: {delivery.customerNote}
+                      </p>
+                    )}
                     {delivery.proofPhotoUrl && (
                       <a
                         href={delivery.proofPhotoUrl}

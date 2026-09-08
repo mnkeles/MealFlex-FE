@@ -249,6 +249,7 @@ export interface Delivery {
   routeSequence?: number;
   status: DeliveryStatus;
   notes?: string;
+  customerNote?: string;
   deliveredAt?: string;
   statusChangedAt?: string;
   preparationStartedAt?: string;

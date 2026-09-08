@@ -181,6 +181,7 @@ export interface DeliveryChangeRequest {
   priceDifference: number;
   status: "PENDING" | "APPROVED" | "REJECTED" | "APPLIED";
   decisionReason?: string;
+  customerNote?: string;
   requestedAt: string;
 }
 

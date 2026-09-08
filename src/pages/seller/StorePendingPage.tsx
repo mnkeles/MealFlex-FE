@@ -250,6 +250,11 @@ export default function StorePendingPage() {
                         → <strong>{request.requestedAddress}</strong>
                       </p>
                     )}
+                    {request.customerNote && (
+                      <p className="mt-2 rounded-lg bg-info-50 p-3 text-sm text-info-800">
+                        <strong>Müşteri notu:</strong> {request.customerNote}
+                      </p>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <button
