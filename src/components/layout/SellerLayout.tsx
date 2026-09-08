@@ -1,5 +1,10 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import {
   Bell,
   ChevronLeft,
@@ -137,7 +142,7 @@ export default function SellerLayout() {
     logout();
     navigate("/seller/login");
   };
-  const guardNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
+  const guardNavigation = (event: ReactMouseEvent<HTMLAnchorElement>) => {
     const target = new URL(event.currentTarget.href);
     if (
       target.pathname === location.pathname &&

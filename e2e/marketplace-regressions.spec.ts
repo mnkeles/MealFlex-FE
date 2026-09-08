@@ -26,6 +26,8 @@ test('satıcı iki ayrı aralığı çakışmaları tekrarlamadan kaydeder ve ye
   })
   await page.goto('/seller/stores/2/settings')
   await expect(page.locator('#store-status').locator('..').getByText('Aktif', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('Kapalı gün tarihi')).toBeVisible()
+  await expect(page.getByLabel('Kapalı gün sebebi')).toBeVisible()
   const rangeStart = page.getByRole('combobox', { name: 'Başlangıç saati' })
   const rangeEnd = page.getByRole('combobox', { name: 'Bitiş saati' })
   await page.getByRole('button', { name: 'Aralığı ekle' }).click()

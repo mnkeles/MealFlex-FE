@@ -294,6 +294,34 @@ test('onay modalı küçük ekrana sığar, odağı yönetir ve Escape ile açan
   await expect(opener).toBeFocused()
 })
 
+test('teslimat durum penceresi erişilebilir, Escape ile kapanır ve odağı geri verir', async ({ page }) => {
+  await loginAs(page, 'SELLER')
+  const delivery = { id: 20, subscriptionId: 1, deliveryDate: '2026-09-08', deliveryTime: '12:30', personCount: 8, menuName: 'Kurumsal Menü', customerName: 'Test Müşteri', deliveryAddress: 'Ankara', status: 'IN_TRANSIT' }
+  await page.route('**/api/**', route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/v1/seller/stores/2')) return json(route, { id: 2, name: 'Test Mutfağı', status: 'ACTIVE', temporarilyClosed: false, rating: 5, reviewCount: 1, categories: [], availableDeliveryTimes: [] })
+    if (path.endsWith('/v1/seller/stores/2/deliveries/today')) return json(route, [delivery])
+    if (path.endsWith('/v1/seller/stores/2/deliveries/route-plan')) return json(route, { method: '', stops: [] })
+    if (path.endsWith('/v1/seller/stores/2/delivery-slots')) return json(route, [])
+    if (path.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/seller/stores/2/daily-orders')
+  await expect(page.getByLabel('Teslimat durumu filtresi')).toBeVisible()
+  await expect(page.getByLabel('Teslimat saati filtresi')).toBeVisible()
+  await expect(page.getByLabel('Kurye filtresi')).toBeVisible()
+  await expect(page.getByLabel('Bölge veya mahalle filtresi')).toBeVisible()
+  const opener = page.getByRole('button', { name: 'Teslim et' })
+  await opener.click()
+  const dialog = page.getByRole('dialog', { name: 'Teslim edildi' })
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByLabel('Müşteri teslimat kodu')).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
+  await expect(opener).toBeFocused()
+})
+
 test('müşteri değişiklik talebini teslimat takviminden izler', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
   await page.route('**/api/**', route => {

@@ -7,6 +7,7 @@ type ModalProps = {
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
+  initialFocusSelector?: string;
 };
 
 const focusableSelector =
@@ -18,33 +19,43 @@ export default function Modal({
   onClose,
   children,
   footer,
+  initialFocusSelector,
 }: ModalProps) {
   const dialogRef = useRef<HTMLElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!open) return;
+    const dialogElement = dialogRef.current;
     previousFocus.current =
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : null;
     const timer = window.setTimeout(
       () =>
-        dialogRef.current
-          ?.querySelector<HTMLElement>(focusableSelector)
-          ?.focus(),
+        (
+          (initialFocusSelector
+            ? dialogElement?.querySelector<HTMLElement>(initialFocusSelector)
+            : null) ||
+          dialogElement?.querySelector<HTMLElement>(focusableSelector)
+        )?.focus(),
       0,
     );
     return () => {
       window.clearTimeout(timer);
-      previousFocus.current?.focus();
+      const focusToRestore = previousFocus.current;
+      window.setTimeout(() => {
+        if (!dialogElement?.isConnected) focusToRestore?.focus();
+      }, 0);
     };
-  }, [open]);
+  }, [open, initialFocusSelector]);
 
   if (!open) return null;
 
   const trapFocus = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
       onClose();
       return;
     }
@@ -78,7 +89,7 @@ export default function Modal({
       <section
         ref={dialogRef}
         onKeyDown={trapFocus}
-        className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="max-h-[90vh] w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
@@ -95,7 +106,9 @@ export default function Modal({
             <X size={20} />
           </button>
         </header>
-        <div className="p-5">{children}</div>
+        <div className="max-h-[calc(90vh-8.5rem)] overflow-y-auto p-5">
+          {children}
+        </div>
         {footer && (
           <footer className="flex flex-wrap justify-end gap-2 border-t border-slate-200 p-4">
             {footer}

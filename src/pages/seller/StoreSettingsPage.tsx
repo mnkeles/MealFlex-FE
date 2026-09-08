@@ -1065,6 +1065,7 @@ export default function StoreSettingsPage() {
           <div className="flex gap-2 mb-4">
             <input
               type="date"
+              aria-label="Kapalı gün tarihi"
               min={earliestClosedDate}
               value={closedDateForm.closedDate}
               onChange={(e) =>
@@ -1077,6 +1078,7 @@ export default function StoreSettingsPage() {
             />
             <input
               type="text"
+              aria-label="Kapalı gün sebebi"
               value={closedDateForm.reason}
               onChange={(e) =>
                 setClosedDateForm({ ...closedDateForm, reason: e.target.value })
@@ -1128,6 +1130,7 @@ export default function StoreSettingsPage() {
                       setPendingDelete({ type: "closedDate", id: cd.id })
                     }
                     className="text-danger-500 text-sm hover:text-danger-700"
+                    aria-label={`${cd.closedDate} kapalı gününü sil`}
                   >
                     Sil
                   </button>

@@ -19,6 +19,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 import StatusBadge from "@/components/ui/StatusBadge";
+import Modal from "@/components/ui/Modal";
 import { deliveryStatuses, uiStatus } from "@/constants/statuses";
 
 const deliveryStatusOptions: DeliveryStatus[] = [
@@ -278,6 +279,7 @@ export default function StoreDailyOrdersPage() {
       ) : null}
       <div className="mf-surface flex flex-wrap items-center gap-2 p-3">
         <select
+          aria-label="Teslimat durumu filtresi"
           value={statusFilter}
           onChange={(event) =>
             setStatusFilter(event.target.value as "ALL" | DeliveryStatus)
@@ -292,6 +294,7 @@ export default function StoreDailyOrdersPage() {
           ))}
         </select>
         <select
+          aria-label="Teslimat saati filtresi"
           value={timeFilter}
           onChange={(event) =>
             setTimeFilter(event.target.value as typeof timeFilter)
@@ -304,6 +307,7 @@ export default function StoreDailyOrdersPage() {
           <option value="EVENING">Akşam (17:00+)</option>
         </select>
         <select
+          aria-label="Kurye filtresi"
           value={courierFilter}
           onChange={(event) => setCourierFilter(event.target.value)}
           className="mf-input w-auto min-w-36"
@@ -316,6 +320,7 @@ export default function StoreDailyOrdersPage() {
           ))}
         </select>
         <input
+          aria-label="Bölge veya mahalle filtresi"
           value={regionFilter}
           onChange={(event) => setRegionFilter(event.target.value)}
           placeholder="Bölge / mahalle ara"
@@ -688,11 +693,34 @@ export default function StoreDailyOrdersPage() {
       )}
 
       {dialog && (
-        <div className="fixed inset-0 z-[70] grid place-items-center bg-slate-950/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6">
-            <h3 className="text-xl font-black">
-              {uiStatus(deliveryStatuses, dialog.target).label}
-            </h3>
+        <Modal
+          open
+          title={uiStatus(deliveryStatuses, dialog.target).label}
+          initialFocusSelector="[data-delivery-dialog-initial-focus]"
+          onClose={() => {
+            if (!updateMutation.isPending) setDialog(undefined);
+          }}
+          footer={
+            <>
+              <button
+                onClick={() => setDialog(undefined)}
+                disabled={updateMutation.isPending}
+                className="rounded-xl px-4 py-2 text-sm font-bold disabled:opacity-50"
+              >
+                Vazgeç
+              </button>
+              <button
+                onClick={submitDialog}
+                disabled={!dialogValid || updateMutation.isPending}
+                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+              >
+                {requiresDeliveryCode
+                  ? "Teslim edildi olarak işaretle"
+                  : "Durumu güncelle"}
+              </button>
+            </>
+          }
+        >
             <p className="mt-1 text-sm text-slate-500">
               #{dialog.delivery.id} teslimatı için operasyon bilgisini girin.
             </p>
@@ -733,7 +761,7 @@ export default function StoreDailyOrdersPage() {
                 <label className="text-xs font-bold text-slate-600 sm:col-span-2">
                   Müşteri teslimat kodu
                   <input
-                    autoFocus
+                    data-delivery-dialog-initial-focus
                     inputMode="numeric"
                     autoComplete="one-time-code"
                     maxLength={4}
@@ -821,38 +849,40 @@ export default function StoreDailyOrdersPage() {
                 {errorMessage(updateMutation.error)}
               </p>
             )}
-            <div className="mt-5 flex justify-end gap-2">
+        </Modal>
+      )}
+
+      {compensationDialog && (
+        <Modal
+          open
+          title="Ücretsiz telafi teslimatı"
+          onClose={() => {
+            if (!compensationMutation.isPending)
+              setCompensationDialog(undefined);
+          }}
+          footer={
+            <>
               <button
-                onClick={() => setDialog(undefined)}
-                className="rounded-xl px-4 py-2 text-sm font-bold"
+                onClick={() => setCompensationDialog(undefined)}
+                disabled={compensationMutation.isPending}
+                className="rounded-xl px-4 py-2 text-sm font-bold disabled:opacity-50"
               >
                 Vazgeç
               </button>
               <button
-                onClick={submitDialog}
-                disabled={!dialogValid || updateMutation.isPending}
-                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                onClick={submitCompensation}
+                disabled={
+                  !compensationForm.deliveryDate ||
+                  !compensationForm.deliveryTime ||
+                  compensationMutation.isPending
+                }
+                className="rounded-xl bg-info-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
               >
-                {requiresDeliveryCode
-                  ? "Teslim edildi olarak işaretle"
-                  : "Durumu güncelle"}
+                Telafiyi planla
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {compensationDialog && (
-        <div
-          className="fixed inset-0 z-[70] grid place-items-center bg-slate-950/50 p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="compensation-dialog-title"
+            </>
+          }
         >
-          <div className="w-full max-w-md rounded-2xl bg-white p-6">
-            <h3 id="compensation-dialog-title" className="text-xl font-black">
-              Ücretsiz telafi teslimatı
-            </h3>
             <p className="mt-1 text-sm text-slate-500">
               #{compensationDialog.delivery.id} numaralı başarısız teslimat için
               müşteriden ek ücret alınmadan yeni gün ve saat seçin.
@@ -901,27 +931,7 @@ export default function StoreDailyOrdersPage() {
                 {errorMessage(compensationMutation.error)}
               </p>
             )}
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => setCompensationDialog(undefined)}
-                className="rounded-xl px-4 py-2 text-sm font-bold"
-              >
-                Vazgeç
-              </button>
-              <button
-                onClick={submitCompensation}
-                disabled={
-                  !compensationForm.deliveryDate ||
-                  !compensationForm.deliveryTime ||
-                  compensationMutation.isPending
-                }
-                className="rounded-xl bg-info-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
-              >
-                Telafiyi planla
-              </button>
-            </div>
-          </div>
-        </div>
+        </Modal>
       )}
     </div>
   );
