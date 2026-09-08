@@ -83,6 +83,16 @@ export const paymentStatuses: Record<string, UiStatus> = {
   REFUNDED: status("İade edildi", "neutral", "Ödeme tamamen iade edildi."),
 };
 
+export const payoutStatuses: Record<string, UiStatus> = {
+  SCHEDULED: status("Planlandı", "info", "Planlanan ödeme zamanını bekliyor."),
+  TRANSFER_FAILED: status(
+    "Aktarım başarısız",
+    "danger",
+    "Banka aktarımı yeniden denenebilir.",
+  ),
+  PAID: status("Ödendi", "success", "Hakediş satıcı hesabına aktarıldı."),
+};
+
 export const complaintStatuses: Record<string, UiStatus> = {
   OPEN: status("Yeni", "warning", "Talep ilk incelemeyi bekliyor."),
   IN_REVIEW: status("İnceleniyor", "info", "Talep değerlendirme sürecinde."),

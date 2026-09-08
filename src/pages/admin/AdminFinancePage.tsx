@@ -2,13 +2,21 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Landmark, Search, WalletCards } from "lucide-react";
 import ConfirmModal from "@/components/common/ConfirmModal";
-import { adminService, type AdminPayment } from "@/services/adminService";
+import {
+  adminService,
+  type AdminPayment,
+  type AdminPayout,
+} from "@/services/adminService";
 import { accountService } from "@/services/accountService";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { paymentStatuses, uiStatus } from "@/constants/statuses";
+import {
+  paymentStatuses,
+  payoutStatuses,
+  uiStatus,
+} from "@/constants/statuses";
 
 const money = (value: number) =>
   new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(
@@ -27,6 +35,8 @@ export default function AdminFinancePage() {
   const [reason, setReason] = useState("");
   const [reauthPassword, setReauthPassword] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [payoutToPay, setPayoutToPay] = useState<AdminPayout | null>(null);
+  const [payoutPassword, setPayoutPassword] = useState("");
   const payments = useQuery({
     queryKey: ["admin-payments", appliedSearch],
     queryFn: () =>
@@ -54,6 +64,27 @@ export default function AdminFinancePage() {
       setReauthPassword("");
     },
   });
+  const payPayout = useMutation({
+    mutationFn: async () =>
+      adminService.payPayout(
+        payoutToPay!.id,
+        await accountService.reauthenticate(payoutPassword),
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-payouts"] });
+      setPayoutToPay(null);
+      setPayoutPassword("");
+    },
+  });
+  const downloadStatement = async (item: AdminPayout) => {
+    const blob = await adminService.getPayoutStatement(item.id);
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `hak-edis-${item.id}.txt`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
   const availableRefund = payment
     ? payment.grossAmount - payment.refundedAmount
     : 0;
@@ -264,12 +295,13 @@ export default function AdminFinancePage() {
                   <th className="px-4 py-3">Mahsup</th>
                   <th className="px-4 py-3">Net hakediş</th>
                   <th className="px-4 py-3">Durum</th>
+                  <th className="px-4 py-3">İşlem</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {payouts.isLoading && (
                   <tr>
-                    <td colSpan={8} className="p-10 text-center text-slate-500">
+                    <td colSpan={9} className="p-10 text-center text-slate-500">
                       Hakedişler yükleniyor…
                     </td>
                   </tr>
@@ -291,16 +323,59 @@ export default function AdminFinancePage() {
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge
-                        tone={uiStatus(paymentStatuses, item.status).tone}
+                        tone={uiStatus(payoutStatuses, item.status).tone}
                       >
-                        {uiStatus(paymentStatuses, item.status).label}
+                        {uiStatus(payoutStatuses, item.status).label}
                       </StatusBadge>
+                      {item.providerPayoutId && (
+                        <div className="mt-1 max-w-40 truncate text-xs text-slate-500">
+                          {item.providerPayoutId}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-2">
+                        {item.status === "PAID" && (
+                          <Button
+                            onClick={() => void downloadStatement(item)}
+                            variant="outline"
+                            size="sm"
+                          >
+                            Belge
+                          </Button>
+                        )}
+                        {["SCHEDULED", "TRANSFER_FAILED"].includes(
+                          item.status,
+                        ) && (
+                          <Button
+                            disabled={
+                              !!item.scheduledAt &&
+                              new Date(item.scheduledAt).getTime() > Date.now()
+                            }
+                            title={
+                              item.scheduledAt &&
+                              new Date(item.scheduledAt).getTime() > Date.now()
+                                ? "Planlanan ödeme zamanı henüz gelmedi"
+                                : undefined
+                            }
+                            onClick={() => {
+                              setPayoutToPay(item);
+                              setPayoutPassword("");
+                            }}
+                            size="sm"
+                          >
+                            {item.status === "TRANSFER_FAILED"
+                              ? "Tekrar dene"
+                              : "Öde"}
+                          </Button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
                 {!payouts.isLoading && !payouts.data?.length && (
                   <tr>
-                    <td colSpan={7} className="p-10 text-center text-slate-500">
+                    <td colSpan={9} className="p-10 text-center text-slate-500">
                       Hakediş bulunamadı.
                     </td>
                   </tr>
@@ -377,6 +452,48 @@ export default function AdminFinancePage() {
                 Şifre doğrulanamadı veya iade başlatılamadı.
               </p>
             )}
+          </section>
+        </div>
+      )}
+      {payoutToPay && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
+          <section className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <h2 className="text-lg font-black">Hakedişi öde</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              {payoutToPay.storeName} için {money(payoutToPay.netAmount)} banka
+              aktarımına gönderilecek. Bu işlem ikinci kez çalıştırılamaz.
+            </p>
+            <label className="mf-label mt-4 block">
+              İşlem şifreniz
+              <input
+                type="password"
+                value={payoutPassword}
+                onChange={(event) => setPayoutPassword(event.target.value)}
+                autoComplete="current-password"
+                className="mf-input mt-2 w-full"
+              />
+            </label>
+            {payPayout.isError && (
+              <p className="mt-3 text-sm text-danger-600">
+                Şifre doğrulanamadı, IBAN eksik veya aktarım başlatılamadı.
+              </p>
+            )}
+            <div className="mt-5 flex justify-end gap-2">
+              <Button
+                onClick={() => setPayoutToPay(null)}
+                variant="ghost"
+                size="sm"
+              >
+                Vazgeç
+              </Button>
+              <Button
+                disabled={!payoutPassword || payPayout.isPending}
+                onClick={() => payPayout.mutate()}
+                size="sm"
+              >
+                {payPayout.isPending ? "Gönderiliyor…" : "Ödemeyi gönder"}
+              </Button>
+            </div>
           </section>
         </div>
       )}

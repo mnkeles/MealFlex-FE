@@ -200,6 +200,7 @@ export interface AdminPayout {
   refundAmount: number;
   adjustmentAmount: number;
   netAmount: number;
+  providerPayoutId?: string;
   scheduledAt?: string;
   paidAt?: string;
 }
@@ -497,6 +498,18 @@ export const adminService = {
 
   getPayouts: () =>
     api.get<AdminPayout[]>("/v1/admin/payouts").then((r) => r.data),
+  payPayout: (id: number, reauthToken: string) =>
+    api
+      .post<AdminPayout>(`/v1/admin/payouts/${id}/pay`, null, {
+        headers: { "X-Reauth-Token": reauthToken },
+      })
+      .then((r) => r.data),
+  getPayoutStatement: (id: number) =>
+    api
+      .get<Blob>(`/v1/admin/payouts/${id}/statement`, {
+        responseType: "blob",
+      })
+      .then((r) => r.data),
   getFinanceReconciliations: () =>
     api
       .get<FinanceReconciliation[]>("/v1/admin/finance-reconciliations")
