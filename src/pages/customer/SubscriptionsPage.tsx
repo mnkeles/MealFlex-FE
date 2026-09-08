@@ -12,9 +12,9 @@ import { subscriptionService } from "@/services/subscriptionService";
 import type { Subscription, SubscriptionStatus } from "@/types";
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
-import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 import MediaPlaceholder from "@/components/brand/MediaPlaceholder";
+import QueryBoundary from "@/components/ui/QueryBoundary";
 
 type Tab = "all" | "pending" | "ongoing" | "completed" | "closed";
 const tabs: { value: Tab; label: string }[] = [
@@ -113,12 +113,12 @@ export default function SubscriptionsPage() {
   const [tab, setTab] = useState<Tab>("all");
   const [page, setPage] = useState(0);
   const statuses = groups[tab];
-  const { data, isLoading } = useQuery({
+  const subscriptionsQuery = useQuery({
     queryKey: ["subscriptions", "customer", tab, page],
     queryFn: () =>
       subscriptionService.getMySubscriptions(undefined, page, 10, statuses),
   });
-  const visible = data?.content || [];
+  const data = subscriptionsQuery.data;
   const selectTab = (value: Tab) => {
     setTab(value);
     setPage(0);
@@ -150,30 +150,37 @@ export default function SubscriptionsPage() {
         ))}
       </div>
       <div className="space-y-4">
-        {isLoading ? (
-          [1, 2, 3].map((index) => (
-            <div
-              key={index}
-              className="h-44 animate-pulse rounded-2xl bg-slate-200"
-            />
-          ))
-        ) : visible.length ? (
-          visible.map((item) => <SubscriptionCard key={item.id} item={item} />)
-        ) : (
-          <EmptyState
-            title={
-              tab === "pending"
-                ? "Onay bekleyen aboneliğiniz bulunmuyor"
-                : "Bu bölümde abonelik bulunmuyor"
-            }
-            description="Adresinize hizmet veren işletmeleri inceleyerek yeni abonelik talebi oluşturabilirsiniz."
-            action={
-              <Link to="/stores">
-                <Button>İşletmeleri keşfet</Button>
-              </Link>
-            }
-          />
-        )}
+        <QueryBoundary
+          query={subscriptionsQuery}
+          loadingFallback={
+            <>
+              {[1, 2, 3].map((index) => (
+                <div
+                  key={index}
+                  className="h-44 animate-pulse rounded-2xl bg-slate-200"
+                />
+              ))}
+            </>
+          }
+          errorTitle="Abonelikleriniz yüklenemedi"
+          errorDescription="Abonelik kayıtlarınız silinmedi. Bağlantınızı kontrol edip tekrar deneyin."
+          isEmpty={(result) => !result.content.length}
+          emptyTitle={
+            tab === "pending"
+              ? "Onay bekleyen aboneliğiniz bulunmuyor"
+              : "Bu bölümde abonelik bulunmuyor"
+          }
+          emptyDescription="Adresinize hizmet veren işletmeleri inceleyerek yeni abonelik talebi oluşturabilirsiniz."
+          emptyAction={
+            <Link to="/stores">
+              <Button>İşletmeleri keşfet</Button>
+            </Link>
+          }
+        >
+          {(result) => result.content.map((item) => (
+            <SubscriptionCard key={item.id} item={item} />
+          ))}
+        </QueryBoundary>
       </div>
       {!!data && data.totalPages > 1 && (
         <div className="flex items-center justify-center gap-3">

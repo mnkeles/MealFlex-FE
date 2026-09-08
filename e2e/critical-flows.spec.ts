@@ -234,6 +234,42 @@ test('satıcı paneli telefon, tablet ve masaüstünde taşmaz; panel daraltıla
   await expect(page.getByLabel('Mağaza bölümleri').evaluate(element => element.scrollWidth >= element.clientWidth)).resolves.toBeTruthy()
 })
 
+test('abonelik listesi API hatasını boş liste gibi göstermez', async ({ page }) => {
+  await loginAs(page, 'CUSTOMER')
+  await page.route('**/api/**', route => {
+    const url = new URL(route.request().url())
+    if (url.pathname.endsWith('/v1/subscriptions')) {
+      return route.fulfill({ status: 503, contentType: 'application/json', body: '{}' })
+    }
+    if (url.pathname.endsWith('/v1/addresses')) return json(route, [])
+    if (url.pathname.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/subscriptions')
+  await expect(page.getByRole('heading', { name: 'Abonelikleriniz yüklenemedi' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Tekrar dene' })).toBeVisible()
+  await expect(page.getByText('Bu bölümde abonelik bulunmuyor')).toBeHidden()
+})
+
+test('satıcı onay talepleri API hatasını boş liste gibi göstermez', async ({ page }) => {
+  await loginAs(page, 'SELLER')
+  await page.route('**/api/**', route => {
+    const url = new URL(route.request().url())
+    if (url.pathname.endsWith('/v1/seller/stores/2')) return json(route, { id: 2, name: 'Test Mutfağı', status: 'ACTIVE', temporarilyClosed: false, rating: 5, reviewCount: 1, categories: [], availableDeliveryTimes: [] })
+    if (url.pathname.includes('/subscriptions/stores/2')) {
+      return route.fulfill({ status: 503, contentType: 'application/json', body: '{}' })
+    }
+    if (url.pathname.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/seller/stores/2/pending')
+  await expect(page.getByRole('heading', { name: 'Onay bekleyen talepler yüklenemedi' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Tekrar dene' })).toBeVisible()
+  await expect(page.getByText('Onay bekleyen talep bulunmuyor')).toBeHidden()
+})
+
 test('onay modalı küçük ekrana sığar, odağı yönetir ve Escape ile açan düğmeye döner', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
   await page.setViewportSize({ width: 360, height: 800 })

@@ -11,6 +11,7 @@ import {
   Users,
 } from "lucide-react";
 import { sellerService } from "@/services/sellerService";
+import QueryBoundary from "@/components/ui/QueryBoundary";
 
 function remaining(deadline: string | undefined, now: number) {
   if (!deadline) return "SLA tanımsız";
@@ -173,7 +174,6 @@ export default function StorePendingPage() {
       setChangeRejectReason("");
     },
   });
-  const loading = pending.isLoading;
   return (
     <div
       className={
@@ -313,13 +313,16 @@ export default function StorePendingPage() {
           </div>
         </section>
       )}
-      {loading ? (
-        <div className="py-12 text-center text-slate-500">Yükleniyor...</div>
-      ) : !subscriptions.length ? (
-        <div className="rounded-xl bg-white p-12 text-center text-slate-500 shadow-sm">
-          Onay bekleyen talep bulunmuyor.
-        </div>
-      ) : (
+      <QueryBoundary
+        query={pending}
+        loadingLabel="Onay bekleyen talepler yükleniyor…"
+        errorTitle="Onay bekleyen talepler yüklenemedi"
+        errorDescription="Talepler kaybolmadı. Bağlantınızı kontrol edip tekrar deneyin."
+        isEmpty={(result) => !result.content.length}
+        emptyTitle="Onay bekleyen talep bulunmuyor"
+        emptyDescription="Yeni abonelik talepleri geldiğinde burada görünecek."
+      >
+        {() => (
         <div className="space-y-4">
           {subscriptions.map((sub) => {
             const expired =
@@ -436,7 +439,8 @@ export default function StorePendingPage() {
             );
           })}
         </div>
-      )}
+        )}
+      </QueryBoundary>
       {(approve.isError || reject.isError) && (
         <p className="mt-4 rounded-xl bg-danger-50 p-3 text-sm font-semibold text-danger-700">
           {apiError(approve.error || reject.error)}
