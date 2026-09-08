@@ -10,6 +10,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 import Drawer from "@/components/ui/Drawer";
+import QueryBoundary from "@/components/ui/QueryBoundary";
 
 export default function StoreListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -72,11 +73,12 @@ export default function StoreListPage() {
     queryKey: ["discovery-metadata"],
     queryFn: storeService.getDiscoveryMetadata,
   });
-  const { data, isLoading, isError } = useQuery({
+  const storesQuery = useQuery({
     queryKey: ["stores", activeAddressId, filters],
     queryFn: () => storeService.getStores(activeAddressId!, filters),
     enabled: !!activeAddressId,
   });
+  const data = storesQuery.data;
   const { data: recent = [] } = useQuery({
     queryKey: ["recent-stores", activeAddressId],
     queryFn: () => storeService.getRecentStores(activeAddressId!),
@@ -288,59 +290,48 @@ export default function StoreListPage() {
         </div>
       )}
 
-      {isLoading ? (
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-72 animate-pulse rounded-2xl bg-slate-200"
-            />
-          ))}
-        </div>
-      ) : isError ? (
-        <EmptyState
-          title="İşletmeler yüklenemedi"
-          description="Bağlantınızı kontrol ederek tekrar deneyin."
-        />
-      ) : !data?.content.length ? (
-        isUnfilteredEmpty ? (
-          <EmptyState
-            title="Bu bölgeye henüz hizmet veren işletme yok"
-            description={
-              demandMutation.isSuccess
-                ? "Talebinizi aldık. Bölgenizde hizmet başladığında size bildireceğiz."
-                : `${activeAddress?.district || "Seçili bölgeniz"} için talep bırakarak yeni hizmet planlamasına katkıda bulunabilirsiniz.`
-            }
-            icon={<BellRing className="h-6 w-6" />}
-            action={
-              demandMutation.isSuccess ? undefined : (
-                <Button
-                  onClick={() => demandMutation.mutate()}
-                  disabled={demandMutation.isPending}
-                >
-                  {demandMutation.isPending
-                    ? "Talep kaydediliyor…"
-                    : "Bölgenize hizmet başladığında haber ver"}
-                </Button>
-              )
-            }
-          />
-        ) : (
-          <EmptyState
-            title="Filtrelerinize uygun işletme bulunamadı"
-            description="Farklı bir arama, kategori, puan veya kişi limiti deneyebilirsiniz."
-            action={
-              <Button variant="outline" onClick={clearFilters}>
-                Filtreleri temizle
+      <QueryBoundary
+        query={storesQuery}
+        loadingFallback={
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="İşletmeler yükleniyor">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-72 animate-pulse rounded-2xl bg-slate-200" />
+            ))}
+          </div>
+        }
+        errorTitle="İşletmeler yüklenemedi"
+        errorDescription="Bağlantınızı kontrol ederek tekrar deneyin."
+        isEmpty={(result) => result.content.length === 0}
+        emptyTitle={
+          isUnfilteredEmpty
+            ? "Bu bölgeye henüz hizmet veren işletme yok"
+            : "Filtrelerinize uygun işletme bulunamadı"
+        }
+        emptyDescription={
+          isUnfilteredEmpty
+            ? demandMutation.isSuccess
+              ? "Talebinizi aldık. Bölgenizde hizmet başladığında size bildireceğiz."
+              : `${activeAddress?.district || "Seçili bölgeniz"} için talep bırakarak yeni hizmet planlamasına katkıda bulunabilirsiniz.`
+            : "Farklı bir arama, kategori, puan veya kişi limiti deneyebilirsiniz."
+        }
+        emptyIcon={isUnfilteredEmpty ? <BellRing className="h-6 w-6" /> : undefined}
+        emptyAction={
+          isUnfilteredEmpty ? (
+            demandMutation.isSuccess ? undefined : (
+              <Button onClick={() => demandMutation.mutate()} disabled={demandMutation.isPending}>
+                {demandMutation.isPending ? "Talep kaydediliyor…" : "Bölgenize hizmet başladığında haber ver"}
               </Button>
-            }
-          />
-        )
-      ) : (
-        <>
+            )
+          ) : (
+            <Button variant="outline" onClick={clearFilters}>Filtreleri temizle</Button>
+          )
+        }
+      >
+        {(result) => (
+          <>
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-500">
-              <strong className="text-ink">{data.totalElements}</strong> işletme
+              <strong className="text-ink">{result.totalElements}</strong> işletme
               bulundu
             </p>
             <span className="text-xs font-bold text-slate-500">
@@ -348,7 +339,7 @@ export default function StoreListPage() {
             </span>
           </div>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {data.content.map((store) => (
+            {result.content.map((store) => (
               <StoreCard
                 key={store.id}
                 store={store}
@@ -356,8 +347,9 @@ export default function StoreListPage() {
               />
             ))}
           </div>
-        </>
-      )}
+          </>
+        )}
+      </QueryBoundary>
       {demandMutation.isError && (
         <p role="alert" className="text-center text-sm font-semibold text-danger-700">
           Hizmet talebi kaydedilemedi. Lütfen tekrar deneyin.

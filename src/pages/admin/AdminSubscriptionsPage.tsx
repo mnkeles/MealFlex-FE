@@ -13,7 +13,7 @@ import ConfirmModal from "@/components/common/ConfirmModal";
 import Button from "@/components/ui/Button";
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
-import EmptyState from "@/components/ui/EmptyState";
+import QueryBoundary from "@/components/ui/QueryBoundary";
 import { subscriptionStatuses } from "@/constants/statuses";
 const money = (amount: number) =>
   new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(
@@ -123,22 +123,17 @@ export default function AdminSubscriptionsPage() {
         <Button type="submit">Filtrele</Button>
       </form>
 
-      {listQuery.isError ? (
-        <EmptyState
-          title="Abonelikler yüklenemedi"
-          description="Bağlantıyı kontrol edip tekrar deneyin."
-          action={
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => listQuery.refetch()}
-            >
-              Tekrar dene
-            </Button>
-          }
-        />
-      ) : (
-        <>
+      <QueryBoundary
+        query={listQuery}
+        loadingLabel="Abonelikler yükleniyor…"
+        errorTitle="Abonelikler yüklenemedi"
+        errorDescription="Bağlantıyı kontrol edip tekrar deneyin."
+        isEmpty={(result) => result.content.length === 0}
+        emptyTitle="Filtreye uygun abonelik bulunamadı"
+        emptyDescription="Filtreleri değiştirerek tekrar deneyin."
+      >
+        {(data) => (
+          <>
       <div className="mf-surface overflow-x-auto">
         <table className="w-full min-w-[960px] text-left">
           <thead className="border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
@@ -153,27 +148,7 @@ export default function AdminSubscriptionsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-sm">
-            {listQuery.isLoading && (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="px-4 py-12 text-center text-slate-500"
-                >
-                  Abonelikler yükleniyor…
-                </td>
-              </tr>
-            )}
-            {!listQuery.isLoading && listQuery.data?.content.length === 0 && (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="px-4 py-12 text-center text-slate-500"
-                >
-                  Filtreye uygun abonelik bulunamadı.
-                </td>
-              </tr>
-            )}
-            {listQuery.data?.content.map((subscription) => (
+            {data.content.map((subscription) => (
               <tr
                 key={subscription.id}
                 className="transition hover:bg-slate-50/80"
@@ -234,10 +209,10 @@ export default function AdminSubscriptionsPage() {
         </table>
       </div>
 
-      {listQuery.data && listQuery.data.totalPages > 1 && (
+      {data.totalPages > 1 && (
         <div className="flex items-center justify-center gap-3">
           <Button
-            disabled={listQuery.data.first}
+            disabled={data.first}
             onClick={() => setPage((value) => Math.max(0, value - 1))}
             variant="outline"
             size="sm"
@@ -246,10 +221,10 @@ export default function AdminSubscriptionsPage() {
             <ChevronLeft size={18} />
           </Button>
           <span className="text-sm text-slate-600">
-            Sayfa {listQuery.data.number + 1} / {listQuery.data.totalPages}
+            Sayfa {data.number + 1} / {data.totalPages}
           </span>
           <Button
-            disabled={listQuery.data.last}
+            disabled={data.last}
             onClick={() => setPage((value) => value + 1)}
             variant="outline"
             size="sm"
@@ -259,8 +234,9 @@ export default function AdminSubscriptionsPage() {
           </Button>
         </div>
       )}
-        </>
-      )}
+          </>
+        )}
+      </QueryBoundary>
 
       {selectedId !== null && (
         <div

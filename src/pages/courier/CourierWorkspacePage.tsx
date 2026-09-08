@@ -4,6 +4,7 @@ import { CheckCircle2, MapPin, Navigation, Truck, WifiOff } from "lucide-react";
 import { courierService } from "@/services/courierService";
 import type { Delivery, DeliveryStatus } from "@/types";
 import StatusBadge from "@/components/ui/StatusBadge";
+import QueryBoundary from "@/components/ui/QueryBoundary";
 
 type Pending = {
   id: number;
@@ -27,11 +28,7 @@ export default function CourierWorkspacePage() {
   const [code, setCode] = useState("");
   const [proofUrl, setProofUrl] = useState("");
   const [receiver, setReceiver] = useState("");
-  const {
-    data: deliveries = [],
-    isLoading,
-    isError,
-  } = useQuery({
+  const deliveriesQuery = useQuery({
     queryKey: ["courier-workspace-today"],
     queryFn: courierService.today,
   });
@@ -106,19 +103,6 @@ export default function CourierWorkspacePage() {
         Teslim et
       </button>
     ) : null;
-  if (isLoading)
-    return (
-      <div className="grid min-h-screen place-items-center text-slate-500">
-        Rota yükleniyor…
-      </div>
-    );
-  if (isError)
-    return (
-      <div className="m-4 rounded-xl bg-danger-50 p-4 text-danger-700">
-        Kurye çalışma alanı yüklenemedi. Kurye davetinizin kabul edildiğini
-        kontrol edin.
-      </div>
-    );
   return (
     <main className="mx-auto min-h-screen max-w-xl bg-slate-50 p-4 pb-24">
       <header className="mb-4">
@@ -138,13 +122,18 @@ export default function CourierWorkspacePage() {
           Gönderilmeyi bekleyen {pending.length} işlem var.
         </div>
       )}
-      <div className="space-y-3">
-        {deliveries.length === 0 ? (
-          <div className="rounded-2xl bg-white p-8 text-center text-slate-500">
-            Bugün için size atanmış teslimat yok.
-          </div>
-        ) : (
-          deliveries.map((delivery, index) => (
+      <QueryBoundary
+        query={deliveriesQuery}
+        loadingLabel="Rota yükleniyor…"
+        errorTitle="Kurye çalışma alanı yüklenemedi"
+        errorDescription="Kurye davetinizin kabul edildiğini ve bağlantınızı kontrol edin."
+        isEmpty={(deliveries) => deliveries.length === 0}
+        emptyTitle="Bugün için size atanmış teslimat yok"
+        emptyDescription="Yeni bir teslimat atandığında rotanız burada görünecek."
+      >
+        {(deliveries) => (
+          <div className="space-y-3">
+            {deliveries.map((delivery, index) => (
             <article
               key={delivery.id}
               className="rounded-2xl border bg-white p-4 shadow-sm"
@@ -230,9 +219,10 @@ export default function CourierWorkspacePage() {
                 </div>
               )}
             </article>
-          ))
+            ))}
+          </div>
         )}
-      </div>
+      </QueryBoundary>
     </main>
   );
 }

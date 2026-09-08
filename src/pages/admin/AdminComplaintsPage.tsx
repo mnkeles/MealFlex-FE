@@ -11,6 +11,7 @@ import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
+import QueryBoundary from "@/components/ui/QueryBoundary";
 import { complaintStatuses, uiStatus } from "@/constants/statuses";
 
 export default function AdminComplaintsPage() {
@@ -142,41 +143,30 @@ export default function AdminComplaintsPage() {
           SLA yaklaşanlar
         </button>
       </section>
-      {complaints.isError ? (
-        <EmptyState
-          title="Şikâyetler yüklenemedi"
-          description="Bağlantıyı kontrol edip tekrar deneyin."
-          action={
-            <Button
-              onClick={() => complaints.refetch()}
-              variant="outline"
-              size="sm"
-            >
-              Tekrar dene
-            </Button>
-          }
-        />
-      ) : complaints.isLoading ? (
-        <div className="mf-surface p-10 text-center text-sm text-slate-500">
-          Şikâyetler yükleniyor…
-        </div>
-      ) : !complaints.data?.content.length ? (
-        <EmptyState
-          title="Şikâyet bulunamadı"
-          description="Yeni şikâyetler bu alanda görünür."
-        />
-      ) : !visibleComplaints.length ? (
-        <EmptyState
-          title="Bu filtrede şikâyet bulunamadı"
-          description="Arama metnini veya durum filtresini değiştirin."
-        />
-      ) : (
-        <div className="grid gap-4">
-          {visibleComplaints.map((item) => (
-            <ComplaintListCard key={item.id} item={item} onOpen={open} />
-          ))}
-        </div>
-      )}
+      <QueryBoundary
+        query={complaints}
+        loadingLabel="Şikâyetler yükleniyor…"
+        errorTitle="Şikâyetler yüklenemedi"
+        errorDescription="Bağlantıyı kontrol edip tekrar deneyin."
+        isEmpty={(result) => result.content.length === 0}
+        emptyTitle="Şikâyet bulunamadı"
+        emptyDescription="Yeni şikâyetler bu alanda görünür."
+      >
+        {() =>
+          visibleComplaints.length ? (
+            <div className="grid gap-4">
+              {visibleComplaints.map((item) => (
+                <ComplaintListCard key={item.id} item={item} onOpen={open} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="Bu filtrede şikâyet bulunamadı"
+              description="Arama metnini veya durum filtresini değiştirin."
+            />
+          )
+        }
+      </QueryBoundary>
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
           <section
