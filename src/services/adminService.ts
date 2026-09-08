@@ -305,12 +305,23 @@ export interface AdminSensitiveAction {
   reauthToken: string;
 }
 
+export interface ServiceDemandSummary {
+  city: string;
+  district: string;
+  neighborhood?: string;
+  requestCount: number;
+}
+
 const sensitiveActionConfig = (action: AdminSensitiveAction) => ({
   params: { reason: action.reason },
   headers: { "X-Reauth-Token": action.reauthToken },
 });
 
 export const adminService = {
+  getServiceDemands: () =>
+    api
+      .get<ServiceDemandSummary[]>("/v1/admin/service-demands")
+      .then((response) => response.data),
   getOperationsSummary: (
     params: { startDate?: string; endDate?: string; storeId?: number } = {},
   ) =>

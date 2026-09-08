@@ -7,6 +7,7 @@ import {
   CalendarClock,
   Download,
   FileWarning,
+  MapPinned,
   Users,
 } from "lucide-react";
 import { adminService } from "@/services/adminService";
@@ -62,6 +63,10 @@ export default function AdminDashboard() {
     queryFn: () => adminService.getOperationsSummary(filter),
     refetchInterval: 60_000,
   });
+  const serviceDemandsQuery = useQuery({
+    queryKey: ["admin-service-demands"],
+    queryFn: adminService.getServiceDemands,
+  });
   const previousOperationsQuery = useQuery({
     queryKey: [
       "admin-operations-summary",
@@ -97,13 +102,15 @@ export default function AdminDashboard() {
     usersQuery.isError ||
     storesCountQuery.isError ||
     storesQuery.isError ||
-    operationsQuery.isError;
+    operationsQuery.isError ||
+    serviceDemandsQuery.isError;
   const retryDashboard = () => {
     usersQuery.refetch();
     storesCountQuery.refetch();
     storesQuery.refetch();
     operationsQuery.refetch();
     previousOperationsQuery.refetch();
+    serviceDemandsQuery.refetch();
   };
   const alertTone = (type: string) =>
     type.includes("PAYMENT") || type.includes("DELAY") ? "danger" : "warning";
@@ -401,6 +408,50 @@ export default function AdminDashboard() {
           Dışa aktarımlar kişisel veri içermez; yalnız işlem türü, kayıt
           numarası ve operasyon özeti paylaşılır.
         </p>
+      </section>
+
+      <section className="mf-surface overflow-hidden">
+        <div className="flex items-center gap-3 border-b border-slate-100 p-5">
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-600">
+            <MapPinned className="h-5 w-5" />
+          </span>
+          <div>
+            <h2 className="mf-section-title">Hizmet bekleyen bölgeler</h2>
+            <p className="mf-muted mt-1">
+              Müşterilerin işletme bulunmayan adreslerden bıraktığı aktif talepler.
+            </p>
+          </div>
+        </div>
+        {serviceDemandsQuery.isLoading ? (
+          <p className="p-5 text-sm text-slate-500">Bölgesel talepler yükleniyor…</p>
+        ) : serviceDemandsQuery.data?.length ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-5 py-3">İl</th>
+                  <th className="px-5 py-3">İlçe</th>
+                  <th className="px-5 py-3">Mahalle</th>
+                  <th className="px-5 py-3 text-right">Talep</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {serviceDemandsQuery.data.map((item) => (
+                  <tr key={`${item.city}-${item.district}-${item.neighborhood || ""}`}>
+                    <td className="px-5 py-3 font-semibold text-ink">{item.city}</td>
+                    <td className="px-5 py-3 text-slate-700">{item.district}</td>
+                    <td className="px-5 py-3 text-slate-600">{item.neighborhood || "—"}</td>
+                    <td className="px-5 py-3 text-right font-black text-primary-700">
+                      {item.requestCount}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="p-5 text-sm text-slate-500">Henüz aktif bölgesel hizmet talebi yok.</p>
+        )}
       </section>
       <ConfirmModal
         open={showExportConfirm}

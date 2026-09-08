@@ -20,6 +20,16 @@ export interface StoreFilters {
   size?: number;
 }
 
+export interface ServiceDemand {
+  id: number;
+  addressId: number;
+  city: string;
+  district: string;
+  neighborhood?: string;
+  status: "ACTIVE";
+  createdAt: string;
+}
+
 export const storeService = {
   async getDiscoveryMetadata(): Promise<{
     categories: string[];
@@ -39,6 +49,13 @@ export const storeService = {
 
   async recordStoreView(storeId: number): Promise<void> {
     await api.post(`/v1/stores/${storeId}/view`);
+  },
+
+  async registerServiceDemand(addressId: number): Promise<ServiceDemand> {
+    const response = await api.post<ServiceDemand>("/v1/service-demands", null, {
+      params: { addressId },
+    });
+    return response.data;
   },
   async getStores(
     addressId: number,

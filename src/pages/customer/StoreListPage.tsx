@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { History, MapPin, Search, SlidersHorizontal, X } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { BellRing, History, MapPin, Search, SlidersHorizontal, X } from "lucide-react";
 import { storeService, type StoreFilters } from "@/services/storeService";
 import { useCustomerAddress } from "@/contexts/CustomerAddressContext";
 import StoreCard from "@/components/customer/StoreCard";
@@ -82,6 +82,9 @@ export default function StoreListPage() {
     queryFn: () => storeService.getRecentStores(activeAddressId!),
     enabled: !!activeAddressId,
   });
+  const demandMutation = useMutation({
+    mutationFn: () => storeService.registerServiceDemand(activeAddressId!),
+  });
 
   const clearFilters = () => {
     setSearch("");
@@ -106,6 +109,7 @@ export default function StoreListPage() {
     },
     { value: openOnly, label: openOnly ? "Yalnızca açık" : "" },
   ].filter((item) => !!item.value);
+  const isUnfilteredEmpty = !debouncedSearch.trim() && !activeFilters.length;
 
   const filterControls = (
     <>
@@ -299,15 +303,39 @@ export default function StoreListPage() {
           description="Bağlantınızı kontrol ederek tekrar deneyin."
         />
       ) : !data?.content.length ? (
-        <EmptyState
-          title="Filtrelerinize uygun işletme bulunamadı"
-          description="Farklı bir kategori, puan veya kişi limiti deneyebilirsiniz."
-          action={
-            <Button variant="outline" onClick={clearFilters}>
-              Filtreleri temizle
-            </Button>
-          }
-        />
+        isUnfilteredEmpty ? (
+          <EmptyState
+            title="Bu bölgeye henüz hizmet veren işletme yok"
+            description={
+              demandMutation.isSuccess
+                ? "Talebinizi aldık. Bölgenizde hizmet başladığında size bildireceğiz."
+                : `${activeAddress?.district || "Seçili bölgeniz"} için talep bırakarak yeni hizmet planlamasına katkıda bulunabilirsiniz.`
+            }
+            icon={<BellRing className="h-6 w-6" />}
+            action={
+              demandMutation.isSuccess ? undefined : (
+                <Button
+                  onClick={() => demandMutation.mutate()}
+                  disabled={demandMutation.isPending}
+                >
+                  {demandMutation.isPending
+                    ? "Talep kaydediliyor…"
+                    : "Bölgenize hizmet başladığında haber ver"}
+                </Button>
+              )
+            }
+          />
+        ) : (
+          <EmptyState
+            title="Filtrelerinize uygun işletme bulunamadı"
+            description="Farklı bir arama, kategori, puan veya kişi limiti deneyebilirsiniz."
+            action={
+              <Button variant="outline" onClick={clearFilters}>
+                Filtreleri temizle
+              </Button>
+            }
+          />
+        )
       ) : (
         <>
           <div className="flex items-center justify-between">
@@ -329,6 +357,11 @@ export default function StoreListPage() {
             ))}
           </div>
         </>
+      )}
+      {demandMutation.isError && (
+        <p role="alert" className="text-center text-sm font-semibold text-danger-700">
+          Hizmet talebi kaydedilemedi. Lütfen tekrar deneyin.
+        </p>
       )}
       {!!data && data.totalPages > 1 && (
         <div className="mt-8 flex items-center justify-center gap-3">
