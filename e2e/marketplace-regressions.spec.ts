@@ -47,6 +47,50 @@ test('satıcı iki ayrı aralığı çakışmaları tekrarlamadan kaydeder ve ye
   await expect(page.getByText('Bitiş saati başlangıç saatinden önce olamaz.')).toBeVisible()
 })
 
+test('mağaza ayarları taslağı korunur ve mesafe kaydı yalnız sunucudaki mağaza verisini kullanır', async ({ page }) => {
+  await login(page, 'SELLER')
+  const store = { id: 2, name: 'Kayıtlı Catering', description: 'Kayıtlı açıklama', status: 'ACTIVE', categories: [], availableDeliveryTimes: [], rating: 0, reviewCount: 0, latitude: 39.93, longitude: 32.85 }
+  const secondStore = { ...store, id: 3, name: 'İkinci Mağaza' }
+  let distanceRules = [{ id: 1, distanceKm: 5, minPersonCount: 3 }]
+  let updatePayload: Record<string, unknown> | undefined
+  await page.route('**/api/**', route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/seller/stores/2/distance-rules')) return json(route, distanceRules)
+    if (path.endsWith('/seller/stores/2') && route.request().method() === 'PUT') {
+      updatePayload = route.request().postDataJSON()
+      distanceRules = (updatePayload.distanceRules as typeof distanceRules).map((rule, index) => ({ ...rule, id: index + 1 }))
+      return json(route, { ...store, ...updatePayload })
+    }
+    if (path.endsWith('/seller/stores/2')) return json(route, store)
+    if (path.endsWith('/seller/stores')) return json(route, [store, secondStore])
+    if (path.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/seller/stores/2/settings')
+  const nameInput = page.locator('#store-profile form input[type="text"]').first()
+  await nameInput.fill('Kaydedilmemiş Taslak')
+  await expect(page.getByText(/Kaydedilmemiş değişiklikler var/)).toBeVisible()
+  await expect(page.getByLabel('Kaydedilmemiş değişiklik var')).toHaveCount(1)
+
+  await page.getByLabel('1. kural minimum kişi sayısı').fill('4')
+  await expect(page.getByLabel('Kaydedilmemiş değişiklik var')).toHaveCount(2)
+  await page.getByRole('button', { name: 'Mesafe Kurallarını Kaydet' }).click()
+  await expect(page.getByText('Mesafe kuralları kaydedildi.')).toBeVisible()
+  expect(updatePayload?.name).toBe('Kayıtlı Catering')
+  expect(updatePayload?.description).toBe('Kayıtlı açıklama')
+  await expect(nameInput).toHaveValue('Kaydedilmemiş Taslak')
+  await expect(page.getByLabel('Kaydedilmemiş değişiklik var')).toHaveCount(1)
+
+  page.once('dialog', dialog => dialog.dismiss())
+  if (await page.getByLabel('Aktif mağaza').isVisible()) {
+    await page.getByLabel('Aktif mağaza').selectOption('3')
+  } else {
+    await page.locator('nav[aria-label="Satıcı mobil navigasyonu"]').getByRole('link', { name: 'Bildirimler' }).click()
+  }
+  await expect(page).toHaveURL(/\/seller\/stores\/2\/settings$/)
+})
+
 async function subscriptionScenario(page: Page, times: string[]) {
   await login(page, 'CUSTOMER')
   const start = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10)

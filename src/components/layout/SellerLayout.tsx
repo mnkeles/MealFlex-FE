@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import {
   Bell,
   ChevronLeft,
@@ -132,9 +132,20 @@ export default function SellerLayout() {
   const SystemStatusIcon = systemStatus.icon;
 
   const handleLogout = () => {
+    if (!confirmSellerStoreNavigation()) return;
     setAccountMenuOpen(false);
     logout();
     navigate("/seller/login");
+  };
+  const guardNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
+    const target = new URL(event.currentTarget.href);
+    if (
+      target.pathname === location.pathname &&
+      target.search === location.search &&
+      target.hash === location.hash
+    )
+      return;
+    if (!confirmSellerStoreNavigation()) event.preventDefault();
   };
 
   return (
@@ -151,7 +162,7 @@ export default function SellerLayout() {
           className={`flex h-[89px] items-center border-b border-slate-100 ${isSidebarCollapsed ? "justify-center px-2" : "justify-between px-6"}`}
         >
           <div>
-            <Link to="/seller/stores">
+            <Link to="/seller/stores" onClick={guardNavigation}>
               <MealFlexLogo
                 showWordmark={!isSidebarCollapsed}
                 iconClassName="h-9 w-9"
@@ -185,6 +196,7 @@ export default function SellerLayout() {
             <Link
               key={item.path}
               to={item.path}
+              onClick={guardNavigation}
               className={`flex items-center rounded-lg py-2.5 text-sm font-medium transition-colors ${isSidebarCollapsed ? "justify-center px-2" : "gap-3 px-4"} ${
                 location.pathname.startsWith(item.path)
                   ? "bg-primary-50 text-primary-700 shadow-sm"
@@ -242,7 +254,10 @@ export default function SellerLayout() {
               <Link
                 role="menuitem"
                 to="/seller/profile"
-                onClick={() => setAccountMenuOpen(false)}
+                onClick={(event) => {
+                  guardNavigation(event);
+                  if (!event.defaultPrevented) setAccountMenuOpen(false);
+                }}
                 className="mt-1 flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               >
                 <UserRound className="h-4 w-4" /> Profil
@@ -250,7 +265,10 @@ export default function SellerLayout() {
               <Link
                 role="menuitem"
                 to="/seller/security"
-                onClick={() => setAccountMenuOpen(false)}
+                onClick={(event) => {
+                  guardNavigation(event);
+                  if (!event.defaultPrevented) setAccountMenuOpen(false);
+                }}
                 className="flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               >
                 <ShieldCheck className="h-4 w-4" /> Hesap ve Güvenlik
@@ -258,7 +276,10 @@ export default function SellerLayout() {
               <Link
                 role="menuitem"
                 to="/seller/security#notification-preferences"
-                onClick={() => setAccountMenuOpen(false)}
+                onClick={(event) => {
+                  guardNavigation(event);
+                  if (!event.defaultPrevented) setAccountMenuOpen(false);
+                }}
                 className="flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               >
                 <SlidersHorizontal className="h-4 w-4" /> Bildirim tercihleri
@@ -305,7 +326,7 @@ export default function SellerLayout() {
         className={`min-w-0 flex-1 overflow-x-hidden transition-[margin] duration-300 ease-in-out ${isSidebarCollapsed ? "md:ml-16" : "md:ml-72"}`}
       >
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:hidden">
-          <Link to="/seller/stores">
+          <Link to="/seller/stores" onClick={guardNavigation}>
             <MealFlexLogo
               iconClassName="h-8 w-8"
               wordmarkClassName="text-lg font-black tracking-tight text-primary-600"
@@ -347,6 +368,7 @@ export default function SellerLayout() {
             </span>
             <Link
               to="/seller/notifications"
+              onClick={guardNavigation}
               aria-label="Bildirimler"
               className="relative grid h-10 w-10 place-items-center rounded-xl text-slate-600 hover:bg-slate-100"
             >
@@ -359,6 +381,7 @@ export default function SellerLayout() {
             </Link>
             <Link
               to="/seller/profile"
+              onClick={guardNavigation}
               className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm font-bold text-slate-700 hover:bg-slate-100"
             >
               <span className="grid h-8 w-8 place-items-center rounded-full bg-slate-900 text-xs text-white">
@@ -383,6 +406,7 @@ export default function SellerLayout() {
             <Link
               key={item.label}
               to={item.path}
+              onClick={guardNavigation}
               className={`relative flex min-h-11 items-center justify-center px-1 py-2 text-center text-[10px] font-bold ${active ? "text-primary-600" : "text-slate-500"}`}
             >
               {item.label}

@@ -11,6 +11,11 @@ import { parseApiError } from "@/utils/apiErrors";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { discoveryLabels } from "@/constants/discovery";
 import DeliverySlotRangePicker from "@/components/seller/DeliverySlotRangePicker";
+import useUnsavedChanges from "@/hooks/useUnsavedChanges";
+import {
+  confirmSellerStoreNavigation,
+  subscribeToSellerStoreNavigation,
+} from "@/utils/sellerStoreNavigation";
 
 type DistanceRuleDraft = {
   id?: number;
@@ -75,8 +80,75 @@ const settingsSections = [
   { id: "business-hours", label: "Çalışma saatleri" },
   { id: "delivery-slots", label: "Teslimat saatleri" },
   { id: "service-areas", label: "Hizmet bölgeleri" },
+  { id: "closed-days", label: "Kapalı günler" },
   { id: "store-status", label: "Hizmet Kuralları" },
 ];
+
+const formFromStore = (store: Store) => ({
+  name: store.name || "",
+  description: store.description || "",
+  maxPersonCount: store.maxPersonCount ? String(store.maxPersonCount) : "",
+  dailyCapacity: store.dailyCapacity ? String(store.dailyCapacity) : "",
+  changeCutoffHours: String(store.changeCutoffHours || 24),
+  productionAddress: store.productionAddress || "",
+  addressTitle: store.addressTitle || "",
+  city: store.city || "",
+  district: store.district || "",
+  neighborhood: store.neighborhood || "",
+  street: store.street || "",
+  buildingNo: store.buildingNo || "",
+  floor: store.floor || "",
+  apartmentNo: store.apartmentNo || "",
+  directions: store.directions || "",
+  logoUrl: store.logoUrl || "",
+  coverImageUrl: store.coverImageUrl || "",
+  categories: store.categories || [],
+  latitude: String(store.latitude ?? 39.9334),
+  longitude: String(store.longitude ?? 32.8597),
+});
+
+const hoursFromResponse = (
+  values: { dayOfWeek: string; open: boolean; openTime?: string; closeTime?: string }[],
+) =>
+  days.map((dayOfWeek) => {
+    const saved = values.find((value) => value.dayOfWeek === dayOfWeek);
+    return saved
+      ? {
+          dayOfWeek,
+          open: saved.open,
+          openTime: saved.openTime || "11:00",
+          closeTime: saved.closeTime || "15:00",
+        }
+      : {
+          dayOfWeek,
+          open: dayOfWeek !== "SUNDAY",
+          openTime: "11:00",
+          closeTime: "15:00",
+        };
+  });
+
+const savedStorePayload = (store: Store) => ({
+  name: store.name,
+  description: store.description,
+  maxPersonCount: store.maxPersonCount,
+  dailyCapacity: store.dailyCapacity,
+  changeCutoffHours: store.changeCutoffHours,
+  productionAddress: store.productionAddress,
+  addressTitle: store.addressTitle,
+  city: store.city,
+  district: store.district,
+  neighborhood: store.neighborhood,
+  street: store.street,
+  buildingNo: store.buildingNo,
+  floor: store.floor,
+  apartmentNo: store.apartmentNo,
+  directions: store.directions,
+  logoUrl: store.logoUrl,
+  coverImageUrl: store.coverImageUrl,
+  categories: store.categories,
+  latitude: store.latitude ?? 39.9334,
+  longitude: store.longitude ?? 32.8597,
+});
 
 export default function StoreSettingsPage() {
   const { storeId, store } = useOutletContext<{
@@ -129,30 +201,7 @@ export default function StoreSettingsPage() {
 
   useEffect(() => {
     if (store) {
-      setForm({
-        name: store.name || "",
-        description: store.description || "",
-        maxPersonCount: store.maxPersonCount
-          ? String(store.maxPersonCount)
-          : "",
-        dailyCapacity: store.dailyCapacity ? String(store.dailyCapacity) : "",
-        changeCutoffHours: String(store.changeCutoffHours || 24),
-        productionAddress: store.productionAddress || "",
-        addressTitle: store.addressTitle || "",
-        city: store.city || "",
-        district: store.district || "",
-        neighborhood: store.neighborhood || "",
-        street: store.street || "",
-        buildingNo: store.buildingNo || "",
-        floor: store.floor || "",
-        apartmentNo: store.apartmentNo || "",
-        directions: store.directions || "",
-        logoUrl: store.logoUrl || "",
-        coverImageUrl: store.coverImageUrl || "",
-        categories: store.categories || [],
-        latitude: String(store.latitude ?? 39.9334),
-        longitude: String(store.longitude ?? 32.8597),
-      });
+      setForm(formFromStore(store));
     }
   }, [store]);
 
@@ -163,26 +212,7 @@ export default function StoreSettingsPage() {
   });
 
   useEffect(() => {
-    if (businessHours && businessHours.length > 0) {
-      setHours(
-        days.map((d) => {
-          const bh = businessHours.find((h) => h.dayOfWeek === d);
-          return bh
-            ? {
-                dayOfWeek: d,
-                open: bh.open,
-                openTime: bh.openTime || "11:00",
-                closeTime: bh.closeTime || "15:00",
-              }
-            : {
-                dayOfWeek: d,
-                open: d !== "SUNDAY",
-                openTime: "11:00",
-                closeTime: "15:00",
-              };
-        }),
-      );
-    }
+    if (businessHours) setHours(hoursFromResponse(businessHours));
   }, [businessHours]);
 
   const { data: savedDeliverySlots, isPending: deliverySlotsLoading, isError: deliverySlotsLoadError, refetch: reloadDeliverySlots } = useQuery({
@@ -204,7 +234,7 @@ export default function StoreSettingsPage() {
     onSuccess: () => {
       setStoreFormError(undefined);
       queryClient.invalidateQueries({
-        queryKey: ["seller-store", String(storeId)],
+        queryKey: ["seller-store", storeId],
       });
       queryClient.invalidateQueries({ queryKey: ["seller-stores"] });
     },
@@ -229,9 +259,6 @@ export default function StoreSettingsPage() {
       setDeliverySlotSuccess("Teslimat saatleri kaydedildi.");
       queryClient.invalidateQueries({
         queryKey: ["store-delivery-slots", storeId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["seller-store", String(storeId)],
       });
       queryClient.invalidateQueries({ queryKey: ["seller-stores"] });
     },
@@ -349,6 +376,55 @@ export default function StoreSettingsPage() {
     },
   });
 
+  const dirtySections: Record<string, boolean> = {
+    "store-profile": Boolean(
+      store && JSON.stringify(form) !== JSON.stringify(formFromStore(store)),
+    ),
+    "business-hours": Boolean(
+      businessHours &&
+        JSON.stringify(hours) !== JSON.stringify(hoursFromResponse(businessHours)),
+    ),
+    "delivery-slots": Boolean(
+      savedDeliverySlots &&
+        JSON.stringify(deliverySlots) !==
+          JSON.stringify(
+            savedDeliverySlots.map((slot) => slot.deliveryTime.slice(0, 5)),
+          ),
+    ),
+    "service-areas":
+      Boolean(areaForm.district || areaForm.neighborhood) ||
+      Boolean(
+        distanceRules &&
+          JSON.stringify(distanceRuleDrafts) !==
+            JSON.stringify(
+              distanceRules.map((rule) => ({
+                id: rule.id,
+                distanceKm: String(rule.distanceKm),
+                minPersonCount: String(rule.minPersonCount),
+              })),
+            ),
+      ),
+    "closed-days": Boolean(closedDateForm.closedDate || closedDateForm.reason),
+    "store-status": false,
+  };
+  const hasUnsavedChanges = Object.values(dirtySections).some(Boolean);
+
+  useUnsavedChanges(hasUnsavedChanges);
+  useEffect(
+    () =>
+      subscribeToSellerStoreNavigation((event) => {
+        if (
+          hasUnsavedChanges &&
+          !window.confirm(
+            "Kaydedilmemiş mağaza ayarları var. Geçiş yaparsanız bu değişiklikler kaybolacak. Devam etmek istiyor musunuz?",
+          )
+        ) {
+          event.preventDefault();
+        }
+      }),
+    [hasUnsavedChanges],
+  );
+
   const handleStoreSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateMutation.mutate({
@@ -380,28 +456,7 @@ export default function StoreSettingsPage() {
   const distanceRuleMutation = useMutation({
     mutationFn: (rules: { distanceKm: number; minPersonCount: number }[]) =>
       sellerService.updateStoreById(storeId, {
-        name: form.name,
-        description: form.description || undefined,
-        maxPersonCount: form.maxPersonCount
-          ? Number(form.maxPersonCount)
-          : undefined,
-        dailyCapacity: form.dailyCapacity ? Number(form.dailyCapacity) : undefined,
-        changeCutoffHours: Number(form.changeCutoffHours),
-        productionAddress: form.productionAddress || undefined,
-        addressTitle: form.addressTitle || undefined,
-        city: form.city || undefined,
-        district: form.district || undefined,
-        neighborhood: form.neighborhood || undefined,
-        street: form.street || undefined,
-        buildingNo: form.buildingNo || undefined,
-        floor: form.floor || undefined,
-        apartmentNo: form.apartmentNo || undefined,
-        directions: form.directions || undefined,
-        logoUrl: form.logoUrl || undefined,
-        coverImageUrl: form.coverImageUrl || undefined,
-        categories: form.categories,
-        latitude: Number(form.latitude),
-        longitude: Number(form.longitude),
+        ...savedStorePayload(store!),
         maxDeliveryDistanceKm: rules[rules.length - 1].distanceKm,
         distanceRules: rules,
       }),
@@ -410,9 +465,6 @@ export default function StoreSettingsPage() {
       setDistanceRuleSuccess("Mesafe kuralları kaydedildi.");
       queryClient.invalidateQueries({
         queryKey: ["store-distance-rules", storeId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["seller-store", String(storeId)],
       });
       queryClient.invalidateQueries({ queryKey: ["seller-stores"] });
     },
@@ -512,6 +564,15 @@ export default function StoreSettingsPage() {
 
   return (
     <div className="space-y-8">
+      {hasUnsavedChanges && (
+        <div
+          role="status"
+          className="rounded-xl border border-warning-200 bg-warning-50 px-4 py-3 text-sm font-semibold text-warning-800"
+        >
+          Kaydedilmemiş değişiklikler var. Turuncu noktalı bölümü kaydetmeden
+          mağaza değiştirmeyin veya sayfadan ayrılmayın.
+        </div>
+      )}
       <nav
         aria-label="Mağaza ayarları bölümleri"
         className="sticky top-2 z-10 -mx-1 flex gap-2 overflow-x-auto rounded-xl border border-slate-200 bg-white/95 p-2 shadow-sm backdrop-blur"
@@ -523,7 +584,15 @@ export default function StoreSettingsPage() {
             onClick={() => scrollToSection(section.id)}
             className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-primary-50 hover:text-primary-700"
           >
-            {section.label}
+            <span className="inline-flex items-center gap-2">
+              {section.label}
+              {dirtySections[section.id] && (
+                <span
+                  className="h-2 w-2 rounded-full bg-warning-500"
+                  aria-label="Kaydedilmemiş değişiklik var"
+                />
+              )}
+            </span>
           </button>
         ))}
       </nav>
@@ -564,6 +633,9 @@ export default function StoreSettingsPage() {
               </p>
               <Link
                 to={`/seller/stores/${storeId}/showcase`}
+                onClick={(event) => {
+                  if (!confirmSellerStoreNavigation()) event.preventDefault();
+                }}
                 className="mt-2 inline-flex text-xs font-bold text-primary-700 hover:underline"
               >
                 Mağaza görünümünü aç →
