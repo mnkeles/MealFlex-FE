@@ -8,6 +8,7 @@ import {
   Clock3,
   CookingPot,
   MapPin,
+  Printer,
   Truck,
 } from "lucide-react";
 import {
@@ -61,6 +62,19 @@ function errorMessage(error: unknown) {
   const candidate = error as { response?: { data?: { message?: string } } };
   return candidate.response?.data?.message || "Teslimat durumu güncellenemedi.";
 }
+
+const escapeHtml = (value: unknown) =>
+  String(value ?? "").replace(
+    /[&<>'"]/g,
+    (character) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;",
+      })[character]!,
+  );
 
 export default function StoreDailyOrdersPage() {
   const queryClient = useQueryClient();
@@ -212,6 +226,62 @@ export default function StoreDailyOrdersPage() {
       ),
     [deliveries],
   );
+  const kitchenDeliveries = useMemo(
+    () =>
+      deliveries.filter(
+        (delivery) => !["CANCELLED", "SKIPPED"].includes(delivery.status),
+      ),
+    [deliveries],
+  );
+  const menuPortions = useMemo(
+    () =>
+      [
+        ...kitchenDeliveries.reduce(
+          (summary, delivery) => {
+            const current = summary.get(delivery.menuName) ?? {
+              menuName: delivery.menuName,
+              portions: 0,
+              deliveries: 0,
+            };
+            current.portions += delivery.personCount;
+            current.deliveries += 1;
+            summary.set(delivery.menuName, current);
+            return summary;
+          },
+          new Map<
+            string,
+            { menuName: string; portions: number; deliveries: number }
+          >(),
+        ).values(),
+      ].sort((left, right) => right.portions - left.portions),
+    [kitchenDeliveries],
+  );
+  const totalKitchenPortions = kitchenDeliveries.reduce(
+    (total, delivery) => total + delivery.personCount,
+    0,
+  );
+  const printKitchenList = () => {
+    const popup = window.open("", "_blank", "width=960,height=720");
+    if (!popup) return;
+    const menuRows = menuPortions
+      .map(
+        (menu) =>
+          `<tr><td>${escapeHtml(menu.menuName)}</td><td>${menu.deliveries}</td><td><strong>${menu.portions}</strong></td></tr>`,
+      )
+      .join("");
+    const deliveryRows = kitchenDeliveries
+      .map(
+        (delivery) =>
+          `<tr><td>${escapeHtml(delivery.deliveryTime.slice(0, 5))}</td><td>${escapeHtml(delivery.menuName)}</td><td>${delivery.personCount}</td><td>${escapeHtml(delivery.customerName)}</td><td>${escapeHtml(delivery.deliveryAddressDetails || delivery.deliveryAddress)}</td><td>${escapeHtml(delivery.customerNote || delivery.notes || "")}</td></tr>`,
+      )
+      .join("");
+    popup.document.write(
+      `<html><head><title>Günlük Mutfak Listesi</title><style>body{font:14px Arial;padding:24px}h1{margin-bottom:4px}table{border-collapse:collapse;width:100%;margin:16px 0 28px}th,td{border:1px solid #bbb;padding:8px;text-align:left}th{background:#eee}.total{font-size:18px;font-weight:bold}</style></head><body><h1>Günlük Mutfak Listesi</h1><p>${escapeHtml(new Date().toLocaleDateString("tr-TR"))}</p><p class="total">${totalKitchenPortions} porsiyon · ${kitchenDeliveries.length} teslimat</p><h2>Menü özeti</h2><table><thead><tr><th>Menü</th><th>Teslimat</th><th>Porsiyon</th></tr></thead><tbody>${menuRows}</tbody></table><h2>Teslimat hazırlık listesi</h2><table><thead><tr><th>Saat</th><th>Menü</th><th>Porsiyon</th><th>Müşteri</th><th>Adres</th><th>Not</th></tr></thead><tbody>${deliveryRows}</tbody></table></body></html>`,
+    );
+    popup.document.close();
+    popup.focus();
+    popup.print();
+  };
   const scheduledIds = deliveries
     .filter((delivery) => delivery.status === "SCHEDULED")
     .map((delivery) => delivery.id);
@@ -285,6 +355,46 @@ export default function StoreDailyOrdersPage() {
         title="Bugünün teslimatları"
         description="Hazırlık, kurye, teslimat denemesi ve kanıt akışını tek ekrandan yönetin."
       />
+      <section className="rounded-2xl border border-primary-100 bg-white p-4 shadow-card">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="font-black text-ink">Bugünün mutfak özeti</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              {totalKitchenPortions} porsiyon · {kitchenDeliveries.length} teslimat
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={printKitchenList}
+            disabled={!kitchenDeliveries.length}
+            className="flex h-10 items-center gap-2 rounded-xl bg-slate-900 px-3 text-sm font-bold text-white disabled:opacity-40"
+          >
+            <Printer className="h-4 w-4" aria-hidden="true" />
+            Mutfak çıktısı
+          </button>
+        </div>
+        {menuPortions.length ? (
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            {menuPortions.map((menu) => (
+              <article
+                key={menu.menuName}
+                className="rounded-xl bg-slate-50 px-3 py-2.5"
+              >
+                <p className="truncate text-sm font-black text-slate-800">
+                  {menu.menuName}
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  {menu.portions} porsiyon · {menu.deliveries} teslimat
+                </p>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-500">
+            Bugün hazırlanacak menü bulunmuyor.
+          </p>
+        )}
+      </section>
       {routePlan?.stops.length ? (
         <section className="mb-4 rounded-2xl border border-info-200 bg-info-50 p-4">
           <h3 className="font-black text-info-900">Rota önerisi</h3>

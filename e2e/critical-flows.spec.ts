@@ -360,6 +360,40 @@ test('toplu teslimat güncellemesi onay ister ve kısmi hata sonucunu açıklar'
   expect(attempted.sort()).toEqual([20, 21, 22])
 })
 
+test('günlük operasyon menü porsiyonlarını özetler ve mutfak çıktısı üretir', async ({ page }) => {
+  await loginAs(page, 'SELLER')
+  const base = { subscriptionId: 1, deliveryDate: '2026-09-08', deliveryTime: '12:30', customerName: 'Test Müşteri', deliveryAddress: 'Ankara', status: 'SCHEDULED' }
+  const deliveries = [
+    { ...base, id: 30, menuName: 'Ev Menüsü', personCount: 5 },
+    { ...base, id: 31, menuName: 'Ev Menüsü', personCount: 3 },
+    { ...base, id: 32, menuName: 'Vegan Menü', personCount: 4 },
+    { ...base, id: 33, menuName: 'İptal Menü', personCount: 100, status: 'CANCELLED' },
+  ]
+  await page.route('**/api/**', route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/v1/seller/stores/2')) return json(route, { id: 2, name: 'Test Mutfağı', status: 'ACTIVE', temporarilyClosed: false, rating: 5, reviewCount: 1, categories: [], availableDeliveryTimes: [] })
+    if (path.endsWith('/v1/seller/stores/2/deliveries/today')) return json(route, deliveries)
+    if (path.endsWith('/v1/seller/stores/2/deliveries/route-plan')) return json(route, { method: '', stops: [] })
+    if (path.endsWith('/v1/seller/stores/2/delivery-slots')) return json(route, [])
+    if (path.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/seller/stores/2/operations')
+  const summary = page.getByRole('heading', { name: 'Bugünün mutfak özeti' }).locator('xpath=ancestor::section')
+  await expect(summary).toContainText('12 porsiyon · 3 teslimat')
+  await expect(summary).toContainText('Ev Menüsü')
+  await expect(summary).toContainText('8 porsiyon · 2 teslimat')
+  await expect(summary).toContainText('Vegan Menü')
+  await expect(summary).not.toContainText('İptal Menü')
+
+  const popupPromise = page.waitForEvent('popup')
+  await summary.getByRole('button', { name: 'Mutfak çıktısı' }).click()
+  const popup = await popupPromise
+  await expect(popup.locator('body')).toContainText('Günlük Mutfak Listesi')
+  await expect(popup.locator('body')).toContainText('12 porsiyon · 3 teslimat')
+})
+
 test('müşteri değişiklik talebini teslimat takviminden izler', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
   await page.route('**/api/**', route => {
