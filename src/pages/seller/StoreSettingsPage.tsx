@@ -11,6 +11,7 @@ import { parseApiError } from "@/utils/apiErrors";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { discoveryLabels } from "@/constants/discovery";
 import DeliverySlotRangePicker from "@/components/seller/DeliverySlotRangePicker";
+import StatusBadge from "@/components/ui/StatusBadge";
 import useUnsavedChanges from "@/hooks/useUnsavedChanges";
 import {
   confirmSellerStoreNavigation,
@@ -1145,10 +1146,10 @@ export default function StoreSettingsPage() {
           Mağaza Durumu
         </h2>
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <p className="text-sm text-slate-600 mb-3">
-            Mevcut durum:{" "}
-            <span className="font-semibold">{store?.status || "DRAFT"}</span>
-          </p>
+          <div className="mb-3 flex items-center gap-2 text-sm text-slate-600">
+            <span>Mevcut durum:</span>
+            <StatusBadge domain="store" status={store?.status || "DRAFT"} />
+          </div>
           <div className="flex gap-2">
             {(store?.status === "DRAFT" || store?.status === "SUSPENDED") && (
               <button
