@@ -20,6 +20,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 import StatusBadge from "@/components/ui/StatusBadge";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/common/ConfirmModal";
 import { deliveryStatuses, uiStatus } from "@/constants/statuses";
 
 const deliveryStatusOptions: DeliveryStatus[] = [
@@ -35,6 +36,16 @@ const deliveryStatusOptions: DeliveryStatus[] = [
 
 type DialogState = { delivery: Delivery; target: DeliveryStatus };
 type CompensationDialogState = { delivery: Delivery };
+type BulkDialogState = {
+  status: DeliveryStatus;
+  ids: number[];
+  actionLabel: string;
+};
+type BulkResult = {
+  succeeded: number[];
+  failed: number[];
+  status: DeliveryStatus;
+};
 
 const emptyForm = {
   estimatedDeliveryAt: "",
@@ -71,6 +82,8 @@ export default function StoreDailyOrdersPage() {
   const [courierFilter, setCourierFilter] = useState("ALL");
   const [regionFilter, setRegionFilter] = useState("");
   const [presentation, setPresentation] = useState<"LIST" | "KANBAN">("LIST");
+  const [bulkDialog, setBulkDialog] = useState<BulkDialogState>();
+  const [bulkResult, setBulkResult] = useState<BulkResult>();
 
   const deliveriesQuery = useQuery({
     queryKey: ["seller-deliveries-today", storeId],
@@ -105,16 +118,29 @@ export default function StoreDailyOrdersPage() {
     },
   });
   const bulkMutation = useMutation({
-    mutationFn: ({ status, ids }: { status: DeliveryStatus; ids: number[] }) =>
-      Promise.all(
+    mutationFn: async ({ status, ids }: { status: DeliveryStatus; ids: number[] }) => {
+      const settled = await Promise.allSettled(
         ids.map((id) =>
           sellerService.updateDeliveryStatus(storeId, id, { status }),
         ),
-      ),
-    onSuccess: () =>
+      );
+      return settled.reduce<BulkResult>(
+        (result, item, index) => {
+          result[item.status === "fulfilled" ? "succeeded" : "failed"].push(
+            ids[index],
+          );
+          return result;
+        },
+        { succeeded: [], failed: [], status },
+      );
+    },
+    onSuccess: (result) => {
+      setBulkDialog(undefined);
+      setBulkResult(result);
       queryClient.invalidateQueries({
         queryKey: ["seller-deliveries-today", storeId],
-      }),
+      });
+    },
   });
   const compensationMutation = useMutation({
     mutationFn: ({
@@ -343,24 +369,70 @@ export default function StoreDailyOrdersPage() {
           </button>
         </div>
         <button
-          onClick={() =>
-            bulkMutation.mutate({ status: "PREPARING", ids: scheduledIds })
-          }
+          onClick={() => {
+            setBulkResult(undefined);
+            setBulkDialog({
+              status: "PREPARING",
+              ids: scheduledIds,
+              actionLabel: "hazırlamaya al",
+            });
+          }}
           disabled={!scheduledIds.length || bulkMutation.isPending}
           className="h-11 rounded-xl bg-warning-600 px-3 text-sm font-bold text-white disabled:opacity-50"
         >
           Tümünü hazırlamaya al ({scheduledIds.length})
         </button>
         <button
-          onClick={() =>
-            bulkMutation.mutate({ status: "IN_TRANSIT", ids: preparingIds })
-          }
+          onClick={() => {
+            setBulkResult(undefined);
+            setBulkDialog({
+              status: "IN_TRANSIT",
+              ids: preparingIds,
+              actionLabel: "yola çıkar",
+            });
+          }}
           disabled={!preparingIds.length || bulkMutation.isPending}
           className="h-11 rounded-xl bg-info-600 px-3 text-sm font-bold text-white disabled:opacity-50"
         >
           Hazırları yola çıkar ({preparingIds.length})
         </button>
       </div>
+      {bulkResult && (
+        <section
+          role={bulkResult.failed.length ? "alert" : "status"}
+          className={`rounded-2xl border p-4 text-sm ${
+            bulkResult.failed.length
+              ? "border-warning-200 bg-warning-50 text-warning-900"
+              : "border-success-200 bg-success-50 text-success-900"
+          }`}
+        >
+          <p className="font-black">Toplu işlem tamamlandı</p>
+          <p className="mt-1">
+            {bulkResult.succeeded.length} teslimat güncellendi.
+            {bulkResult.failed.length
+              ? ` ${bulkResult.failed.length} teslimat güncellenemedi: #${bulkResult.failed.join(", #")}.`
+              : ""}
+          </p>
+          {!!bulkResult.failed.length && (
+            <button
+              type="button"
+              onClick={() =>
+                setBulkDialog({
+                  status: bulkResult.status,
+                  ids: bulkResult.failed,
+                  actionLabel:
+                    bulkResult.status === "PREPARING"
+                      ? "hazırlamaya al"
+                      : "yola çıkar",
+                })
+              }
+              className="mt-3 rounded-lg border border-warning-300 bg-white px-3 py-2 text-xs font-black"
+            >
+              Başarısızları tekrar dene
+            </button>
+          )}
+        </section>
+      )}
       {!!exceptions.length && (
         <section className="mb-4 rounded-2xl border border-danger-200 bg-danger-50 p-4">
           <h3 className="flex items-center gap-2 font-black text-danger-800">
@@ -691,6 +763,33 @@ export default function StoreDailyOrdersPage() {
           })}
         </div>
       )}
+
+      <ConfirmModal
+        open={!!bulkDialog}
+        title="Toplu teslimat güncellemesi"
+        message={
+          bulkDialog
+            ? `${bulkDialog.ids.length} teslimatı topluca ${bulkDialog.actionLabel} işlemi uygulanacak. Devam etmek istiyor musunuz?`
+            : ""
+        }
+        confirmLabel={
+          bulkDialog
+            ? `${bulkDialog.ids.length} teslimatı güncelle`
+            : "Güncelle"
+        }
+        pending={bulkMutation.isPending}
+        onClose={() => {
+          if (!bulkMutation.isPending) setBulkDialog(undefined);
+        }}
+        onConfirm={() => {
+          if (bulkDialog) {
+            bulkMutation.mutate({
+              status: bulkDialog.status,
+              ids: bulkDialog.ids,
+            });
+          }
+        }}
+      />
 
       {dialog && (
         <Modal

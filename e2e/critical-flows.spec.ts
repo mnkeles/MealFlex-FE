@@ -322,6 +322,44 @@ test('teslimat durum penceresi erişilebilir, Escape ile kapanır ve odağı ger
   await expect(opener).toBeFocused()
 })
 
+test('toplu teslimat güncellemesi onay ister ve kısmi hata sonucunu açıklar', async ({ page }) => {
+  await loginAs(page, 'SELLER')
+  const deliveries = [20, 21, 22].map(id => ({ id, subscriptionId: id, deliveryDate: '2026-09-08', deliveryTime: '12:30', personCount: 8, menuName: 'Kurumsal Menü', customerName: `Müşteri ${id}`, deliveryAddress: 'Ankara', status: 'SCHEDULED' }))
+  const attempted: number[] = []
+  await page.route('**/api/**', route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/v1/seller/stores/2')) return json(route, { id: 2, name: 'Test Mutfağı', status: 'ACTIVE', temporarilyClosed: false, rating: 5, reviewCount: 1, categories: [], availableDeliveryTimes: [] })
+    if (path.endsWith('/v1/seller/stores/2/deliveries/today')) return json(route, deliveries)
+    const statusMatch = path.match(/\/deliveries\/(\d+)\/status$/)
+    if (statusMatch) {
+      const id = Number(statusMatch[1])
+      attempted.push(id)
+      return id === 21
+        ? route.fulfill({ status: 503, contentType: 'application/json', body: '{}' })
+        : json(route, { ...deliveries.find(item => item.id === id), status: 'PREPARING' })
+    }
+    if (path.endsWith('/v1/seller/stores/2/deliveries/route-plan')) return json(route, { method: '', stops: [] })
+    if (path.endsWith('/v1/seller/stores/2/delivery-slots')) return json(route, [])
+    if (path.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/seller/stores/2/operations')
+  const bulkButton = page.getByRole('button', { name: 'Tümünü hazırlamaya al (3)' })
+  await bulkButton.click()
+  const dialog = page.getByRole('dialog', { name: 'Toplu teslimat güncellemesi' })
+  await expect(dialog).toContainText('3 teslimatı topluca hazırlamaya al')
+  await dialog.getByRole('button', { name: 'Vazgeç' }).click()
+  expect(attempted).toHaveLength(0)
+
+  await bulkButton.click()
+  await dialog.getByRole('button', { name: '3 teslimatı güncelle' }).click()
+  await expect(page.getByRole('alert')).toContainText('2 teslimat güncellendi')
+  await expect(page.getByRole('alert')).toContainText('1 teslimat güncellenemedi: #21')
+  await expect(page.getByRole('button', { name: 'Başarısızları tekrar dene' })).toBeVisible()
+  expect(attempted.sort()).toEqual([20, 21, 22])
+})
+
 test('müşteri değişiklik talebini teslimat takviminden izler', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
   await page.route('**/api/**', route => {
