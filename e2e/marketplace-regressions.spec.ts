@@ -225,10 +225,13 @@ test('geçersiz kupon sonrası eski toplamla abonelik gönderilemez', async ({ p
   await page.getByRole('button', { name: /Devam Et/ }).click()
   await page.getByLabel(/Kupon veya kurumsal kod/).fill('GECERSIZ')
   await expect(page.getByText('Kupon geçersiz.')).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Abonelik Talebini Gönder' })).toBeDisabled()
+  const submitButton = page.getByRole('button', {
+    name: /^(Abonelik Talebini Gönder|Talebi gönder)$/i,
+  })
+  await expect(submitButton).toBeDisabled()
   expect(scenario.created()).toBe(0)
   await page.getByLabel(/Kupon veya kurumsal kod/).fill('')
-  await expect(page.getByRole('button', { name: 'Abonelik Talebini Gönder' })).toBeEnabled()
+  await expect(submitButton).toBeEnabled()
 })
 
 test('mobil abonelik çubuğu toplamı ve birincil aksiyonu sabit gösterir', async ({ page }) => {
