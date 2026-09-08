@@ -94,6 +94,33 @@ test('mağaza ayarları taslağı korunur ve mesafe kaydı yalnız sunucudaki ma
   await expect(page).toHaveURL(/\/seller\/stores\/2\/settings$/)
 })
 
+test('aktif mağazada mobil satıcı menüsü günlük operasyona hızlı erişim verir', async ({ page }) => {
+  await login(page, 'SELLER')
+  await page.setViewportSize({ width: 390, height: 844 })
+  const store = { id: 2, name: 'Test Catering', status: 'ACTIVE', categories: [], rating: 0, reviewCount: 0 }
+  await page.route('**/api/**', route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/seller/subscriptions/stores/2/unread-count')) return json(route, { count: 3 })
+    if (path.endsWith('/notifications/unread-count')) return json(route, { count: 2 })
+    if (path.endsWith('/notifications')) return json(route, { content: [], totalPages: 0 })
+    if (path.endsWith('/seller/stores/2')) return json(route, store)
+    if (path.endsWith('/seller/stores')) return json(route, [store])
+    return json(route, [])
+  })
+
+  await page.goto('/seller/stores/2/dashboard')
+  const navigation = page.locator('nav[aria-label="Satıcı mobil navigasyonu"]')
+  await expect(navigation.getByRole('link')).toHaveCount(5)
+  await expect(navigation.getByRole('link', { name: /Operasyon/ })).toHaveAttribute('href', '/seller/stores/2/operations')
+  await expect(navigation.getByRole('link', { name: /Onaylar/ })).toContainText('3')
+  await expect(navigation.getByRole('link', { name: /Üretim/ })).toHaveAttribute('href', '/seller/stores/2/production')
+
+  await navigation.getByRole('link', { name: /Bildirimler/ }).click()
+  await expect(page).toHaveURL(/\/seller\/notifications$/)
+  await expect(navigation.getByRole('link', { name: /Operasyon/ })).toHaveAttribute('href', '/seller/stores/2/operations')
+  await expect(page.getByRole('link', { name: 'Test' })).toHaveAttribute('href', '/seller/profile')
+})
+
 async function subscriptionScenario(page: Page, times: string[]) {
   await login(page, 'CUSTOMER')
   const start = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10)

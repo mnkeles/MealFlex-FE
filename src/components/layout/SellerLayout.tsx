@@ -7,10 +7,13 @@ import {
 } from "react";
 import {
   Bell,
+  ChefHat,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
   CircleHelp,
+  ClipboardCheck,
+  Gauge,
   LoaderCircle,
   LogOut,
   Server,
@@ -82,9 +85,42 @@ export default function SellerLayout() {
     refetchInterval: 30_000,
     refetchOnWindowFocus: true,
   });
-  const activeStoreId =
+  const routeStoreId =
     Number(location.pathname.match(/\/seller\/stores\/(\d+)/)?.[1]) ||
     undefined;
+  const [lastActiveStoreId, setLastActiveStoreId] = useState<
+    number | undefined
+  >(() => {
+    if (routeStoreId) return routeStoreId;
+    const stored = Number(sessionStorage.getItem("mealflex-seller-active-store"));
+    return stored || undefined;
+  });
+  useEffect(() => {
+    if (!routeStoreId) return;
+    setLastActiveStoreId(routeStoreId);
+    sessionStorage.setItem(
+      "mealflex-seller-active-store",
+      String(routeStoreId),
+    );
+  }, [routeStoreId]);
+  const rememberedStoreId =
+    lastActiveStoreId ||
+    Number(sessionStorage.getItem("mealflex-seller-active-store")) ||
+    undefined;
+  const activeStoreId =
+    routeStoreId ||
+    (rememberedStoreId &&
+    (stores.length === 0 || stores.some((store) => store.id === rememberedStoreId))
+      ? rememberedStoreId
+      : stores.length === 1
+        ? stores[0].id
+        : undefined);
+  const { data: pendingCount = 0 } = useQuery({
+    queryKey: ["seller-mobile-pending-count", activeStoreId],
+    queryFn: () => sellerService.getPendingUnreadCount(activeStoreId!),
+    enabled: !!activeStoreId,
+    refetchInterval: 30_000,
+  });
   const menuItems = [
     { path: "/seller/stores", label: "Mağazalar", icon: Store },
     { path: "/seller/notifications", label: "Bildirimler", icon: Bell },
@@ -99,13 +135,44 @@ export default function SellerLayout() {
   const activeStoreSection =
     location.pathname.match(/\/seller\/stores\/\d+\/([^/]+)/)?.[1] ||
     "dashboard";
-  const mobileItems = [
-    { path: "/seller/stores", label: "Mağazalar" },
-    { path: "/seller/notifications", label: "Bildirimler" },
-    { path: "/seller/support", label: "Destek" },
-    { path: "/seller/security", label: "Güvenlik" },
-    { path: "/seller/profile", label: "Profil" },
-  ];
+  const mobileItems = activeStoreId
+    ? [
+        {
+          path: `/seller/stores/${activeStoreId}/operations`,
+          label: "Operasyon",
+          icon: Gauge,
+        },
+        {
+          path: `/seller/stores/${activeStoreId}/pending`,
+          label: "Onaylar",
+          icon: ClipboardCheck,
+          badge: pendingCount,
+        },
+        {
+          path: `/seller/stores/${activeStoreId}/production`,
+          label: "Üretim",
+          icon: ChefHat,
+        },
+        {
+          path: "/seller/notifications",
+          label: "Bildirimler",
+          icon: Bell,
+          badge: unreadCount,
+        },
+        { path: "/seller/stores", label: "Mağazalar", icon: Store },
+      ]
+    : [
+        { path: "/seller/stores", label: "Mağazalar", icon: Store },
+        {
+          path: "/seller/notifications",
+          label: "Bildirimler",
+          icon: Bell,
+          badge: unreadCount,
+        },
+        { path: "/seller/support", label: "Destek", icon: CircleHelp },
+        { path: "/seller/security", label: "Güvenlik", icon: ShieldCheck },
+        { path: "/seller/profile", label: "Profil", icon: UserRound },
+      ];
 
   const systemStatus = !online
     ? {
@@ -150,7 +217,16 @@ export default function SellerLayout() {
       target.hash === location.hash
     )
       return;
-    if (!confirmSellerStoreNavigation()) event.preventDefault();
+    if (!confirmSellerStoreNavigation()) {
+      event.preventDefault();
+      return;
+    }
+    if (routeStoreId) {
+      sessionStorage.setItem(
+        "mealflex-seller-active-store",
+        String(routeStoreId),
+      );
+    }
   };
 
   return (
@@ -337,7 +413,13 @@ export default function SellerLayout() {
               wordmarkClassName="text-lg font-black tracking-tight text-primary-600"
             />
           </Link>
-          <span className="text-sm font-bold">{user?.firstName}</span>
+          <Link
+            to="/seller/profile"
+            onClick={guardNavigation}
+            className="rounded-lg px-2 py-1 text-sm font-bold text-slate-700"
+          >
+            {user?.firstName}
+          </Link>
         </header>
         <header className="sticky top-0 z-30 hidden h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-6 backdrop-blur md:flex lg:px-8">
           <label className="flex min-w-0 items-center gap-2 text-sm font-bold text-slate-600">
@@ -407,19 +489,23 @@ export default function SellerLayout() {
       >
         {mobileItems.map((item) => {
           const active = location.pathname.startsWith(item.path);
+          const Icon = item.icon;
           return (
             <Link
               key={item.label}
               to={item.path}
               onClick={guardNavigation}
-              className={`relative flex min-h-11 items-center justify-center px-1 py-2 text-center text-[10px] font-bold ${active ? "text-primary-600" : "text-slate-500"}`}
+              className={`relative flex min-h-12 flex-col items-center justify-center gap-0.5 px-1 py-1.5 text-center text-[10px] font-bold ${active ? "text-primary-600" : "text-slate-500"}`}
             >
-              {item.label}
-              {item.path === "/seller/notifications" && unreadCount > 0 ? (
-                <sup className="ml-1 rounded-full bg-primary-600 px-1 text-white">
-                  {unreadCount}
-                </sup>
-              ) : null}
+              <span className="relative">
+                <Icon className="h-4 w-4" aria-hidden="true" />
+                {item.badge ? (
+                  <sup className="absolute -right-3 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-primary-600 px-1 text-[9px] text-white">
+                    {item.badge}
+                  </sup>
+                ) : null}
+              </span>
+              <span>{item.label}</span>
             </Link>
           );
         })}
