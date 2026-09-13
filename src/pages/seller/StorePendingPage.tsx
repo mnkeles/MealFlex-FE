@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions -- Existing compact SSE handler intentionally ignores unavailable audio playback. */
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import {
   AlertTriangle,
   BellRing,
@@ -29,13 +29,26 @@ function apiError(error: unknown) {
   );
 }
 
+function tabFromSearchParams(searchParams: URLSearchParams) {
+  const tab = searchParams.get("tab");
+  return tab === "EXTENSIONS" || tab === "DELIVERY_CHANGES"
+    ? tab
+    : "SUBSCRIPTIONS";
+}
+
 export default function StorePendingPage() {
   const { storeId } = useOutletContext<{ storeId: number }>();
+  const [searchParams] = useSearchParams();
   const client = useQueryClient();
   const [rejectId, setRejectId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [changeRejectId, setChangeRejectId] = useState<number | null>(null);
   const [changeRejectReason, setChangeRejectReason] = useState("");
+  const [extensionRejectId, setExtensionRejectId] = useState<number | null>(null);
+  const [extensionRejectReason, setExtensionRejectReason] = useState("");
+  const [activeTab, setActiveTab] = useState<
+    "SUBSCRIPTIONS" | "EXTENSIONS" | "DELIVERY_CHANGES"
+  >(() => tabFromSearchParams(searchParams));
   const [now, setNow] = useState(Date.now());
   const [alarm, setAlarm] = useState(false);
   const [slaFilter, setSlaFilter] = useState<"ALL" | "URGENT" | "EXPIRED">(
@@ -72,6 +85,15 @@ export default function StorePendingPage() {
     queryFn: () => sellerService.getDeliveryChangeRequests(storeId),
     enabled: !!storeId,
   });
+  const extensionRequests = useQuery({
+    queryKey: ["extension-requests", storeId],
+    queryFn: () => sellerService.getExtensionRequests(storeId),
+    enabled: !!storeId,
+  });
+  const { data: rejectionReasons = [] } = useQuery({
+    queryKey: ["seller-rejection-reasons"],
+    queryFn: sellerService.getRejectionReasons,
+  });
   const allSubscriptions = useMemo(
     () => pending.data?.content || [],
     [pending.data],
@@ -105,6 +127,9 @@ export default function StorePendingPage() {
     const timer = window.setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(timer);
   }, []);
+  useEffect(() => {
+    setActiveTab(tabFromSearchParams(searchParams));
+  }, [searchParams]);
   useEffect(() => {
     if (!allSubscriptions.length) return;
     sellerService
@@ -141,7 +166,8 @@ export default function StorePendingPage() {
           for (const block of events) {
             if (
               block.includes("event:subscription-created") ||
-              block.includes("event:delivery-change-requested")
+              block.includes("event:delivery-change-requested") ||
+              block.includes("event:subscription-extension-requested")
             ) {
               setAlarm(true);
               client.invalidateQueries({
@@ -149,6 +175,9 @@ export default function StorePendingPage() {
               });
               client.invalidateQueries({
                 queryKey: ["delivery-change-requests", storeId],
+              });
+              client.invalidateQueries({
+                queryKey: ["extension-requests", storeId],
               });
               client.invalidateQueries({
                 queryKey: ["pending-unread", storeId],
@@ -231,6 +260,22 @@ export default function StorePendingPage() {
       setChangeRejectReason("");
     },
   });
+  const approveExtension = useMutation({
+    mutationFn: sellerService.approveExtensionRequest,
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ["extension-requests", storeId] });
+      client.invalidateQueries({ queryKey: ["seller-subscriptions"] });
+    },
+  });
+  const rejectExtension = useMutation({
+    mutationFn: ({ id, reason }: { id: number; reason: string }) =>
+      sellerService.rejectExtensionRequest(id, reason),
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ["extension-requests", storeId] });
+      setExtensionRejectId(null);
+      setExtensionRejectReason("");
+    },
+  });
   return (
     <div
       className={
@@ -260,7 +305,33 @@ export default function StorePendingPage() {
           <span className="text-xs">Alarmı kapat</span>
         </button>
       )}
-      {!!changeRequests.data?.length && (
+      <div
+        role="tablist"
+        aria-label="Onay talebi türleri"
+        className="mb-5 flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm"
+      >
+        {[
+          ["SUBSCRIPTIONS", "Abonelik", allSubscriptions.length],
+          ["EXTENSIONS", "Dönem uzatma", extensionRequests.data?.length || 0],
+          ["DELIVERY_CHANGES", "Teslimat değişikliği", changeRequests.data?.length || 0],
+        ].map(([value, label, count]) => (
+          <button
+            key={value}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === value}
+            onClick={() => setActiveTab(value as typeof activeTab)}
+            className={`min-h-11 shrink-0 rounded-xl px-4 text-sm font-black transition ${
+              activeTab === value
+                ? "bg-primary-600 text-white"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            {label} <span className="ml-1 opacity-80">({count})</span>
+          </button>
+        ))}
+      </div>
+      {activeTab === "DELIVERY_CHANGES" && !!changeRequests.data?.length && (
         <section className="mb-5 rounded-2xl border border-info-200 bg-info-50 p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
@@ -331,16 +402,28 @@ export default function StorePendingPage() {
                 </div>
                 {changeRejectId === request.id && (
                   <div className="mt-3 rounded-lg bg-danger-50 p-3">
-                    <textarea
+                    <select
                       autoFocus
                       value={changeRejectReason}
                       onChange={(event) =>
                         setChangeRejectReason(event.target.value)
                       }
-                      rows={2}
-                      placeholder="Ret gerekçesi"
-                      className="w-full rounded-lg border border-danger-200 p-2 text-sm"
-                    />
+                      aria-label="Teslimat değişikliği ret nedeni"
+                      className="h-11 w-full rounded-lg border border-danger-200 bg-white px-3 text-sm"
+                    >
+                      <option value="">Ret nedeni seçin</option>
+                      {rejectionReasons.map((reason) => (
+                        <option key={reason.code} value={reason.code}>{reason.label}</option>
+                      ))}
+                    </select>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Seçilen açıklama müşteriye gösterilir.
+                    </p>
+                    {rejectChange.isError && changeRejectId === request.id && (
+                      <p role="alert" className="mt-2 text-sm font-semibold text-danger-700">
+                        {apiError(rejectChange.error)}
+                      </p>
+                    )}
                     <div className="mt-2 flex justify-end gap-2">
                       <button
                         onClick={() => setChangeRejectId(null)}
@@ -370,7 +453,97 @@ export default function StorePendingPage() {
           </div>
         </section>
       )}
-      <QueryBoundary
+      {activeTab === "DELIVERY_CHANGES" && !changeRequests.isLoading &&
+        !changeRequests.isError && !changeRequests.data?.length && (
+          <p className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+            Onay bekleyen teslimat değişikliği talebi bulunmuyor.
+          </p>
+        )}
+      {activeTab === "EXTENSIONS" && (
+        <QueryBoundary
+          query={extensionRequests}
+          loadingLabel="Dönem uzatma talepleri yükleniyor…"
+          errorTitle="Dönem uzatma talepleri yüklenemedi"
+          errorDescription="Talepler kaybolmadı. Bağlantınızı kontrol edip tekrar deneyin."
+          isEmpty={(result) => !result.length}
+          emptyTitle="Onay bekleyen dönem uzatma talebi bulunmuyor"
+          emptyDescription="Müşteriler dönem uzatma talebi gönderdiğinde burada görünecek."
+        >
+          {(requests) => (
+            <div className="space-y-4">
+              {requests.map((request) => (
+                <article key={request.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="flex flex-col justify-between gap-4 lg:flex-row">
+                    <div>
+                      <span className="text-xs font-bold text-slate-500">TALEP #{request.id}</span>
+                      <h3 className="mt-2 text-lg font-black">{request.customerName} · {request.menuName}</h3>
+                      <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-600">
+                        <span className="flex items-center gap-2"><Users className="h-4 w-4 text-primary-600" />{request.personCount} kişi</span>
+                        <span className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-primary-600" />
+                          {new Date(`${request.oldEndDate}T00:00:00`).toLocaleDateString("tr-TR")} → {new Date(`${request.newEndDate}T00:00:00`).toLocaleDateString("tr-TR")}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-xs font-semibold text-slate-500">
+                        İstek: {new Date(request.requestedAt).toLocaleString("tr-TR")}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-start gap-2">
+                      <button
+                        onClick={() => approveExtension.mutate(request.id)}
+                        disabled={approveExtension.isPending}
+                        className="min-h-11 rounded-xl bg-success-600 px-5 text-sm font-black text-white disabled:opacity-50"
+                      >
+                        Onayla ve uzat
+                      </button>
+                      <button
+                        onClick={() => setExtensionRejectId(request.id)}
+                        className="min-h-11 rounded-xl bg-danger-50 px-5 text-sm font-black text-danger-600"
+                      >
+                        Reddet
+                      </button>
+                    </div>
+                  </div>
+                  {extensionRejectId === request.id && (
+                    <div className="mt-4 rounded-xl bg-danger-50 p-4">
+                      <select
+                        autoFocus
+                        value={extensionRejectReason}
+                        onChange={(event) => setExtensionRejectReason(event.target.value)}
+                        aria-label="Dönem uzatma ret nedeni"
+                        className="h-11 w-full rounded-lg border border-danger-200 bg-white px-3 text-sm"
+                      >
+                        <option value="">Ret nedeni seçin</option>
+                        {rejectionReasons.map((reason) => (
+                          <option key={reason.code} value={reason.code}>{reason.label}</option>
+                        ))}
+                      </select>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Seçilen açıklama müşteriye gösterilir.
+                      </p>
+                      {rejectExtension.isError && extensionRejectId === request.id && (
+                        <p role="alert" className="mt-2 text-sm font-semibold text-danger-700">
+                          {apiError(rejectExtension.error)}
+                        </p>
+                      )}
+                      <div className="mt-2 flex justify-end gap-2">
+                        <button onClick={() => setExtensionRejectId(null)} className="px-3 text-sm font-bold">Vazgeç</button>
+                        <button
+                          disabled={!extensionRejectReason.trim() || rejectExtension.isPending}
+                          onClick={() => rejectExtension.mutate({ id: request.id, reason: extensionRejectReason })}
+                          className="rounded-lg bg-danger-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                        >
+                          Talebi reddet
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+        </QueryBoundary>
+      )}
+      {activeTab === "SUBSCRIPTIONS" && <QueryBoundary
         query={pending}
         loadingLabel="Onay bekleyen talepler yükleniyor…"
         errorTitle="Onay bekleyen talepler yüklenemedi"
@@ -555,13 +728,20 @@ export default function StorePendingPage() {
                   <div className="mt-4 rounded-xl bg-danger-50 p-4">
                     <label className="text-xs font-bold text-danger-700">
                       Ret gerekçesi
-                      <textarea
+                      <select
                         autoFocus
-                        rows={3}
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
-                        className="mt-2 w-full rounded-lg border border-danger-200 p-3 text-sm font-normal text-slate-800"
-                      />
+                        className="mt-2 h-11 w-full rounded-lg border border-danger-200 bg-white px-3 text-sm font-normal text-slate-800"
+                      >
+                        <option value="">Ret nedeni seçin</option>
+                        {rejectionReasons.map((reason) => (
+                          <option key={reason.code} value={reason.code}>{reason.label}</option>
+                        ))}
+                      </select>
+                      <span className="mt-1 block text-xs font-normal text-slate-500">
+                        Seçilen açıklama müşteriye gösterilir.
+                      </span>
                     </label>
                     <div className="mt-3 flex justify-end gap-2">
                       <button
@@ -593,10 +773,10 @@ export default function StorePendingPage() {
         )}
         </>
         )}
-      </QueryBoundary>
-      {(approve.isError || reject.isError) && (
+      </QueryBoundary>}
+      {(approve.isError || reject.isError || approveChange.isError || rejectChange.isError || approveExtension.isError || rejectExtension.isError) && (
         <p className="mt-4 rounded-xl bg-danger-50 p-3 text-sm font-semibold text-danger-700">
-          {apiError(approve.error || reject.error)}
+          {apiError(approve.error || reject.error || approveChange.error || rejectChange.error || approveExtension.error || rejectExtension.error)}
         </p>
       )}
       <ConfirmModal

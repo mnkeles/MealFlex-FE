@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import DeliverySlotRangePicker from "./DeliverySlotRangePicker";
@@ -6,8 +6,8 @@ import DeliverySlotRangePicker from "./DeliverySlotRangePicker";
 describe("DeliverySlotRangePicker", () => {
   it("günün tamamını 15 dakikalık 96 seçenek olarak sunar", () => {
     render(<DeliverySlotRangePicker value={[]} onChange={vi.fn()} />);
-    const options = screen.getAllByRole("option");
-    expect(options).toHaveLength(192);
+    const options = within(screen.getByLabelText("Başlangıç saati")).getAllByRole("option");
+    expect(options).toHaveLength(96);
     expect(options[0]).toHaveTextContent("00:00");
     expect(options[95]).toHaveTextContent("23:45");
   });

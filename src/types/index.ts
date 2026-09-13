@@ -118,6 +118,7 @@ export interface DeliverySlot {
 
 export type SubscriptionStatus =
   | "PENDING_APPROVAL"
+  | "PAYMENT_PENDING"
   | "APPROVED"
   | "ACTIVE"
   | "PAYMENT_SUSPENDED"

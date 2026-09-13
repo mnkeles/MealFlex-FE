@@ -27,6 +27,7 @@ const tabs: { value: Tab; label: string }[] = [
 const groups: Record<Tab, SubscriptionStatus[]> = {
   all: [
     "PENDING_APPROVAL",
+    "PAYMENT_PENDING",
     "APPROVED",
     "ACTIVE",
     "PAYMENT_SUSPENDED",
@@ -35,7 +36,7 @@ const groups: Record<Tab, SubscriptionStatus[]> = {
     "CANCELLED",
   ],
   pending: ["PENDING_APPROVAL"],
-  ongoing: ["APPROVED", "ACTIVE", "PAYMENT_SUSPENDED"],
+  ongoing: ["PAYMENT_PENDING", "APPROVED", "ACTIVE", "PAYMENT_SUSPENDED"],
   completed: ["COMPLETED"],
   closed: ["REJECTED", "CANCELLED"],
 };

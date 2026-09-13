@@ -37,7 +37,7 @@ export default function StoreCard({
       </div>
       <div className="p-4">
         <div className="flex items-start gap-3">
-          <div className="-mt-5 grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl border-2 border-white bg-white shadow-sm">
+          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl border-2 border-white bg-white shadow-sm">
             <MediaPlaceholder
               src={store.logoUrl}
               alt=""

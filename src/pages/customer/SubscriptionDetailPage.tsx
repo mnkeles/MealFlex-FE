@@ -25,7 +25,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
 
 const eventLabels: Record<string, string> = {
-  SUBSCRIPTION_APPROVED: "Satıcı aboneliği onayladı",
+  SUBSCRIPTION_APPROVED: "Abonelik onaylandı",
   SUBSCRIPTION_REJECTED: "Satıcı talebi reddetti",
   SUBSCRIPTION_CANCELLED: "Abonelik iptal edildi",
   SUBSCRIPTION_POSTPONED: "Onay süresi dolduğu için tarihler ertelendi",
@@ -33,10 +33,18 @@ const eventLabels: Record<string, string> = {
   SUBSCRIPTION_ACTIVATED: "Abonelik başladı",
   SUBSCRIPTION_COMPLETED: "Abonelik tamamlandı",
   SUBSCRIPTION_EXTENDED: "Abonelik dönemi uzatıldı",
+  SUBSCRIPTION_EXTENSION_REQUESTED: "Abonelik uzatılma talebi gönderildi",
+  SUBSCRIPTION_EXTENSION_REJECTED: "Abonelik uzatılma talebi reddedildi",
   SUBSCRIPTION_AUTO_RENEW_ENABLED: "Otomatik yenileme açıldı",
   SUBSCRIPTION_AUTO_RENEW_DISABLED: "Otomatik yenileme kapatıldı",
   SUBSCRIPTION_AUTO_RENEWED: "Abonelik otomatik yenilendi",
   SUBSCRIPTION_CANCELLED_BY_SELLER: "İşletme aboneliği iptal etti",
+  SUBSCRIPTION_PAYMENT_SUSPENDED: "Ödeme alınamadığı için abonelik durduruldu",
+  SUBSCRIPTION_PAYMENT_COMPLETED: "İlk haftalık ödeme tamamlandı",
+  SUBSCRIPTION_FROZEN: "Abonelik dönemi donduruldu",
+  SUBSCRIPTION_RESUMED: "Abonelik yeniden başlatıldı",
+  SUBSCRIPTION_APPROVAL_EXPIRED: "Satıcı onay süresi doldu",
+  SUBSCRIPTION_PAYMENT_EXPIRED: "Güvenli ödeme süresi doldu",
 };
 
 function eventDetail(event: SubscriptionEvent) {
@@ -55,6 +63,53 @@ function eventDetail(event: SubscriptionEvent) {
 
 function toShortTime(time: string) {
   return time.slice(0, 5);
+}
+
+function formatCoveredDates(dates?: string[]) {
+  if (!dates?.length) return "Hizmet tarihleri henüz belirlenmedi";
+  const format = (date: string) =>
+    new Date(`${date}T12:00:00`).toLocaleDateString("tr-TR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  return dates.map(format).join(", ");
+}
+
+function extensionErrorMessage(error: unknown) {
+  const apiError = (
+    error as { response?: { data?: { code?: string; message?: string } } }
+  ).response?.data;
+  if (apiError?.code && apiError.code !== "INTERNAL_ERROR" && apiError.message) {
+    return apiError.message;
+  }
+  return "Abonelik uzatılırken bir sorun oluştu. Lütfen sayfayı yenileyip tekrar deneyin.";
+}
+
+type TimelineTone = "pending" | "approved" | "rejected" | "neutral";
+
+function timelineTone(action: string): TimelineTone {
+  if (
+    [
+      "SUBSCRIPTION_REJECTED",
+      "SUBSCRIPTION_EXTENSION_REJECTED",
+      "SUBSCRIPTION_CANCELLED",
+      "SUBSCRIPTION_AUTO_CANCELLED",
+      "SUBSCRIPTION_CANCELLED_BY_SELLER",
+      "SUBSCRIPTION_APPROVAL_EXPIRED",
+      "SUBSCRIPTION_PAYMENT_SUSPENDED",
+      "SUBSCRIPTION_PAYMENT_EXPIRED",
+    ].includes(action)
+  )
+    return "rejected";
+  if (
+    [
+      "SUBSCRIPTION_EXTENSION_REQUESTED",
+      "SUBSCRIPTION_POSTPONED",
+    ].includes(action)
+  )
+    return "pending";
+  return "approved";
 }
 
 function timeWithOffset(time: string, offsetMinutes: number) {
@@ -249,6 +304,11 @@ export default function SubscriptionDetailPage() {
     queryFn: () => subscriptionService.getDeliveryChangeRequests(id),
     enabled: !!id,
   });
+  const { data: extensionRequests = [] } = useQuery({
+    queryKey: ["extension-requests", id],
+    queryFn: () => subscriptionService.getExtensionRequests(id),
+    enabled: !!id,
+  });
   const { data: paymentSummary } = useQuery({
     queryKey: ["subscription-payment", id],
     queryFn: () => paymentService.summary(id),
@@ -264,6 +324,7 @@ export default function SubscriptionDetailPage() {
     queryClient.invalidateQueries({
       queryKey: ["delivery-change-requests", id],
     });
+    queryClient.invalidateQueries({ queryKey: ["extension-requests", id] });
     queryClient.invalidateQueries({ queryKey: ["subscription-payment", id] });
     queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
   };
@@ -280,6 +341,21 @@ export default function SubscriptionDetailPage() {
     onError: () =>
       setMessage("Ödeme tekrar alınamadı. Kartınızı kontrol edin."),
   });
+  const startHostedCheckout = useMutation({
+    mutationFn: () => paymentService.startCheckout(id),
+    onSuccess: (checkout) => {
+      window.location.assign(checkout.paymentPageUrl);
+    },
+    onError: (error: unknown) => {
+      const apiMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
+      setMessage(
+        apiMessage ||
+          "Güvenli ödeme sayfası açılamadı. Profil ve iletişim bilgilerinizi kontrol edip tekrar deneyin.",
+      );
+    },
+  });
   const changePaymentMethod = useMutation({
     mutationFn: (paymentMethodId: number) =>
       subscriptionService.changePaymentMethod(id, paymentMethodId),
@@ -294,19 +370,22 @@ export default function SubscriptionDetailPage() {
   });
   const extendSubscription = useMutation({
     mutationFn: () => subscriptionService.extend(id, extensionEndDate),
-    onSuccess: (subscription) => {
+    onSuccess: (request) => {
+      const requestedEndDate = request.newEndDate || extensionEndDate;
+      const formattedEndDate = new Date(
+        `${requestedEndDate}T00:00:00`,
+      ).toLocaleDateString("tr-TR");
       setShowExtend(false);
       setExtensionEndDate("");
       setMessage(
-        `Aboneliğiniz ${new Date(`${subscription.endDate}T00:00:00`).toLocaleDateString("tr-TR")} tarihine kadar uzatıldı.`,
+        `${formattedEndDate} tarihine kadar dönem uzatma talebiniz satıcı onayına gönderildi.`,
       );
       refresh();
     },
-    onError: (error: unknown) =>
-      setMessage(
-        (error as { response?: { data?: { message?: string } } }).response
-          ?.data?.message || "Abonelik uzatılamadı.",
-      ),
+    onError: (error: unknown) => {
+      refresh();
+      setMessage(extensionErrorMessage(error));
+    },
   });
   const autoRenewMutation = useMutation({
     mutationFn: (enabled: boolean) =>
@@ -401,7 +480,7 @@ export default function SubscriptionDetailPage() {
     const heading = {
       summary: "Teslimat takvimi",
       deliveries: "Teslimat takvimi",
-      payments: "Ödeme ve iade",
+      payments: "Ödemeler",
       support: "İşlemler",
     }[tab];
     window.setTimeout(() => {
@@ -453,6 +532,11 @@ export default function SubscriptionDetailPage() {
         ?.scrollIntoView({ behavior: "smooth" });
     }
   }, [data, location.hash]);
+  useEffect(() => {
+    const result = new URLSearchParams(location.search).get("payment");
+    if (result === "success") setMessage("İlk haftalık ödemeniz alındı. Aboneliğiniz onaylandı.");
+    if (result === "failed") setMessage("Ödeme tamamlanamadı. Kart bilgilerinizi kontrol edip tekrar deneyin.");
+  }, [location.search]);
 
   if (isLoading)
     return <div className="h-96 animate-pulse rounded-3xl bg-slate-200" />;
@@ -466,6 +550,12 @@ export default function SubscriptionDetailPage() {
       </div>
     );
   const sub = data.subscription;
+  const pendingExtension = extensionRequests.find(
+    (request) => request.status === "PENDING",
+  );
+  const subscriptionPayments =
+    paymentSummary?.payments ??
+    (paymentSummary?.payment ? [paymentSummary.payment] : []);
   const modifyingDelivery = data.deliveries.find(
     (delivery) => delivery.id === modifyDeliveryId,
   );
@@ -523,46 +613,49 @@ export default function SubscriptionDetailPage() {
   );
   const canReview =
     ["ACTIVE", "COMPLETED"].includes(sub.status) && !data.reviewed;
-  const auditedTimeline = events.map((event) => ({
-    key: `event-${event.id}`,
-    label: eventLabels[event.action] || event.action,
-    date: event.timestamp,
-    detail: eventDetail(event),
+  const approvalEvent = events.find(
+    (event) => event.action === "SUBSCRIPTION_APPROVED",
+  );
+  const isApprovedSubscription =
+    Boolean(sub.approvedAt || approvalEvent) ||
+    ["ACTIVE", "COMPLETED"].includes(sub.status);
+  const initialTimelineStep = {
+    key: "subscription-approval",
+    label: isApprovedSubscription ? "Abonelik onaylandı" : "Talep oluşturuldu",
+    date: approvalEvent?.timestamp || sub.approvedAt || sub.createdAt,
     done: true,
-    failed: [
-      "SUBSCRIPTION_REJECTED",
-      "SUBSCRIPTION_CANCELLED",
-      "SUBSCRIPTION_AUTO_CANCELLED",
-    ].includes(event.action),
-  }));
+    tone: (isApprovedSubscription ? "approved" : "pending") as TimelineTone,
+    detail: undefined,
+  };
+  const auditedTimeline = events
+    .filter(
+      (event) =>
+        !["SUBSCRIPTION_PAYMENT_METHOD_CHANGED", "SUBSCRIPTION_APPROVED"].includes(
+          event.action,
+        ),
+    )
+    .map((event) => ({
+      key: `event-${event.id}`,
+      label: eventLabels[event.action] ?? "Abonelik bilgileri güncellendi",
+      date: event.timestamp,
+      detail: eventDetail(event),
+      done: true,
+      tone: timelineTone(event.action),
+    }));
   const timeline = auditedTimeline.length
     ? [
-        {
-          key: "created",
-          label: "Talep oluşturuldu",
-          date: sub.createdAt,
-          done: true,
-          failed: false,
-          detail: undefined,
-        },
+        initialTimelineStep,
         ...auditedTimeline,
       ]
     : [
-        {
-          key: "created",
-          label: "Talep oluşturuldu",
-          date: sub.createdAt,
-          done: true,
-          failed: false,
-          detail: undefined,
-        },
+        initialTimelineStep,
         {
           key: "approval",
           label:
             sub.status === "REJECTED" ? "Talep reddedildi" : "Satıcı onayı",
           date: sub.rejectedAt || sub.approvedAt,
           done: !!(sub.approvedAt || sub.rejectedAt),
-          failed: sub.status === "REJECTED",
+          tone: sub.status === "REJECTED" ? "rejected" as TimelineTone : sub.approvedAt ? "approved" as TimelineTone : "pending" as TimelineTone,
           detail: undefined,
         },
         {
@@ -572,7 +665,7 @@ export default function SubscriptionDetailPage() {
             ? sub.startDate
             : undefined,
           done: ["ACTIVE", "COMPLETED"].includes(sub.status),
-          failed: false,
+          tone: ["ACTIVE", "COMPLETED"].includes(sub.status) ? "approved" as TimelineTone : "neutral" as TimelineTone,
           detail: undefined,
         },
         {
@@ -580,7 +673,7 @@ export default function SubscriptionDetailPage() {
           label: "Abonelik tamamlandı",
           date: sub.completedAt,
           done: sub.status === "COMPLETED",
-          failed: false,
+          tone: sub.status === "COMPLETED" ? "approved" as TimelineTone : "neutral" as TimelineTone,
           detail: undefined,
         },
       ];
@@ -620,6 +713,19 @@ export default function SubscriptionDetailPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {sub.status === "PAYMENT_PENDING" && (
+            <button
+              type="button"
+              disabled={startHostedCheckout.isPending}
+              onClick={() => startHostedCheckout.mutate()}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-bold text-white disabled:cursor-wait disabled:opacity-60"
+            >
+              <CreditCard className="h-4 w-4" />
+              {startHostedCheckout.isPending
+                ? "iyzico açılıyor…"
+                : "Güvenli ödemeye geç"}
+            </button>
+          )}
           {sub.status === "COMPLETED" && (
             <Link
               to={`/subscribe?storeId=${sub.storeId}&menuId=${sub.menuId}&addressId=${sub.addressId}&renewFrom=${sub.id}`}
@@ -632,6 +738,7 @@ export default function SubscriptionDetailPage() {
           {["APPROVED", "ACTIVE"].includes(sub.status) && (
             <button
               type="button"
+              disabled={!!pendingExtension}
               onClick={() => {
                 const suggested = new Date(`${sub.endDate}T12:00:00`);
                 suggested.setDate(suggested.getDate() + 7);
@@ -639,9 +746,10 @@ export default function SubscriptionDetailPage() {
                 extendSubscription.reset();
                 setShowExtend(true);
               }}
-              className="inline-flex items-center gap-2 rounded-xl border border-primary-200 px-4 py-2 text-sm font-bold text-primary-700"
+              className="inline-flex items-center gap-2 rounded-xl border border-primary-200 px-4 py-2 text-sm font-bold text-primary-700 disabled:cursor-not-allowed disabled:border-warning-200 disabled:bg-warning-50 disabled:text-warning-700"
             >
-              <CalendarDays className="h-4 w-4" /> Dönemi uzat
+              <CalendarDays className="h-4 w-4" />
+              {pendingExtension ? "Uzatma onayı bekleniyor" : "Dönemi uzat"}
             </button>
           )}
           <StatusBadge domain="subscription" status={sub.status} />
@@ -875,10 +983,10 @@ export default function SubscriptionDetailPage() {
                 <div>
                   <h2 className="flex items-center gap-2 text-xl font-black">
                     <CreditCard className="h-5 w-5 text-primary-600" />
-                    Ödeme ve iade
+                    Ödemeler
                   </h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    Tahsilat, dekont ve iade hareketleri
+                    Tutar, catering firması, hizmet tarihleri ve kullanılan kart
                   </p>
                 </div>
                 {paymentSummary.invoiceId && (
@@ -892,54 +1000,60 @@ export default function SubscriptionDetailPage() {
                   </button>
                 )}
               </div>
-              <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {[
-                  ["Toplam", paymentSummary.orderTotal],
-                  ["Ödenen", paymentSummary.paidAmount],
-                  ["İade", paymentSummary.refundedAmount],
-                  ["İade edilebilir", paymentSummary.refundableAmount],
-                ].map(([label, amount]) => (
-                  <div
-                    key={String(label)}
-                    className="rounded-xl bg-slate-50 p-3"
-                  >
-                    <span className="block text-xs text-slate-500">
-                      {label}
-                    </span>
-                    <strong className="mt-1 block">
-                      {Number(amount).toLocaleString("tr-TR")}{" "}
-                      {paymentSummary.currency}
-                    </strong>
-                  </div>
-                ))}
-              </div>
-              {paymentSummary.payment && (
-                <div
-                  className={`mt-4 rounded-xl p-4 text-sm ${paymentSummary.payment.status === "FAILED" ? "bg-danger-50 text-danger-700" : "bg-success-50 text-success-700"}`}
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span>
-                      <strong>{paymentSummary.payment.cardLabel}</strong> ·{" "}
-                      {paymentSummary.payment.status}
-                    </span>
-                    {paymentSummary.payment.status === "FAILED" && (
-                      <button
-                        onClick={() =>
-                          retryPayment.mutate(paymentSummary.payment!.id)
-                        }
-                        disabled={retryPayment.isPending}
-                        className="rounded-lg bg-danger-600 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
-                      >
-                        Tekrar dene
-                      </button>
-                    )}
-                  </div>
-                  {paymentSummary.payment.failureMessage && (
-                    <p className="mt-2 text-xs">
-                      {paymentSummary.payment.failureMessage}
-                    </p>
-                  )}
+              {subscriptionPayments.length ? (
+                <div className="mt-5 space-y-3">
+                  {subscriptionPayments.map((payment) => (
+                    <article key={payment.id} className="rounded-2xl border border-slate-200 p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="font-black text-slate-900">
+                            {payment.storeName ?? sub.storeName}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {payment.paidAt ? "Ödeme" : "İşlem"} tarihi:{" "}
+                            {new Date(payment.paidAt ?? payment.createdAt).toLocaleString("tr-TR")}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <strong className="block text-lg">
+                            {payment.grossAmount.toLocaleString("tr-TR")} {payment.currency}
+                          </strong>
+                          <StatusBadge domain="payment" status={payment.status} />
+                        </div>
+                      </div>
+                      <dl className="mt-4 grid gap-3 rounded-xl bg-slate-50 p-3 text-sm sm:grid-cols-2">
+                        <div>
+                          <dt className="text-xs text-slate-500">Hizmet tarihleri</dt>
+                          <dd className="mt-1 font-semibold text-slate-800">
+                            {formatCoveredDates(payment.coveredDates)}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-slate-500">Ödeme yöntemi</dt>
+                          <dd className="mt-1 font-semibold text-slate-800">
+                            {payment.cardLabel ?? "Öğün bakiyesi"}
+                          </dd>
+                        </div>
+                      </dl>
+                      {payment.status === "FAILED" && (
+                        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-danger-50 p-3 text-sm text-danger-700">
+                          <span>{payment.failureMessage ?? "Ödeme alınamadı."}</span>
+                          <button
+                            onClick={() => retryPayment.mutate(payment.id)}
+                            disabled={retryPayment.isPending}
+                            className="rounded-lg bg-danger-600 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+                          >
+                            Tekrar dene
+                          </button>
+                        </div>
+                      )}
+                    </article>
+                  ))}
                 </div>
+              ) : (
+                <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+                  Bu abonelik için henüz ödeme hareketi yok.
+                </p>
               )}
               {["PENDING_APPROVAL", "APPROVED", "ACTIVE", "PAYMENT_SUSPENDED"].includes(
                 sub.status,
@@ -1170,23 +1284,50 @@ export default function SubscriptionDetailPage() {
           <section className="rounded-2xl border border-slate-200 bg-white p-5">
             <h2 className="font-black">Durum geçmişi</h2>
             <div className="mt-5 space-y-0">
-              {timeline.map((item, index) => (
+              {timeline.map((item, index) => {
+                const tone = {
+                  pending: {
+                    marker: "border-warning-500 bg-warning-100 text-warning-800",
+                    connector: "bg-warning-300",
+                    text: "text-warning-800",
+                  },
+                  approved: {
+                    marker: "border-success-600 bg-success-600 text-white",
+                    connector: "bg-success-300",
+                    text: "text-slate-800",
+                  },
+                  rejected: {
+                    marker: "border-danger-600 bg-danger-600 text-white",
+                    connector: "bg-danger-300",
+                    text: "text-danger-700",
+                  },
+                  neutral: {
+                    marker: "border-slate-300 bg-white text-slate-400",
+                    connector: "bg-slate-200",
+                    text: "text-slate-500",
+                  },
+                }[item.tone];
+                return (
                 <div key={item.key} className="flex gap-3">
                   <div className="flex flex-col items-center">
                     <span
-                      className={`grid h-6 w-6 place-items-center rounded-full border-2 ${item.failed ? "border-danger-600 bg-danger-600 text-white" : item.done ? "border-success-600 bg-success-600 text-white" : "border-slate-300 bg-white"}`}
+                      className={`grid h-6 w-6 place-items-center rounded-full border-2 ${tone.marker}`}
                     >
-                      {item.done && <CheckCircle2 className="h-4 w-4" />}
+                      {item.tone === "pending" ? (
+                        <Clock3 className="h-3.5 w-3.5" />
+                      ) : item.done ? (
+                        <CheckCircle2 className="h-4 w-4" />
+                      ) : null}
                     </span>
                     {index < timeline.length - 1 && (
                       <span
-                        className={`min-h-12 w-0.5 flex-1 ${item.done ? "bg-success-300" : "bg-slate-200"}`}
+                        className={`min-h-12 w-0.5 flex-1 ${tone.connector}`}
                       />
                     )}
                   </div>
                   <div className="pb-5">
                     <p
-                      className={`text-sm font-semibold ${item.done ? "text-slate-800" : "text-slate-500"}`}
+                      className={`text-sm font-semibold ${tone.text}`}
                     >
                       {item.label}
                     </p>
@@ -1202,7 +1343,8 @@ export default function SubscriptionDetailPage() {
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </section>
           <section className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -1509,7 +1651,7 @@ export default function SubscriptionDetailPage() {
             </h2>
             <p className="mt-2 text-sm text-slate-500">
               Mevcut menü, kişi sayısı, adres ve teslimat saati korunur. Yeni
-              hizmet günleri haftalık ödeme planına eklenir.
+              hizmet günleri satıcı onayından sonra haftalık ödeme planına eklenir.
             </p>
             <label className="mt-5 block text-sm font-bold text-slate-700">
               Yeni bitiş tarihi
@@ -1539,7 +1681,7 @@ export default function SubscriptionDetailPage() {
                 disabled={!extensionEndDate || extendSubscription.isPending}
                 className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
               >
-                Dönemi uzat
+                Onaya gönder
               </button>
             </div>
           </div>

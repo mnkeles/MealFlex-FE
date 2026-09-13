@@ -375,10 +375,17 @@ export default function CreateSubscriptionPage() {
       queryFn: () => storeService.getBusinessHours(storeId),
       enabled: !!storeId,
     });
+  const paymentConfigurationQuery = useQuery({
+    queryKey: ["payment-configuration"],
+    queryFn: paymentService.configuration,
+  });
+  const paymentConfiguration = paymentConfigurationQuery.data;
+  const hostedCheckout = paymentConfiguration?.hostedCheckout === true;
   const { data: paymentMethods = [], refetch: refetchPaymentMethods } =
     useQuery({
       queryKey: ["payment-methods"],
       queryFn: paymentService.methods,
+      enabled: paymentConfiguration?.hostedCheckout === false,
     });
   useEffect(() => {
     if (!paymentMethodId && paymentMethods.length)
@@ -445,8 +452,11 @@ export default function CreateSubscriptionPage() {
     deliveryTime,
     startDate,
     endDate,
-    paymentMethodId,
+    paymentMethodId: hostedCheckout ? undefined : paymentMethodId,
     commercialTermsAccepted,
+    recurringPaymentConsent: hostedCheckout
+      ? commercialTermsAccepted
+      : undefined,
     couponCode: couponCode || undefined,
   };
   const previewMutation = useMutation({
@@ -555,11 +565,19 @@ export default function CreateSubscriptionPage() {
 
   const submitSubscription = () => {
     setError("");
+    if (!paymentConfiguration) {
+      setError(
+        paymentConfigurationQuery.isError
+          ? "Ödeme yapılandırması alınamadı. Lütfen sayfayı yenileyip tekrar deneyin."
+          : "Ödeme yapılandırması hazırlanıyor. Lütfen kısa bir süre sonra tekrar deneyin.",
+      );
+      return;
+    }
     if (!previewIsCurrent) {
       setError("Güncel tutar hesaplanmadan talep gönderilemez. Önizlemeyi yenileyin.");
       return;
     }
-    if (!paymentMethodId) {
+    if (!hostedCheckout && !paymentMethodId) {
       setError("Devam etmek için kayıtlı bir ödeme yöntemi seçin.");
       return;
     }
@@ -586,8 +604,9 @@ export default function CreateSubscriptionPage() {
             Talebiniz satıcıya gönderildi
           </h1>
           <p className="mt-3 leading-7 text-slate-600">
-            Satıcının yanıtını Aboneliklerim alanından takip edebilirsiniz.
-            Durum değiştiğinde size bildirim göndereceğiz.
+            {hostedCheckout
+              ? "Satıcı onay verdiğinde abonelik detayından iyzico güvenli ödeme sayfasına geçebilirsiniz. Kart bilgileriniz MealFlex’e gönderilmez."
+              : "Satıcının yanıtını Aboneliklerim alanından takip edebilirsiniz. Durum değiştiğinde size bildirim göndereceğiz."}
           </p>
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
             <Link to={`/subscriptions/${createdId}`}>
@@ -752,8 +771,29 @@ export default function CreateSubscriptionPage() {
                     className="mt-2 h-11 w-full rounded-xl border border-slate-200 px-3 font-normal"
                   />
                 </label>
-                <div className="mt-5 grid gap-3">
-                  {paymentMethods.map((method) => (
+                {!paymentConfiguration ? (
+                  <div
+                    role={paymentConfigurationQuery.isError ? "alert" : "status"}
+                    className={`mt-5 rounded-2xl border p-5 text-sm leading-6 ${paymentConfigurationQuery.isError ? "border-danger-200 bg-danger-50 text-danger-700" : "border-slate-200 bg-slate-50 text-slate-600"}`}
+                  >
+                    {paymentConfigurationQuery.isError
+                      ? "Ödeme yapılandırması alınamadı. Kart bilgisi girmeyin; sayfayı yenileyip tekrar deneyin."
+                      : "Güvenli ödeme yöntemi hazırlanıyor…"}
+                  </div>
+                ) : hostedCheckout ? (
+                  <div className="mt-5 rounded-2xl border border-success-200 bg-success-50 p-5 text-sm leading-6 text-success-800">
+                    <strong className="block text-base text-success-900">
+                      Kartınızı şimdi girmeyeceksiniz
+                    </strong>
+                    Satıcı talebinizi onayladıktan sonra iyzico’nun güvenli ödeme
+                    sayfasına yönlendirileceksiniz. Kart numarası ve güvenlik kodu
+                    MealFlex sunucularına ulaşmaz; sonraki haftalarda yalnız iyzico
+                    kart tokenı kullanılır.
+                  </div>
+                ) : (
+                  <>
+                    <div className="mt-5 grid gap-3">
+                      {paymentMethods.map((method) => (
                     <button
                       key={method.id}
                       onClick={() => setPaymentMethodId(method.id)}
@@ -773,16 +813,18 @@ export default function CreateSubscriptionPage() {
                         <Check className="h-5 w-5 text-primary-600" />
                       )}
                     </button>
-                  ))}
-                </div>
-                <div className="mt-5">
-                  <MockCardTokenizationForm
-                    onAdded={async (method) => {
-                      await refetchPaymentMethods();
-                      setPaymentMethodId(method.id);
-                    }}
-                  />
-                </div>
+                      ))}
+                    </div>
+                    <div className="mt-5">
+                      <MockCardTokenizationForm
+                        onAdded={async (method) => {
+                          await refetchPaymentMethods();
+                          setPaymentMethodId(method.id);
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
                 <label className="mt-5 flex items-start gap-3 rounded-xl border border-slate-200 p-4 text-sm leading-6">
                   <input
                     type="checkbox"
@@ -794,12 +836,14 @@ export default function CreateSubscriptionPage() {
                   />
                   <span>
                     <strong>
-                      Mesafeli satış ve abonelik koşullarını okudum, kabul
-                      ediyorum.
+                      {hostedCheckout
+                        ? "Mesafeli satış ve abonelik koşullarını; haftalık tahsilatlar için kartımın iyzico’da güvenle saklanmasını kabul ediyorum."
+                        : "Mesafeli satış ve abonelik koşullarını okudum, kabul ediyorum."}
                     </strong>
                     <span className="block text-xs text-slate-500">
-                      Satıcı onayında toplam tutar tahsil edilir. İptalde teslim
-                      edilmemiş günler oranında iade uygulanır.
+                      {hostedCheckout
+                        ? "Satıcı onayından sonra ilk haftalık ödeme iyzico üzerinden alınır. Sonraki haftalar kayıtlı iyzico tokenıyla tahsil edilir."
+                        : "İptalde teslim edilmemiş günler oranında iade uygulanır."}
                     </span>
                   </span>
                 </label>

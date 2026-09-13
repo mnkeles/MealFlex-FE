@@ -155,7 +155,7 @@ function MenuCard({
               variant={selected ? "secondary" : "primary"}
               size="sm"
             >
-              {selected ? "Seçildi" : "Bu menüyü seç"}
+              {selected ? "Seçildi" : "Menüyü seç"}
             </Button>
           )}
         </div>

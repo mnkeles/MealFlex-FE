@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CreditCard, ReceiptText, Trash2, WalletCards } from "lucide-react";
+import { CreditCard, ExternalLink, ReceiptText, Trash2, WalletCards } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import MockCardTokenizationForm from "@/components/payment/MockCardTokenizationForm";
 import { paymentService } from "@/services/paymentService";
 import ConfirmModal from "@/components/common/ConfirmModal";
@@ -8,17 +9,33 @@ import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { paymentStatuses } from "@/constants/statuses";
 
+function formatCoveredDates(dates?: string[]) {
+  if (!dates?.length) return "Hizmet tarihleri henüz belirlenmedi";
+  const format = (date: string) =>
+    new Date(`${date}T12:00:00`).toLocaleDateString("tr-TR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  return dates.map(format).join(", ");
+}
+
 export default function PaymentsPage({
   view = "all",
 }: {
   view?: "all" | "methods" | "history";
 }) {
   const queryClient = useQueryClient();
+  const location = useLocation();
   const [deleteId, setDeleteId] = useState<number>();
   const [historyStatus, setHistoryStatus] = useState("");
   const { data: methods = [], isLoading } = useQuery({
     queryKey: ["payment-methods"],
     queryFn: paymentService.methods,
+  });
+  const paymentConfiguration = useQuery({
+    queryKey: ["payment-configuration"],
+    queryFn: paymentService.configuration,
   });
   const { data: history = [] } = useQuery({
     queryKey: ["payment-history"],
@@ -35,12 +52,34 @@ export default function PaymentsPage({
       queryClient.invalidateQueries({ queryKey: ["payment-methods"] });
     },
   });
+  const manageCards = useMutation({
+    mutationFn: paymentService.startCardManagement,
+    onSuccess: (session) => {
+      const destination = new URL(session.cardPageUrl);
+      const host = destination.hostname.toLowerCase();
+      if (
+        destination.protocol !== "https:" ||
+        !(
+          host === "iyzipay.com" ||
+          host.endsWith(".iyzipay.com") ||
+          host === "iyzico.com" ||
+          host.endsWith(".iyzico.com")
+        )
+      ) {
+        throw new Error("Güvenilmeyen kart yönetim adresi");
+      }
+      window.location.assign(destination.toString());
+    },
+  });
 
   const showMethods = view !== "history";
   const showHistory = view !== "methods";
   const visibleHistory = historyStatus
     ? history.filter((payment) => payment.status === historyStatus)
     : history;
+  const cardManagementResult = new URLSearchParams(location.search).get(
+    "cardManagement",
+  );
   return (
     <div className="mf-page mx-auto max-w-4xl space-y-7">
       <PageHeader
@@ -66,6 +105,16 @@ export default function PaymentsPage({
           Kart numaranız MealFlex sunucularında saklanmaz.
         </p>
       </div>
+      {cardManagementResult === "success" && (
+        <p className="rounded-2xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
+          Kartlarınız iyzico üzerinden güvenle güncellendi.
+        </p>
+      )}
+      {cardManagementResult === "failed" && (
+        <p className="rounded-2xl bg-danger-50 p-4 text-sm font-semibold text-danger-700">
+          Kart güncellemesi tamamlanamadı. Lütfen tekrar deneyin.
+        </p>
+      )}
       {showMethods && (
         <section className="rounded-3xl border bg-white p-6">
           <h2 className="flex items-center gap-2 text-lg font-black">
@@ -107,11 +156,47 @@ export default function PaymentsPage({
               ))}
             </div>
           )}
-          <MockCardTokenizationForm
-            onAdded={() =>
-              queryClient.invalidateQueries({ queryKey: ["payment-methods"] })
-            }
-          />
+          {paymentConfiguration.isLoading ? (
+            <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+              Güvenli kart yönetimi hazırlanıyor...
+            </p>
+          ) : paymentConfiguration.isError ? (
+            <p className="rounded-xl bg-danger-50 p-4 text-sm font-semibold text-danger-700">
+              Ödeme sağlayıcısı doğrulanamadı. Kart ekleme işlemi şu anda kapalı.
+            </p>
+          ) : paymentConfiguration.data?.provider === "IYZICO" ? (
+            <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
+              <p className="text-sm text-slate-700">
+                Kart bilgilerinizi yalnız iyzico&apos;nun güvenli sayfasına girersiniz;
+                MealFlex kart numarası veya CVV almaz.
+              </p>
+              <button
+                type="button"
+                onClick={() => manageCards.mutate()}
+                disabled={
+                  manageCards.isPending ||
+                  !paymentConfiguration.data.hostedCheckout
+                }
+                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <ExternalLink className="h-4 w-4" />
+                {manageCards.isPending
+                  ? "iyzico açılıyor..."
+                  : "Kart ekle veya yönet"}
+              </button>
+              {manageCards.isError && (
+                <p className="mt-3 text-sm font-semibold text-danger-700">
+                  Güvenli kart yönetimi başlatılamadı. Lütfen tekrar deneyin.
+                </p>
+              )}
+            </div>
+          ) : (
+            <MockCardTokenizationForm
+              onAdded={() =>
+                queryClient.invalidateQueries({ queryKey: ["payment-methods"] })
+              }
+            />
+          )}
           {remove.isError && (
             <p className="mt-3 rounded-xl bg-danger-50 p-3 text-sm font-semibold text-danger-700">
               Bu kart aktif bir abonelikte kullanılıyor olabilir. Önce ilgili
@@ -177,32 +262,39 @@ export default function PaymentsPage({
             visibleHistory.length ? (
               <div className="mt-4 divide-y">
                 {visibleHistory.map((payment) => (
-                  <div
-                    key={payment.id}
-                    className="flex flex-wrap items-center justify-between gap-3 py-4 text-sm"
-                  >
-                    <div>
-                      <strong>Abonelik #{payment.subscriptionId}</strong>
-                      <p className="text-xs text-slate-500">
-                        {new Date(payment.createdAt).toLocaleString("tr-TR")} ·{" "}
-                        {payment.cardLabel}
-                      </p>
-                      {(payment.balanceAmount > 0 || payment.cardAmount !== payment.grossAmount) && (
+                  <article key={payment.id} className="py-5 text-sm">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <strong className="text-base">
+                          {payment.storeName ?? `Abonelik #${payment.subscriptionId}`}
+                        </strong>
                         <p className="mt-1 text-xs text-slate-500">
-                          Öğün bakiyesi: {payment.balanceAmount.toLocaleString("tr-TR")} TL · Kart: {payment.cardAmount.toLocaleString("tr-TR")} TL
+                          {new Date(payment.paidAt ?? payment.createdAt).toLocaleString("tr-TR")}
                         </p>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <strong className="block">
-                        {payment.grossAmount.toLocaleString("tr-TR")}{" "}
-                        {payment.currency}
-                      </strong>
-                      <span className="mt-1 inline-flex">
+                      </div>
+                      <div className="text-right">
+                        <strong className="block text-base">
+                          {payment.grossAmount.toLocaleString("tr-TR")} {payment.currency}
+                        </strong>
                         <StatusBadge domain="payment" status={payment.status} />
-                      </span>
+                      </div>
                     </div>
-                  </div>
+                    <dl className="mt-4 grid gap-3 rounded-xl bg-slate-50 p-3 sm:grid-cols-2">
+                      <div>
+                        <dt className="text-xs text-slate-500">Hizmet tarihleri</dt>
+                        <dd className="mt-1 font-semibold">{formatCoveredDates(payment.coveredDates)}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs text-slate-500">Ödeme yöntemi</dt>
+                        <dd className="mt-1 font-semibold">{payment.cardLabel ?? "Öğün bakiyesi"}</dd>
+                      </div>
+                    </dl>
+                    {(payment.balanceAmount > 0 || payment.cardAmount !== payment.grossAmount) && (
+                      <p className="mt-2 text-xs text-slate-500">
+                        Öğün bakiyesi: {payment.balanceAmount.toLocaleString("tr-TR")} TL · Kart: {payment.cardAmount.toLocaleString("tr-TR")} TL
+                      </p>
+                    )}
+                  </article>
                 ))}
               </div>
             ) : (

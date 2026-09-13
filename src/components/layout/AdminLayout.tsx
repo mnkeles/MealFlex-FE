@@ -32,6 +32,7 @@ const menuGroups = [
         label: "Operasyon merkezi",
         icon: LayoutDashboard,
       },
+      { path: "/admin/notifications", label: "Bildirimler", icon: Bell },
     ],
   },
   {

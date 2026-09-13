@@ -334,6 +334,7 @@ export default function App() {
             }
           >
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="notifications" element={<NotificationsPage role="ADMIN" />} />
             <Route path="users" element={<AdminUsersPage />} />
             <Route path="users/:id" element={<AdminUserDetailPage />} />
             <Route path="stores" element={<AdminStoresPage />} />

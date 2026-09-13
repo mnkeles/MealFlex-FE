@@ -27,6 +27,8 @@ export interface Payment {
   commissionAmount: number;
   refundedAmount: number;
   netAmount: number;
+  storeName?: string;
+  coveredDates?: string[];
   cardLabel?: string;
   failureMessage?: string;
   paidAt?: string;
@@ -48,6 +50,7 @@ export interface PaymentSummary {
   refundableAmount: number;
   currency: string;
   payment?: Payment;
+  payments?: Payment[];
   refunds: Refund[];
   invoiceId?: number;
 }
@@ -99,7 +102,38 @@ export interface FinanceSummary {
   payouts: Payout[];
 }
 
+export interface PaymentConfiguration {
+  provider: string;
+  hostedCheckout: boolean;
+}
+
+export interface HostedCheckout {
+  sessionId: number;
+  subscriptionId: number;
+  provider: string;
+  paymentPageUrl: string;
+  expiresAt?: string;
+}
+
+export interface CardManagementPage {
+  sessionId: number;
+  provider: string;
+  cardPageUrl: string;
+  expiresAt?: string;
+}
+
 export const paymentService = {
+  async configuration(): Promise<PaymentConfiguration> {
+    return (await api.get("/v1/payments/configuration")).data;
+  },
+  async startCheckout(subscriptionId: number): Promise<HostedCheckout> {
+    return (
+      await api.post(`/v1/payments/subscriptions/${subscriptionId}/checkout`)
+    ).data;
+  },
+  async startCardManagement(): Promise<CardManagementPage> {
+    return (await api.post("/v1/payments/methods/management")).data;
+  },
   async methods(): Promise<PaymentMethod[]> {
     return (await api.get("/v1/payments/methods")).data;
   },

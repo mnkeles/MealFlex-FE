@@ -25,9 +25,12 @@ export default function SellerNotificationsPage() {
   const openNotification = async (
     notification: NonNullable<typeof data>["content"][number],
   ) => {
-    if (!notification.read) await markReadMutation.mutateAsync(notification.id);
-    const link = getNotificationLink(notification, "SELLER");
-    if (link) navigate(link);
+    try {
+      if (!notification.read) await markReadMutation.mutateAsync(notification.id);
+    } finally {
+      const link = getNotificationLink(notification, "SELLER");
+      if (link) navigate(link);
+    }
   };
 
   return (

@@ -21,6 +21,7 @@ export interface SubscriptionInput {
   endDate: string;
   paymentMethodId?: number;
   commercialTermsAccepted?: boolean;
+  recurringPaymentConsent?: boolean;
   couponCode?: string;
 }
 
@@ -73,6 +74,19 @@ export interface DeliveryModificationRequestResult {
   requestedAt: string;
   decidedAt?: string;
 }
+export interface SubscriptionExtensionRequestResult {
+  id: number;
+  subscriptionId: number;
+  customerName: string;
+  menuName: string;
+  personCount: number;
+  oldEndDate: string;
+  newEndDate: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  decisionReason?: string;
+  requestedAt: string;
+  decidedAt?: string;
+}
 
 export const subscriptionService = {
   async create(
@@ -119,9 +133,20 @@ export const subscriptionService = {
     ).data;
   },
 
-  async extend(id: number, newEndDate: string): Promise<Subscription> {
+  async extend(
+    id: number,
+    newEndDate: string,
+  ): Promise<SubscriptionExtensionRequestResult> {
     return (await api.post(`/v1/subscriptions/${id}/extend`, { newEndDate }))
       .data;
+  },
+
+  async getExtensionRequests(
+    subscriptionId: number,
+  ): Promise<SubscriptionExtensionRequestResult[]> {
+    return (
+      await api.get(`/v1/subscriptions/${subscriptionId}/extension-requests`)
+    ).data;
   },
 
   async setAutoRenew(id: number, enabled: boolean): Promise<Subscription> {

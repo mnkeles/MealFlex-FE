@@ -311,6 +311,41 @@ test('satıcı talepleri SLA ile süzer ve seçilenleri kısmi sonuçla toplu ka
   expect(approved.sort()).toEqual([101, 102, 103])
 })
 
+test('dönem uzatma talebi ayrı sekmede bekler ve satıcı onayıyla sonuçlanır', async ({ page }) => {
+  await loginAs(page, 'SELLER')
+  let approvedRequestId: number | undefined
+  const extensionRequest = {
+    id: 41,
+    subscriptionId: 11,
+    customerName: 'Ayşe Yılmaz',
+    menuName: 'Haftalık Menü',
+    personCount: 10,
+    oldEndDate: '2026-10-30',
+    newEndDate: '2026-11-13',
+    status: 'PENDING',
+    requestedAt: '2026-09-12T10:00:00Z',
+  }
+  await page.route('**/api/**', route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/v1/seller/stores/2')) return json(route, { id: 2, name: 'Test Mutfağı', status: 'ACTIVE', temporarilyClosed: false, rating: 5, reviewCount: 1, categories: [], availableDeliveryTimes: [] })
+    if (path.endsWith('/v1/seller/subscriptions/stores/2/extension-requests')) return json(route, [extensionRequest])
+    if (path.endsWith('/v1/seller/subscriptions/extension-requests/41/approve')) {
+      approvedRequestId = 41
+      return json(route, { ...extensionRequest, status: 'APPROVED' })
+    }
+    if (path.endsWith('/v1/seller/subscriptions/stores/2')) return json(route, pageResult())
+    if (path.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/seller/stores/2/pending')
+  await page.getByRole('tab', { name: 'Dönem uzatma (1)' }).click()
+  await expect(page.getByText('Ayşe Yılmaz · Haftalık Menü')).toBeVisible()
+  await expect(page.getByText('30.10.2026 → 13.11.2026')).toBeVisible()
+  await page.getByRole('button', { name: 'Onayla ve uzat' }).click()
+  await expect.poll(() => approvedRequestId).toBe(41)
+})
+
 test('onay modalı küçük ekrana sığar, odağı yönetir ve Escape ile açan düğmeye döner', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
   await page.setViewportSize({ width: 360, height: 800 })
@@ -333,6 +368,43 @@ test('onay modalı küçük ekrana sığar, odağı yönetir ve Escape ile açan
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
   await expect(opener).toBeFocused()
+})
+
+test('iyzico modunda kart bilgisi alınmaz ve güvenli kart yönetim sayfasına yönlendirilir', async ({ page }) => {
+  await loginAs(page, 'CUSTOMER')
+  let managementRequests = 0
+  await page.route('**/api/**', route => {
+    const url = new URL(route.request().url())
+    if (url.pathname.endsWith('/v1/payments/configuration')) {
+      return json(route, { provider: 'IYZICO', hostedCheckout: true })
+    }
+    if (url.pathname.endsWith('/v1/payments/methods/management')) {
+      managementRequests += 1
+      return json(route, {
+        sessionId: 77,
+        provider: 'IYZICO',
+        cardPageUrl: 'https://sandbox-cpp.iyzipay.com/card-management/test',
+        expiresAt: '2026-09-12T22:00:00Z',
+      })
+    }
+    if (url.pathname.endsWith('/v1/payments/methods')) return json(route, [])
+    if (url.pathname.endsWith('/v1/payments/meal-balance')) {
+      return json(route, { availableAmount: 0, currency: 'TRY', recentTransactions: [] })
+    }
+    if (url.pathname.endsWith('/v1/payments/history')) return json(route, [])
+    if (url.pathname.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+  await page.route('https://sandbox-cpp.iyzipay.com/**', route =>
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<title>iyzico güvenli kart yönetimi</title>' }),
+  )
+
+  await page.goto('/payment-methods')
+
+  await expect(page.getByLabel('Kart numarası')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Kart ekle veya yönet' }).click()
+  await expect.poll(() => managementRequests).toBe(1)
+  await expect(page).toHaveURL(/sandbox-cpp\.iyzipay\.com\/card-management\/test/)
 })
 
 test('teslimat durum penceresi erişilebilir, Escape ile kapanır ve odağı geri verir', async ({ page }) => {
@@ -476,6 +548,7 @@ test('müşteri değişiklik talebini teslimat takviminden izler', async ({ page
   await page.route('**/api/**', route => {
     const url = route.request().url()
     if (url.includes('/delivery-change-requests')) return json(route, [{ id: 9, subscriptionId: 1, deliveryId: 11, deliveryDate: '2026-09-10', oldDeliveryTime: '12:00', requestedDeliveryTime: '13:00', oldPersonCount: 5, requestedPersonCount: 7, priceDifference: 200, status: 'PENDING', requestedAt: '2026-08-29T12:00:00Z' }])
+    if (url.includes('/extension-requests')) return json(route, [])
     if (url.endsWith('/v1/subscriptions/1/events')) return json(route, [])
     if (url.endsWith('/v1/subscriptions/1')) return json(route, { subscription: { id: 1, storeId: 2, storeName: 'Test Mutfağı', menuId: 3, menuName: 'Ev Menüsü', addressId: 4, personCount: 5, pricePerPerson: 100, deliveryTime: '12:00', startDate: '2026-09-10', endDate: '2026-09-14', serviceDayCount: 5, totalAmount: 2500, status: 'ACTIVE', createdAt: '2026-08-20T10:00:00Z' }, deliveries: [{ id: 11, subscriptionId: 1, deliveryDate: '2026-09-10', deliveryTime: '12:00', personCount: 5, menuName: 'Ev Menüsü', customerName: 'Test Kullanıcı', deliveryAddress: 'Ankara', status: 'IN_TRANSIT', courierName: 'Mehmet Kurye', courierPhone: '+905321234567', courierPhoneMasked: '•••• ••• 4567' }], reviewed: false })
     if (url.includes('/v1/payments/subscriptions/1')) return json(route, null)
@@ -505,6 +578,7 @@ test('satıcı değişiklik talebi kutusunda sayaç ve karar alanlarını görü
     return json(route, [])
   })
   await page.goto('/seller/stores/2/pending')
+  await page.getByRole('tab', { name: 'Teslimat değişikliği (1)' }).click()
   await expect(page.getByText('Teslimat değişikliği talepleri')).toBeVisible()
   await expect(page.getByText('Ahmet Yılmaz')).toBeVisible()
   await expect(page.getByText(/Kişi:/)).toContainText('5 → 7')
@@ -814,6 +888,7 @@ test('abonelik formu beş hizmet günü, kupon ve ödeme yöntemiyle aynı topla
     if (url.pathname.endsWith('/v1/stores/2/delivery-times')) return json(route, ['12:30', '13:30'])
     if (url.pathname.endsWith('/v1/stores/2/menus/3')) return json(route, menu)
     if (url.pathname.endsWith('/v1/stores/2/menus/3/schedule')) return json(route, {})
+    if (url.pathname.endsWith('/v1/payments/configuration')) return json(route, { provider: 'MOCK', hostedCheckout: false })
     if (url.pathname.endsWith('/v1/payments/methods')) return json(route, [paymentMethod])
     if (url.pathname.endsWith('/v1/subscriptions/preview')) {
       const body = route.request().postDataJSON() as Record<string, unknown>
@@ -845,6 +920,33 @@ test('abonelik formu beş hizmet günü, kupon ve ödeme yöntemiyle aynı topla
   await page.getByRole('button', { name: /^(Abonelik Talebini Gönder|Talebi gönder)$/i }).click()
   await expect(page.getByRole('heading', { name: 'Talebiniz satıcıya gönderildi' })).toBeVisible()
   expect(createRequest).toMatchObject({ storeId: 2, menuId: 3, addressId: 11, personCount: 3, deliveryTime: '13:30', startDate, endDate, paymentMethodId: 90, couponCode: 'HOSGELDIN', commercialTermsAccepted: true })
+})
+
+test('ödeme bekleyen müşteri iyzico güvenli ödeme sayfasına yönlendirilir', async ({ page }) => {
+  await loginAs(page, 'CUSTOMER')
+  const subscription = { id: 1, storeId: 2, storeName: 'Test Mutfağı', menuId: 3, menuName: 'Ev Menüsü', addressId: 11, addressTitle: 'Ofis', deliveryAddress: 'Test adresi', personCount: 3, pricePerPerson: 120, deliveryTime: '12:30', startDate: '2099-09-01', endDate: '2099-09-05', serviceDayCount: 5, totalAmount: 1800, status: 'PAYMENT_PENDING', approvedAt: '2099-08-21T10:00:00Z', createdAt: '2099-08-20T10:00:00Z' }
+  let checkoutStarted = false
+  await page.route('https://sandbox-api.iyzipay.com/**', route => route.fulfill({ status: 200, contentType: 'text/html', body: '<h1>iyzico güvenli ödeme</h1>' }))
+  await page.route('**/api/**', route => {
+    const url = new URL(route.request().url())
+    if (url.pathname.endsWith('/v1/subscriptions/1')) return json(route, { subscription, deliveries: [], reviewed: false })
+    if (url.pathname.endsWith('/v1/subscriptions/1/events')) return json(route, [])
+    if (url.pathname.endsWith('/v1/subscriptions/1/extension-requests')) return json(route, [])
+    if (url.pathname.endsWith('/v1/subscriptions/1/delivery-change-requests')) return json(route, [])
+    if (url.pathname.endsWith('/v1/payments/subscriptions/1/checkout') && route.request().method() === 'POST') {
+      checkoutStarted = true
+      return json(route, { sessionId: 91, subscriptionId: 1, provider: 'IYZICO', paymentPageUrl: 'https://sandbox-api.iyzipay.com/checkout/form', expiresAt: '2099-08-21T10:30:00Z' })
+    }
+    if (url.pathname.endsWith('/v1/payments/subscriptions/1')) return json(route, null)
+    if (url.pathname.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/subscriptions/1')
+  await page.getByRole('button', { name: 'Güvenli ödemeye geç' }).click()
+
+  await expect.poll(() => checkoutStarted).toBeTruthy()
+  await expect(page).toHaveURL('https://sandbox-api.iyzipay.com/checkout/form')
 })
 
 test('müşteri abonelik listesindeki her yaşam döngüsü durumunu doğru görür', async ({ page }) => {
@@ -908,6 +1010,42 @@ test('teslimat değişikliği kararı bildirimi abonelik ayrıntısına yönlend
   await page.goto('/notifications')
   await page.getByRole('button', { name: /Teslimat değişikliği onaylandı/ }).click()
   await expect(page).toHaveURL('/subscriptions/1')
+})
+
+test('ödeme geçmişi eski API yanıtında eksik firma ve tarih alanlarıyla çökmez', async ({ page }) => {
+  await loginAs(page, 'CUSTOMER')
+  await page.route('**/api/**', route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/v1/payments/history')) return json(route, [{
+      id: 10,
+      subscriptionId: 4,
+      status: 'SUCCEEDED',
+      currency: 'TRY',
+      grossAmount: 1000,
+      balanceAmount: 0,
+      cardAmount: 1000,
+      campaignContribution: 0,
+      commissionAmount: 0,
+      refundedAmount: 0,
+      netAmount: 1000,
+      cardLabel: 'Mastercard •••• 1234',
+      createdAt: '2026-09-11T09:00:00Z',
+    }])
+    if (path.endsWith('/v1/payments/meal-balance')) return json(route, {
+      availableAmount: 0,
+      currency: 'TRY',
+      recentTransactions: [],
+    })
+    if (path.endsWith('/v1/payments/methods')) return json(route, [])
+    if (path.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/payments')
+
+  await expect(page.getByText('Abonelik #4')).toBeVisible()
+  await expect(page.getByText('Hizmet tarihleri henüz belirlenmedi')).toBeVisible()
+  await expect(page.getByText('Mastercard •••• 1234')).toBeVisible()
 })
 
 async function openDeliveryChangeScenario(page: Page) {

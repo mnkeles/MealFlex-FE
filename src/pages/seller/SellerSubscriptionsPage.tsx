@@ -4,6 +4,13 @@ import { sellerService } from "@/services/sellerService";
 import type { SubscriptionStatus } from "@/types";
 import StatusBadge from "@/components/ui/StatusBadge";
 
+function apiError(error: unknown) {
+  return (
+    (error as { response?: { data?: { message?: string } } }).response?.data
+      ?.message || "İşlem tamamlanamadı."
+  );
+}
+
 export default function SellerSubscriptionsPage() {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<SubscriptionStatus | undefined>(
@@ -15,6 +22,10 @@ export default function SellerSubscriptionsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["seller-subscriptions", tab],
     queryFn: () => sellerService.getSubscriptions(tab),
+  });
+  const { data: rejectionReasons = [] } = useQuery({
+    queryKey: ["seller-rejection-reasons"],
+    queryFn: sellerService.getRejectionReasons,
   });
 
   const approveMutation = useMutation({
@@ -35,6 +46,7 @@ export default function SellerSubscriptionsPage() {
 
   const tabs: { label: string; value: SubscriptionStatus | undefined }[] = [
     { label: "Onay Bekleyen", value: "PENDING_APPROVAL" },
+    { label: "Müşteri Ödemesi", value: "PAYMENT_PENDING" },
     { label: "Onaylanan", value: "APPROVED" },
     { label: "Aktif", value: "ACTIVE" },
     { label: "Ödeme bekleyen", value: "PAYMENT_SUSPENDED" },
@@ -108,14 +120,21 @@ export default function SellerSubscriptionsPage() {
                 )}
 
                 {rejectId === sub.id && (
-                  <div className="mt-3 flex gap-2">
-                    <input
-                      type="text"
+                  <div className="mt-3">
+                    <div className="flex gap-2">
+                    <select
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
-                      placeholder="Red sebebi..."
-                      className="flex-1 px-3 py-2 border rounded-lg text-sm"
-                    />
+                      aria-label="Abonelik ret nedeni"
+                      className="flex-1 rounded-lg border bg-white px-3 py-2 text-sm"
+                    >
+                      <option value="">Ret nedeni seçin</option>
+                      {rejectionReasons.map((reason) => (
+                        <option key={reason.code} value={reason.code}>
+                          {reason.label}
+                        </option>
+                      ))}
+                    </select>
                     <button
                       onClick={() =>
                         rejectMutation.mutate({
@@ -137,6 +156,15 @@ export default function SellerSubscriptionsPage() {
                     >
                       İptal
                     </button>
+                    </div>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Seçilen açıklama müşteriye gösterilir.
+                    </p>
+                    {rejectMutation.isError && (
+                      <p role="alert" className="mt-2 text-sm font-semibold text-danger-700">
+                        {apiError(rejectMutation.error)}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

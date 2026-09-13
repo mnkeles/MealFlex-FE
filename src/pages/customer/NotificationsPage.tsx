@@ -16,6 +16,7 @@ interface Notification {
   createdAt: string;
   referenceType?: string;
   referenceId?: number;
+  targetUrl?: string;
 }
 
 const notificationGroups: Record<string, string> = {
@@ -39,10 +40,12 @@ function NotificationSection({
   title,
   items,
   onOpen,
+  role,
 }: {
   title: string;
   items: Notification[];
   onOpen: (item: Notification) => void;
+  role: "CUSTOMER" | "ADMIN";
 }) {
   return (
     <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -50,7 +53,7 @@ function NotificationSection({
         {title}
       </h2>
       {items.map((item) => {
-        const link = getNotificationLink(item, "CUSTOMER");
+        const link = getNotificationLink(item, role);
         return (
           <button
             key={item.id}
@@ -89,7 +92,7 @@ function NotificationSection({
   );
 }
 
-export default function NotificationsPage() {
+export default function NotificationsPage({ role = "CUSTOMER" }: { role?: "CUSTOMER" | "ADMIN" }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const query = useQuery({
@@ -120,9 +123,12 @@ export default function NotificationsPage() {
     },
   });
   const open = async (item: Notification) => {
-    if (!item.read) await markRead.mutateAsync(item.id);
-    const link = getNotificationLink(item, "CUSTOMER");
-    if (link) navigate(link);
+    try {
+      if (!item.read) await markRead.mutateAsync(item.id);
+    } finally {
+      const link = getNotificationLink(item, role);
+      if (link) navigate(link);
+    }
   };
   const hasUnread = query.data?.content.some((item) => !item.read);
 
@@ -161,6 +167,7 @@ export default function NotificationsPage() {
                     title={group}
                     items={items}
                     onOpen={open}
+                    role={role}
                   />
                 ),
               )}

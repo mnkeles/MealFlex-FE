@@ -8,7 +8,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 export default function StoreSubscriptionsPage() {
   const { storeId } = useOutletContext<{ storeId: number }>();
   const [tab, setTab] =
-    useState<Extract<SubscriptionStatus, "APPROVED" | "ACTIVE" | "PAYMENT_SUSPENDED">>(
+    useState<Extract<SubscriptionStatus, "PAYMENT_PENDING" | "APPROVED" | "ACTIVE" | "PAYMENT_SUSPENDED">>(
       "ACTIVE",
     );
   const { data, isLoading } = useQuery({
@@ -18,6 +18,7 @@ export default function StoreSubscriptionsPage() {
   });
 
   const tabs: { value: typeof tab; label: string }[] = [
+    { value: "PAYMENT_PENDING", label: "Müşteri Ödemesi" },
     { value: "APPROVED", label: "Başlamayı Bekleyen" },
     { value: "ACTIVE", label: "Aktif" },
     { value: "PAYMENT_SUSPENDED", label: "Ödeme Bekleyen" },

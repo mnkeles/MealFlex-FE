@@ -185,6 +185,25 @@ export interface DeliveryChangeRequest {
   requestedAt: string;
 }
 
+export interface ExtensionRequest {
+  id: number;
+  subscriptionId: number;
+  customerName: string;
+  menuName: string;
+  personCount: number;
+  oldEndDate: string;
+  newEndDate: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  decisionReason?: string;
+  requestedAt: string;
+  decidedAt?: string;
+}
+
+export interface SellerRejectionReason {
+  code: string;
+  label: string;
+}
+
 export interface DeliveryStatusUpdate {
   status: DeliveryStatus;
   estimatedDeliveryAt?: string;
@@ -504,18 +523,25 @@ export const sellerService = {
     return response.data;
   },
 
-  async rejectSubscription(id: number, reason: string): Promise<Subscription> {
+  async getRejectionReasons(): Promise<SellerRejectionReason[]> {
+    return (await api.get("/v1/seller/subscriptions/rejection-reasons")).data;
+  },
+
+  async rejectSubscription(
+    id: number,
+    reasonCode: string,
+  ): Promise<Subscription> {
     const response = await api.post(
       `/v1/seller/subscriptions/${id}/reject`,
       null,
-      { params: { reason } },
+      { params: { reasonCode } },
     );
     return response.data;
   },
 
-  async cancelSubscription(id: number, reason: string): Promise<Subscription> {
+  async cancelSubscription(id: number, reasonCode: string): Promise<Subscription> {
     const response = await api.post(`/v1/seller/subscriptions/${id}/cancel`, {
-      reason,
+      reasonCode,
     });
     return response.data;
   },
@@ -654,13 +680,42 @@ export const sellerService = {
 
   async rejectDeliveryChangeRequest(
     requestId: number,
-    reason: string,
+    reasonCode: string,
   ): Promise<DeliveryChangeRequest> {
     return (
       await api.post(
         `/v1/seller/subscriptions/delivery-change-requests/${requestId}/reject`,
         null,
-        { params: { reason } },
+        { params: { reasonCode } },
+      )
+    ).data;
+  },
+
+  async getExtensionRequests(storeId: number): Promise<ExtensionRequest[]> {
+    return (
+      await api.get(
+        `/v1/seller/subscriptions/stores/${storeId}/extension-requests`,
+      )
+    ).data;
+  },
+
+  async approveExtensionRequest(requestId: number): Promise<ExtensionRequest> {
+    return (
+      await api.post(
+        `/v1/seller/subscriptions/extension-requests/${requestId}/approve`,
+      )
+    ).data;
+  },
+
+  async rejectExtensionRequest(
+    requestId: number,
+    reasonCode: string,
+  ): Promise<ExtensionRequest> {
+    return (
+      await api.post(
+        `/v1/seller/subscriptions/extension-requests/${requestId}/reject`,
+        null,
+        { params: { reasonCode } },
       )
     ).data;
   },
@@ -816,6 +871,7 @@ export const sellerService = {
       readAt?: string;
       referenceType?: string;
       referenceId?: number;
+      targetUrl?: string;
       createdAt: string;
     }>
   > {

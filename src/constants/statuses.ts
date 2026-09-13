@@ -31,6 +31,11 @@ export const subscriptionStatuses: Record<string, UiStatus> = {
     "warning",
     "Satıcının kararı bekleniyor.",
   ),
+  PAYMENT_PENDING: status(
+    "Güvenli ödeme bekleniyor",
+    "warning",
+    "Satıcı onayladı; aboneliğin başlaması için iyzico ödemesi tamamlanmalı.",
+  ),
   APPROVED: status("Onaylandı", "info", "İlk teslimat için hazırlanıyor."),
   ACTIVE: status("Devam ediyor", "success", "Abonelik aktif."),
   PAYMENT_SUSPENDED: status(

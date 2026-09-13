@@ -33,7 +33,7 @@ export default function StoreSubscriptionDetailPage() {
     "summary" | "deliveries" | "history" | "contact"
   >("summary");
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [cancelReason, setCancelReason] = useState("");
+  const [cancelReasonCode, setCancelReasonCode] = useState("");
   const { data, isLoading } = useQuery({
     queryKey: ["seller-subscription-detail", id],
     queryFn: () => sellerService.getSellerSubscriptionDetail(id),
@@ -45,7 +45,7 @@ export default function StoreSubscriptionDetailPage() {
     enabled: Number.isFinite(id),
   });
   const cancelMutation = useMutation({
-    mutationFn: () => sellerService.cancelSubscription(id, cancelReason.trim()),
+    mutationFn: () => sellerService.cancelSubscription(id, cancelReasonCode),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["seller-subscription-detail", id],
@@ -55,8 +55,12 @@ export default function StoreSubscriptionDetailPage() {
       });
       queryClient.invalidateQueries({ queryKey: ["seller-subscriptions"] });
       setCancelDialogOpen(false);
-      setCancelReason("");
+      setCancelReasonCode("");
     },
+  });
+  const { data: cancellationReasons = [] } = useQuery({
+    queryKey: ["seller-rejection-reasons"],
+    queryFn: sellerService.getRejectionReasons,
   });
 
   if (isLoading)
@@ -91,6 +95,7 @@ export default function StoreSubscriptionDetailPage() {
               type="button"
               onClick={() => {
                 cancelMutation.reset();
+                setCancelReasonCode("");
                 setCancelDialogOpen(true);
               }}
               className="rounded-lg border border-danger-200 px-3 py-2 text-sm font-bold text-danger-700 hover:bg-danger-50"
@@ -264,16 +269,20 @@ export default function StoreSubscriptionDetailPage() {
               eklenir. Bu işlem geri alınamaz.
             </p>
             <label className="mt-5 block text-sm font-bold text-slate-700">
-              Müşteriye iletilecek gerekçe
-              <textarea
+              Müşteriye iletilecek iptal gerekçesi
+              <select
                 autoFocus
-                rows={4}
-                maxLength={500}
-                value={cancelReason}
-                onChange={(event) => setCancelReason(event.target.value)}
+                value={cancelReasonCode}
+                onChange={(event) => setCancelReasonCode(event.target.value)}
                 className="mt-2 w-full rounded-xl border border-slate-200 p-3 font-normal"
-                placeholder="Örn. Mutfak ekipmanındaki arıza nedeniyle hizmete devam edemiyoruz."
-              />
+              >
+                <option value="">Bir gerekçe seçin</option>
+                {cancellationReasons.map((reason) => (
+                  <option key={reason.code} value={reason.code}>
+                    {reason.label}
+                  </option>
+                ))}
+              </select>
             </label>
             {cancelMutation.isError && (
               <p className="mt-3 text-sm font-semibold text-danger-700">
@@ -292,7 +301,7 @@ export default function StoreSubscriptionDetailPage() {
               <button
                 type="button"
                 onClick={() => cancelMutation.mutate()}
-                disabled={!cancelReason.trim() || cancelMutation.isPending}
+                disabled={!cancelReasonCode || cancelMutation.isPending}
                 className="rounded-xl bg-danger-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
               >
                 İptal ve iadeyi başlat
