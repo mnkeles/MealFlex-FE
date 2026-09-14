@@ -649,6 +649,7 @@ export default function StoreShowcasePage() {
         </div>
       </section>
 
+      {completedSetupSteps < setupSteps.length && (
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -704,6 +705,7 @@ export default function StoreShowcasePage() {
           </p>
         )}
       </section>
+      )}
 
       <div id="menus" className="flex justify-end">
         <Button
