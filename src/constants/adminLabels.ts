@@ -10,6 +10,21 @@ const actionLabels: Record<string, string> = {
   ADMIN_SUBSCRIPTION_CANCELLED: "Abonelik iptal edildi",
   ADMIN_SUBSCRIPTION_NOTE: "Aboneliğe yönetici notu eklendi",
   ADMIN_DELIVERY_CORRECTED: "Teslimat bilgisi düzeltildi",
+  DELIVERY_SKIPPED: "Teslimat atlandı",
+  DELIVERY_CHANGE_REQUESTED: "Teslimat değişikliği istendi",
+  DELIVERY_CHANGE_APPROVED: "Teslimat değişikliği onaylandı",
+  DELIVERY_CHANGE_REJECTED: "Teslimat değişikliği reddedildi",
+  PAYMENT_SUCCEEDED: "Ödeme başarılı",
+  PAYMENT_FAILED: "Ödeme başarısız",
+  REFUND_SUCCEEDED: "İade başarılı",
+  REFUND_FAILED: "İade başarısız",
+  SUBSCRIPTION_APPROVED: "Abonelik onaylandı",
+  SUBSCRIPTION_REJECTED: "Abonelik reddedildi",
+  SUBSCRIPTION_CANCELLED: "Abonelik iptal edildi",
+  SUBSCRIPTION_COMPLETED: "Abonelik tamamlandı",
+  SUBSCRIPTION_EXTENSION_REQUESTED: "Abonelik uzatma talebi oluşturuldu",
+  SUBSCRIPTION_EXTENSION_APPROVED: "Abonelik uzatma talebi onaylandı",
+  SUBSCRIPTION_EXTENSION_REJECTED: "Abonelik uzatma talebi reddedildi",
   RISK_CASE_ACKNOWLEDGED: "Risk kaydı işleme alındı",
   RISK_CASE_DISMISSED: "Risk kaydı kapatıldı",
   RISK_CASE_REOPENED: "Risk kararı geri alındı",
@@ -30,9 +45,9 @@ const entityLabels: Record<string, string> = {
 export const adminActionLabel = (value: string) =>
   actionLabels[value] ||
   value
-    .toLocaleLowerCase("tr-TR")
+    .toLocaleLowerCase("en-US")
     .split("_")
-    .map((part) => part.charAt(0).toLocaleUpperCase("tr-TR") + part.slice(1))
+    .map((part) => part.charAt(0).toLocaleUpperCase("en-US") + part.slice(1))
     .join(" ");
 
 export const adminEntityLabel = (value: string) =>

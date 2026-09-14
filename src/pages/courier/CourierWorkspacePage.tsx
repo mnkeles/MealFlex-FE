@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, MapPin, Navigation, Truck, WifiOff } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  MapPin,
+  Navigation,
+  Truck,
+  WifiOff,
+} from "lucide-react";
 import { courierService } from "@/services/courierService";
 import type { Delivery, DeliveryStatus } from "@/types";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -13,6 +20,11 @@ type Pending = {
     deliveryCode?: string;
     proofPhotoUrl?: string;
     receiverName?: string;
+    failureReason?: string;
+    notes?: string;
+    delayMinutes?: number;
+    courierLatitude?: number;
+    courierLongitude?: number;
   };
 };
 const queueKey = "mealflex-courier-pending-operations";
@@ -28,6 +40,15 @@ export default function CourierWorkspacePage() {
   const [code, setCode] = useState("");
   const [proofUrl, setProofUrl] = useState("");
   const [receiver, setReceiver] = useState("");
+  const [failureFor, setFailureFor] = useState<number>();
+  const [failureReason, setFailureReason] = useState("");
+  const [failureNotes, setFailureNotes] = useState("");
+  const [delayMinutes, setDelayMinutes] = useState("");
+  const [locationPendingId, setLocationPendingId] = useState<number>();
+  const [locationMessage, setLocationMessage] = useState<{
+    deliveryId: number;
+    text: string;
+  }>();
   const deliveriesQuery = useQuery({
     queryKey: ["courier-workspace-today"],
     queryFn: courierService.today,
@@ -40,6 +61,10 @@ export default function CourierWorkspacePage() {
       setCode("");
       setProofUrl("");
       setReceiver("");
+      setFailureFor(undefined);
+      setFailureReason("");
+      setFailureNotes("");
+      setDelayMinutes("");
     },
   });
   useEffect(() => {
@@ -78,6 +103,7 @@ export default function CourierWorkspacePage() {
       );
   }, [online, pending, client]);
   const send = (id: number, data: Pending["data"]) => {
+    update.reset();
     if (online) update.mutate({ id, data });
     else
       setPending((items) => [
@@ -85,23 +111,85 @@ export default function CourierWorkspacePage() {
         { id, data },
       ]);
   };
+  const startTransit = (delivery: Delivery) => {
+    const withoutLocation = (message: string) => {
+      setLocationPendingId(undefined);
+      setLocationMessage({ deliveryId: delivery.id, text: message });
+      send(delivery.id, { status: "IN_TRANSIT" });
+    };
+
+    if (!navigator.geolocation) {
+      withoutLocation(
+        "Bu cihaz konum paylaşımını desteklemiyor. Teslimat konumsuz güncellendi.",
+      );
+      return;
+    }
+
+    setLocationPendingId(delivery.id);
+    setLocationMessage(undefined);
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setLocationPendingId(undefined);
+        setLocationMessage({
+          deliveryId: delivery.id,
+          text: "Konumunuz durum güncellemesine eklendi.",
+        });
+        send(delivery.id, {
+          status: "IN_TRANSIT",
+          courierLatitude: coords.latitude,
+          courierLongitude: coords.longitude,
+        });
+      },
+      (error) =>
+        withoutLocation(
+          error.code === error.PERMISSION_DENIED
+            ? "Konum izni verilmedi. Teslimat konumsuz güncellendi; tarayıcı izinlerini kontrol edin."
+            : "Konum alınamadı. Teslimat konumsuz güncellendi; bağlantınızı kontrol edin.",
+        ),
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 30_000 },
+    );
+  };
   const action = (delivery: Delivery) =>
-    delivery.status === "SCHEDULED" || delivery.status === "PREPARING" ? (
+    delivery.status === "SCHEDULED" ||
+    delivery.status === "PREPARING" ||
+    delivery.status === "DELIVERY_ATTEMPTED" ? (
       <button
-        onClick={() => send(delivery.id, { status: "IN_TRANSIT" })}
+        onClick={() => startTransit(delivery)}
+        disabled={locationPendingId === delivery.id}
         className="flex items-center gap-1 rounded-xl bg-info-600 px-4 py-3 text-sm font-bold text-white"
       >
         <Truck className="h-4 w-4" />
-        Yola çıktım
+        {locationPendingId === delivery.id
+          ? "Konum alınıyor..."
+          : delivery.status === "DELIVERY_ATTEMPTED"
+            ? "Tekrar yola çıktım"
+            : "Yola çıktım"}
       </button>
     ) : delivery.status === "IN_TRANSIT" ? (
-      <button
-        onClick={() => setProofFor(delivery.id)}
-        className="flex items-center gap-1 rounded-xl bg-success-600 px-4 py-3 text-sm font-bold text-white"
-      >
-        <CheckCircle2 className="h-4 w-4" />
-        Teslim et
-      </button>
+      <div className="flex flex-wrap justify-end gap-2">
+        <button
+          onClick={() => {
+            update.reset();
+            setFailureFor(undefined);
+            setProofFor(delivery.id);
+          }}
+          className="flex items-center gap-1 rounded-xl bg-success-600 px-4 py-3 text-sm font-bold text-white"
+        >
+          <CheckCircle2 className="h-4 w-4" />
+          Teslim et
+        </button>
+        <button
+          onClick={() => {
+            update.reset();
+            setProofFor(undefined);
+            setFailureFor(delivery.id);
+          }}
+          className="flex items-center gap-1 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm font-bold text-danger-700"
+        >
+          <AlertTriangle className="h-4 w-4" />
+          Teslim edilemedi
+        </button>
+      </div>
     ) : null;
   return (
     <main className="mx-auto min-h-screen max-w-xl bg-slate-50 p-4 pb-24">
@@ -120,6 +208,12 @@ export default function CourierWorkspacePage() {
       {pending.length > 0 && (
         <div className="mb-3 rounded-xl bg-info-50 p-3 text-sm text-info-800">
           Gönderilmeyi bekleyen {pending.length} işlem var.
+        </div>
+      )}
+      {update.isError && (
+        <div role="alert" className="mb-3 rounded-xl bg-danger-50 p-3 text-sm font-semibold text-danger-800">
+          {(update.error as { response?: { data?: { message?: string } } })
+            .response?.data?.message || "Teslimat durumu güncellenemedi."}
         </div>
       )}
       <QueryBoundary
@@ -161,6 +255,14 @@ export default function CourierWorkspacePage() {
                   Müşteri telefonu: {delivery.customerPhoneMasked}
                 </p>
               )}
+              {locationMessage?.deliveryId === delivery.id && (
+                <p
+                  role="status"
+                  className="mt-2 rounded-lg bg-info-50 p-2 text-xs font-semibold text-info-800"
+                >
+                  {locationMessage.text}
+                </p>
+              )}
               <a
                 href={`https://www.openstreetmap.org/?q=${encodeURIComponent(delivery.deliveryAddressDetails || delivery.deliveryAddress || "")}`}
                 target="_blank"
@@ -173,12 +275,14 @@ export default function CourierWorkspacePage() {
               {proofFor === delivery.id && (
                 <div className="mt-4 grid gap-2 border-t pt-4">
                   <input
+                    aria-label="Teslim alan kişi"
                     value={receiver}
                     onChange={(event) => setReceiver(event.target.value)}
                     placeholder="Teslim alan kişi"
                     className="rounded-xl border px-3 py-2"
                   />
                   <input
+                    aria-label="Müşteri teslimat kodu"
                     value={code}
                     onChange={(event) =>
                       setCode(event.target.value.replace(/\D/g, "").slice(0, 4))
@@ -188,6 +292,7 @@ export default function CourierWorkspacePage() {
                     className="rounded-xl border px-3 py-2"
                   />
                   <input
+                    aria-label="Kanıt fotoğrafı bağlantısı"
                     value={proofUrl}
                     onChange={(event) => setProofUrl(event.target.value)}
                     type="url"
@@ -214,6 +319,60 @@ export default function CourierWorkspacePage() {
                       className="rounded-xl bg-success-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
                     >
                       Teslimatı tamamla
+                    </button>
+                  </div>
+                </div>
+              )}
+              {failureFor === delivery.id && (
+                <div className="mt-4 grid gap-2 border-t pt-4">
+                  <textarea
+                    aria-label="Teslim edilememe nedeni"
+                    value={failureReason}
+                    onChange={(event) => setFailureReason(event.target.value)}
+                    rows={3}
+                    placeholder="Teslim edilememe nedeni *"
+                    className="rounded-xl border p-3"
+                  />
+                  <input
+                    aria-label="Gecikme süresi (dakika)"
+                    value={delayMinutes}
+                    onChange={(event) =>
+                      setDelayMinutes(event.target.value.replace(/\D/g, "").slice(0, 4))
+                    }
+                    inputMode="numeric"
+                    placeholder="Gecikme süresi (dakika)"
+                    className="rounded-xl border px-3 py-2"
+                  />
+                  <textarea
+                    aria-label="Operasyon notu"
+                    value={failureNotes}
+                    onChange={(event) => setFailureNotes(event.target.value)}
+                    rows={2}
+                    placeholder="Operasyon notu"
+                    className="rounded-xl border p-3"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setFailureFor(undefined)}
+                      className="rounded-xl px-3 py-2 text-sm font-bold"
+                    >
+                      Vazgeç
+                    </button>
+                    <button
+                      disabled={!failureReason.trim() || update.isPending}
+                      onClick={() =>
+                        send(delivery.id, {
+                          status: "DELIVERY_ATTEMPTED",
+                          failureReason: failureReason.trim(),
+                          notes: failureNotes.trim() || undefined,
+                          delayMinutes: delayMinutes
+                            ? Number(delayMinutes)
+                            : undefined,
+                        })
+                      }
+                      className="rounded-xl bg-danger-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                    >
+                      Başarısız denemeyi kaydet
                     </button>
                   </div>
                 </div>

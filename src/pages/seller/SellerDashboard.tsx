@@ -158,14 +158,14 @@ export default function SellerDashboard() {
           tone="danger"
         />
         <StatCard
-          label="Toplam gelir"
+          label="Abonelik sözleşme tutarı"
           value={
             revenueQuery.isError
               ? "—"
               : `${(revenue?.totalRevenue ?? 0).toLocaleString("tr-TR")} ₺`
           }
           icon={<CalendarCheck2 className="h-5 w-5" />}
-          detail="Bu mağazanın abonelik geliri"
+          detail="Aktif ve tamamlanmış aboneliklerin toplamı"
           tone="success"
         />
       </section>

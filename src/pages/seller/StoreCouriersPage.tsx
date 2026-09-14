@@ -136,6 +136,7 @@ export default function StoreCouriersPage() {
         className="flex flex-wrap gap-2 rounded-2xl border bg-white p-4"
       >
         <input
+          aria-label="Kurye adı"
           required
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -143,12 +144,14 @@ export default function StoreCouriersPage() {
           className="min-w-48 flex-1 rounded-xl border px-3 py-2 text-sm"
         />
         <input
+          aria-label="Kurye telefonu"
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
           placeholder="Telefon (yalnız operasyon için)"
           className="rounded-xl border px-3 py-2 text-sm"
         />
         <input
+          aria-label="Kurye personel e-postası"
           required
           type="email"
           value={email}

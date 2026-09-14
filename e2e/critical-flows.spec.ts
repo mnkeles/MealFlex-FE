@@ -58,6 +58,157 @@ test('kurye davetini kabul eder, atanan teslimatı çalışma alanında görür'
   await expect(page.getByText(/Test Caddesi No: 1/)).toBeVisible()
 })
 
+test('kurye konumunu çevrimdışı kuyruğa ekler ve bağlantı gelince bir kez gönderir', async ({ page, context }) => {
+  await loginAs(page, 'CUSTOMER')
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'geolocation', {
+      configurable: true,
+      value: {
+        getCurrentPosition: (success: PositionCallback) => success({
+          coords: { latitude: 39.933365, longitude: 32.859742 },
+        } as GeolocationPosition),
+      },
+    })
+  })
+  let status = 'SCHEDULED'
+  const updates: Array<Record<string, unknown>> = []
+  await page.route('**/api/v1/courier/deliveries/today', route => json(route, [{
+    id: 20,
+    subscriptionId: 11,
+    deliveryDate: '2026-09-14',
+    deliveryTime: '12:30',
+    personCount: 8,
+    menuId: 4,
+    addressId: 6,
+    menuName: 'Kurumsal Öğle Menüsü',
+    deliveryAddress: 'Yenimahalle, Ankara',
+    deliveryAddressDetails: 'Test Caddesi No: 1 · Yenimahalle · Ankara',
+    courierId: 9,
+    courierName: 'Test Kurye',
+    routeSequence: 1,
+    status,
+  }]))
+  await page.route('**/api/v1/courier/deliveries/20/status', async route => {
+    updates.push(route.request().postDataJSON())
+    status = 'IN_TRANSIT'
+    return json(route, { id: 20, status })
+  })
+
+  await page.goto('/courier')
+  await context.setOffline(true)
+  await expect(page.getByText('Çevrimdışısınız; işlemler bağlantı geldiğinde gönderilecek.')).toBeVisible()
+  await page.getByRole('button', { name: 'Yola çıktım' }).click()
+  await expect(page.getByText('Konumunuz durum güncellemesine eklendi.')).toBeVisible()
+  await expect(page.getByText('Gönderilmeyi bekleyen 1 işlem var.')).toBeVisible()
+  expect(updates).toHaveLength(0)
+
+  await context.setOffline(false)
+  await expect.poll(() => updates.length).toBe(1)
+  expect(updates[0]).toMatchObject({
+    status: 'IN_TRANSIT',
+    courierLatitude: 39.933365,
+    courierLongitude: 32.859742,
+  })
+  await expect(page.getByText('Gönderilmeyi bekleyen 1 işlem var.')).toBeHidden()
+})
+
+test('kurye konum iznini reddettiğinde teslimatı konumsuz günceller', async ({ page }) => {
+  await loginAs(page, 'CUSTOMER')
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'geolocation', {
+      configurable: true,
+      value: {
+        getCurrentPosition: (_success: PositionCallback, error: PositionErrorCallback) =>
+          error({ code: 1, message: 'Permission denied', PERMISSION_DENIED: 1 } as GeolocationPositionError),
+      },
+    })
+  })
+  let update: Record<string, unknown> | undefined
+  await page.route('**/api/v1/courier/deliveries/today', route => json(route, [{
+    id: 21,
+    subscriptionId: 12,
+    deliveryDate: '2026-09-14',
+    deliveryTime: '13:00',
+    personCount: 5,
+    menuId: 4,
+    addressId: 7,
+    menuName: 'Kurumsal Öğle Menüsü',
+    deliveryAddress: 'Etimesgut, Ankara',
+    courierId: 9,
+    courierName: 'Test Kurye',
+    routeSequence: 1,
+    status: 'SCHEDULED',
+  }]))
+  await page.route('**/api/v1/courier/deliveries/21/status', async route => {
+    update = route.request().postDataJSON()
+    return json(route, { id: 21, status: 'IN_TRANSIT' })
+  })
+
+  await page.goto('/courier')
+  await page.getByRole('button', { name: 'Yola çıktım' }).click()
+  await expect(page.getByText(/Konum izni verilmedi.*Teslimat konumsuz güncellendi/)).toBeVisible()
+  await expect.poll(() => update).toEqual({ status: 'IN_TRANSIT' })
+})
+
+test('kurye yanlış teslimat kodunu görür ve başarısız denemeyi gerekçesiyle kaydeder', async ({ page }) => {
+  await loginAs(page, 'CUSTOMER')
+  let status = 'IN_TRANSIT'
+  let failureUpdate: Record<string, unknown> | undefined
+  await page.route('**/api/v1/courier/deliveries/today', route => json(route, [{
+    id: 22,
+    subscriptionId: 12,
+    deliveryDate: '2026-09-14',
+    deliveryTime: '13:00',
+    personCount: 5,
+    menuId: 4,
+    addressId: 7,
+    menuName: 'Kurumsal Öğle Menüsü',
+    deliveryAddress: 'Etimesgut, Ankara',
+    customerPhoneMasked: '•••• ••• 2233',
+    courierId: 9,
+    courierName: 'Test Kurye',
+    routeSequence: 1,
+    status,
+  }]))
+  await page.route('**/api/v1/courier/deliveries/22/status', async route => {
+    const body = route.request().postDataJSON() as Record<string, unknown>
+    if (body.status === 'DELIVERED') {
+      return route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Teslimat kodu hatalı.' }),
+      })
+    }
+    failureUpdate = body
+    status = 'DELIVERY_ATTEMPTED'
+    return json(route, { id: 22, status })
+  })
+
+  await page.goto('/courier')
+  await page.getByRole('button', { name: 'Teslim et' }).click()
+  await page.getByLabel('Teslim alan kişi').fill('Test Teslim Alan')
+  await page.getByLabel('Müşteri teslimat kodu').fill('0000')
+  await page.getByRole('button', { name: 'Teslimatı tamamla' }).click()
+  await expect(page.getByRole('alert')).toHaveText('Teslimat kodu hatalı.')
+
+  await page.getByRole('button', { name: 'Vazgeç' }).click()
+  await page.getByRole('button', { name: 'Teslim edilemedi' }).click()
+  const saveFailure = page.getByRole('button', { name: 'Başarısız denemeyi kaydet' })
+  await expect(saveFailure).toBeDisabled()
+  await page.getByLabel('Teslim edilememe nedeni').fill('Müşteri adreste bulunamadı.')
+  await page.getByLabel('Gecikme süresi (dakika)').fill('15')
+  await page.getByLabel('Operasyon notu').fill('Telefonla ulaşılamadı.')
+  await saveFailure.click()
+  await expect.poll(() => failureUpdate).toEqual({
+    status: 'DELIVERY_ATTEMPTED',
+    failureReason: 'Müşteri adreste bulunamadı.',
+    notes: 'Telefonla ulaşılamadı.',
+    delayMinutes: 15,
+  })
+  await expect(page.getByText('Teslim edilemedi', { exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Tekrar yola çıktım' })).toBeVisible()
+})
+
 test('giriş ve kayıt formları alan bazlı Zod doğrulaması gösterir ve klavyeyle kullanılabilir', async ({ page }) => {
   await page.goto('/login')
   await page.getByRole('button', { name: 'Giriş Yap', exact: true }).click()

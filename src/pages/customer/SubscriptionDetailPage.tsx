@@ -1764,6 +1764,7 @@ export default function SubscriptionDetailPage() {
           <div className="w-full max-w-md rounded-2xl bg-white p-6">
             <h2 className="text-xl font-black">Sorun bildir</h2>
             <select
+              aria-label="Sorunun ilgili olduğu teslimat"
               value={complaint.deliveryId}
               onChange={(event) =>
                 setComplaint({ ...complaint, deliveryId: event.target.value })
@@ -1779,6 +1780,7 @@ export default function SubscriptionDetailPage() {
               ))}
             </select>
             <input
+              aria-label="Sorun başlığı"
               value={complaint.reason}
               onChange={(event) =>
                 setComplaint({ ...complaint, reason: event.target.value })
@@ -1787,6 +1789,7 @@ export default function SubscriptionDetailPage() {
               className="mt-3 h-11 w-full rounded-xl border px-3 text-sm"
             />
             <textarea
+              aria-label="Sorun açıklaması"
               value={complaint.description}
               onChange={(event) =>
                 setComplaint({ ...complaint, description: event.target.value })

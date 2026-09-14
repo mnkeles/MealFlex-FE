@@ -16,6 +16,7 @@ import { subscriptionService } from "@/services/subscriptionService";
 import StatusBadge from "@/components/ui/StatusBadge";
 import PageHeader from "@/components/ui/PageHeader";
 import EmptyState from "@/components/ui/EmptyState";
+import { complaintResolutionLabel } from "@/constants/complaintResolutions";
 
 const faqs = [
   {
@@ -329,13 +330,16 @@ export default function SupportPage() {
                 {item.resolutionType && (
                   <div className="mt-3 rounded-xl border border-success-200 bg-success-50 p-4 text-sm text-success-900">
                     <p className="font-bold">
-                      Çözüm uygulandı: {item.resolutionType}
+                      Çözüm uygulandı:{" "}
+                      {complaintResolutionLabel(item.resolutionType)}
                     </p>
-                    {item.resolutionAmount != null && (
-                      <p>
-                        Tutar: {item.resolutionAmount.toLocaleString("tr-TR")} ₺
-                      </p>
-                    )}
+                    {item.resolutionAmount != null &&
+                      item.resolutionAmount > 0 && (
+                        <p>
+                          Tutar:{" "}
+                          {item.resolutionAmount.toLocaleString("tr-TR")} ₺
+                        </p>
+                      )}
                     {item.compensationCode && (
                       <p>
                         Telafi kodu: <strong>{item.compensationCode}</strong>

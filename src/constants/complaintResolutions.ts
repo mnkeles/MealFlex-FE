@@ -32,3 +32,9 @@ export const resolutions = [
     icon: Truck,
   },
 ] as const;
+
+export function complaintResolutionLabel(value: string) {
+  return (
+    resolutions.find((resolution) => resolution.value === value)?.label ?? value
+  );
+}

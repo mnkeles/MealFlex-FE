@@ -756,7 +756,7 @@ export default function CreateSubscriptionPage() {
                   <div>
                     <h2 className="text-xl font-black">Ödeme yöntemi</h2>
                     <p className="text-sm text-slate-500">
-                      Tutar yalnız satıcı talebi onayladığında tahsil edilir.
+                      Tahsilat, satıcı onayından sonra ilk teslimat haftasında başlar.
                     </p>
                   </div>
                 </div>
