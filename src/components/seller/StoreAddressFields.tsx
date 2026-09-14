@@ -185,7 +185,7 @@ export default function StoreAddressFields({
         >
           <TileLayer
             attribution="&copy; OpenStreetMap contributors"
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <MapClick
             latitude={latitude}
