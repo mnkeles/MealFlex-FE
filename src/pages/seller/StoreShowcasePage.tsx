@@ -510,16 +510,6 @@ export default function StoreShowcasePage() {
         eyebrow="Mağaza vitrini"
         title="Menüler ve vitrin"
         description="Mağaza görünümünüzü, menülerinizi ve müşteri vitrininizi buradan yönetin."
-        actions={
-          <Button
-            onClick={() => {
-              if (showForm) discardForm();
-              else setShowForm(true);
-            }}
-          >
-            {showForm ? "İptal" : "+ Yeni menü"}
-          </Button>
-        }
       />
 
       {actionFeedback && (
@@ -714,6 +704,17 @@ export default function StoreShowcasePage() {
           </p>
         )}
       </section>
+
+      <div id="menus" className="flex justify-end">
+        <Button
+          onClick={() => {
+            if (showForm) discardForm();
+            else setShowForm(true);
+          }}
+        >
+          {showForm ? "İptal" : "+ Yeni menü"}
+        </Button>
+      </div>
 
       {showForm && (
         <form
@@ -1070,7 +1071,7 @@ export default function StoreShowcasePage() {
         </form>
       )}
 
-      <div id="menus">
+      <div>
       {menusQuery.isLoading ? (
         <div className="text-center py-12 text-slate-500">Yükleniyor...</div>
       ) : menusQuery.isError ? (
@@ -1083,9 +1084,6 @@ export default function StoreShowcasePage() {
         <EmptyState
           title="Henüz menü oluşturulmamış"
           description="İlk menünüzü oluşturarak mağaza vitrininizi müşterilere açın."
-          action={
-            <Button onClick={() => setShowForm(true)}>+ Yeni menü</Button>
-          }
         />
       ) : (
         <>
