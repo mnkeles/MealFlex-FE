@@ -224,7 +224,7 @@ export default function StoreDetailPage() {
       </Link>
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-card">
         <div className="relative h-56 bg-gradient-to-br from-warning-100 to-danger-100 sm:h-72">
-          <MediaPlaceholder src={store.coverImageUrl} alt="" kind="menu" />
+          <MediaPlaceholder src={store.coverImageUrl} alt="" kind="menu" fit="contain" />
           <div className="absolute right-4 top-4">
             <FavoriteButton storeId={store.id} />
           </div>
@@ -242,6 +242,7 @@ export default function StoreDetailPage() {
                 alt=""
                 kind="store"
                 fallbackLabel={store.name}
+                fit="contain"
               />
             </div>
             <div className="min-w-0 flex-1">

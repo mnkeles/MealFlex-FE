@@ -38,7 +38,7 @@ function FavoriteCard({
             alt=""
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain"
           />
         ) : (
           <div className="grid h-full place-items-center text-4xl">🍲</div>
@@ -69,7 +69,7 @@ function FavoriteCard({
                 alt=""
                 loading="lazy"
                 decoding="async"
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
               />
             ) : (
               "🍽️"

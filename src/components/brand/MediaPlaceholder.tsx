@@ -9,6 +9,7 @@ type MediaPlaceholderProps = {
   className?: string;
   imageClassName?: string;
   fallbackLabel?: string;
+  fit?: "cover" | "contain";
 };
 
 const icons = { store: Store, menu: ImageIcon, user: UserRound };
@@ -26,6 +27,7 @@ export default function MediaPlaceholder({
   className = "",
   imageClassName = "",
   fallbackLabel,
+  fit = "cover",
 }: MediaPlaceholderProps) {
   const [failed, setFailed] = useState(false);
   const Icon = icons[kind];
@@ -43,7 +45,7 @@ export default function MediaPlaceholder({
         loading="lazy"
         decoding="async"
         onError={() => setFailed(true)}
-        className={`h-full w-full object-cover ${imageClassName}`}
+        className={`h-full w-full ${fit === "contain" ? "object-contain" : "object-cover"} ${imageClassName}`}
       />
     );
   return (

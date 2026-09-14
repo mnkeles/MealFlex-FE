@@ -51,6 +51,7 @@ function SubscriptionCard({ item }: { item: Subscription }) {
               src={item.storeLogoUrl}
               alt={`${item.storeName} logosu`}
               kind="store"
+              fit="contain"
             />
           </div>
           <div className="min-w-0 flex-1">

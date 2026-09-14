@@ -26,6 +26,7 @@ export default function StoreCard({
           src={store.coverImageUrl}
           alt=""
           kind="menu"
+          fit="contain"
           imageClassName="transition duration-300 group-hover:scale-105"
         />
         <FavoriteButton storeId={store.id} className="absolute right-3 top-3" />
@@ -43,6 +44,7 @@ export default function StoreCard({
               alt=""
               kind="store"
               fallbackLabel={store.name}
+              fit="contain"
             />
           </div>
           <div className="min-w-0 flex-1">

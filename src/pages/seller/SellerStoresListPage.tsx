@@ -334,11 +334,11 @@ export default function SellerStoresListPage() {
               >
                 <div className="relative h-28 bg-gradient-to-br from-warning-100 via-cream to-success-100">
                   {store.coverImageUrl && (
-                    <img src={store.coverImageUrl} alt="" className="h-full w-full object-cover" />
+                    <img src={store.coverImageUrl} alt="" className="h-full w-full object-contain" />
                   )}
                   <div className="absolute -bottom-8 left-5 grid h-16 w-16 place-items-center overflow-hidden rounded-2xl border-4 border-white bg-white shadow-sm">
                     {store.logoUrl ? (
-                      <img src={store.logoUrl} alt={`${store.name} logosu`} className="h-full w-full object-cover" />
+                      <img src={store.logoUrl} alt={`${store.name} logosu`} className="h-full w-full object-contain" />
                     ) : (
                       <StoreIcon className="h-7 w-7 text-primary-500" aria-hidden="true" />
                     )}

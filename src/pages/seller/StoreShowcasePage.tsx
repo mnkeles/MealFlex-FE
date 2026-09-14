@@ -558,7 +558,7 @@ export default function StoreShowcasePage() {
             <div className="flex items-center gap-4">
               <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-2xl border border-slate-200 bg-white">
                 {store?.logoUrl ? (
-                  <img src={store.logoUrl} alt={`${store.name} logosu`} className="h-full w-full object-cover" />
+                  <img src={store.logoUrl} alt={`${store.name} logosu`} className="h-full w-full object-contain" />
                 ) : (
                   <StoreIcon className="h-9 w-9 text-primary-500" aria-hidden="true" />
                 )}
@@ -592,7 +592,7 @@ export default function StoreShowcasePage() {
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-warning-100 via-cream to-success-100">
               <div className="grid h-28 place-items-center sm:h-32">
                 {store?.coverImageUrl ? (
-                  <img src={store.coverImageUrl} alt={`${store.name} kapak görseli`} className="h-full w-full object-cover" />
+                  <img src={store.coverImageUrl} alt={`${store.name} kapak görseli`} className="h-full w-full object-contain" />
                 ) : (
                   <div className="text-center text-accent-700">
                     <ImageIcon className="mx-auto h-8 w-8" aria-hidden="true" />
@@ -639,13 +639,13 @@ export default function StoreShowcasePage() {
           <div className="mt-3 max-w-xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="relative h-28 bg-gradient-to-br from-warning-100 via-cream to-success-100 sm:h-32">
               {store?.coverImageUrl && (
-                <img src={store.coverImageUrl} alt="" className="h-full w-full object-cover" />
+                <img src={store.coverImageUrl} alt="" className="h-full w-full object-contain" />
               )}
             </div>
             <div className="flex items-center gap-3 p-4">
               <div className="-mt-10 grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border-4 border-white bg-white shadow-sm">
                 {store?.logoUrl ? (
-                  <img src={store.logoUrl} alt="" className="h-full w-full object-cover" />
+                  <img src={store.logoUrl} alt="" className="h-full w-full object-contain" />
                 ) : (
                   <StoreIcon className="h-7 w-7 text-primary-500" aria-hidden="true" />
                 )}
