@@ -941,7 +941,7 @@ export default function StoreSettingsPage() {
             disabled={distanceRuleDrafts.length >= 30}
             className="rounded-lg border border-primary-200 px-3 py-2 text-sm font-medium text-primary-700 hover:bg-primary-50 disabled:opacity-50"
           >
-            + Yeni Kural
+            + Mesafe Kuralı
           </button>
         </div>
         <form
@@ -1047,7 +1047,7 @@ export default function StoreSettingsPage() {
 
               {distanceRuleDrafts.length === 0 && (
                 <p className="rounded-lg border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500">
-                  Henüz mesafe kuralı yok. “Yeni Kural” ile ekleyebilirsiniz.
+                  Henüz mesafe kuralı yok. “Mesafe Kuralı” ile ekleyebilirsiniz.
                 </p>
               )}
             </div>

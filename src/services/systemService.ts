@@ -7,7 +7,7 @@ export interface SystemHealth {
 export const systemService = {
   health: async (): Promise<SystemHealth> =>
     (
-      await api.get<SystemHealth>("/actuator/health", {
+      await api.get<SystemHealth>("/actuator/health/readiness", {
         timeout: 5_000,
       })
     ).data,

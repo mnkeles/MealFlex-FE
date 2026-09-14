@@ -10,6 +10,13 @@ import { paymentStatuses, uiStatus } from "@/constants/statuses";
 const formatDate = (date: Date) => date.toISOString().split("T")[0];
 const money = (value: number) =>
   `${Number(value).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺`;
+const sellerPaymentStatus = (value: string) => {
+  if (value === "PARTIALLY_REFUNDED")
+    return { label: "Hakediş güncellendi", tone: "info" as const };
+  if (value === "REFUNDED")
+    return { label: "Hakediş oluşmadı", tone: "neutral" as const };
+  return uiStatus(paymentStatuses, value);
+};
 
 export default function StoreFinancePage() {
   const { storeId } = useOutletContext<{ storeId: number }>();
@@ -24,10 +31,7 @@ export default function StoreFinancePage() {
     enabled: !!storeId && startDate <= endDate,
   });
   const weeks = useMemo(() => {
-    const result = new Map<
-      string,
-      { refund: number; net: number }
-    >();
+    const result = new Map<string, { net: number }>();
     data?.movements
       .filter((item) => statusFilter === "ALL" || item.status === statusFilter)
       .forEach((item) => {
@@ -35,8 +39,7 @@ export default function StoreFinancePage() {
         const monday = new Date(date);
         monday.setDate(date.getDate() - ((date.getDay() + 6) % 7));
         const key = formatDate(monday);
-        const row = result.get(key) || { refund: 0, net: 0 };
-        row.refund += item.refundedAmount;
+        const row = result.get(key) || { net: 0 };
         row.net += item.netAmount;
         result.set(key, row);
       });
@@ -53,8 +56,7 @@ export default function StoreFinancePage() {
       item.id,
       item.subscriptionId,
       new Date(item.createdAt).toLocaleString("tr-TR"),
-      item.status,
-      item.refundedAmount,
+      sellerPaymentStatus(item.status).label,
       item.netAmount,
       item.currency,
     ]);
@@ -66,8 +68,7 @@ export default function StoreFinancePage() {
         "Abonelik No",
         "Tarih",
         "Durum",
-        "İade",
-        "Net",
+        "Net Hakediş",
         "Para Birimi",
       ],
       rows(),
@@ -78,8 +79,7 @@ export default function StoreFinancePage() {
       "Abonelik No",
       "Tarih",
       "Durum",
-      "İade",
-      "Net",
+      "Net Hakediş",
       "Para Birimi",
     ];
     const html = `<table><tr>${header.map((value) => `<th>${value}</th>`).join("")}</tr>${rows()
@@ -110,10 +110,7 @@ export default function StoreFinancePage() {
     );
   const movements = data.movements ?? [];
   const payouts = data.payouts ?? [];
-  const cards = [
-    ["İadeler", data.refunds, "text-danger-600"],
-    ["Gelir", data.netEarnings, "text-success-600"],
-  ];
+  const cards = [["Gelir", data.netEarnings, "text-success-600"]];
   const nextPayout = payouts
     .filter((item) => item.status !== "PAID")
     .sort((a, b) =>
@@ -125,7 +122,7 @@ export default function StoreFinancePage() {
         <div>
           <h2 className="text-xl font-black">Finans hareket defteri</h2>
           <p className="mt-1 text-sm text-slate-500">
-            Net hakediş ve iade hareketlerinizi takip edin.
+            Gerçekleşen teslimatlara göre oluşan net hakedişinizi takip edin.
           </p>
         </div>
         <div className="flex gap-2">
@@ -175,14 +172,14 @@ export default function StoreFinancePage() {
             {[...new Set(movements.map((item) => item.status))].map(
               (status) => (
                 <option key={status} value={status}>
-                  {uiStatus(paymentStatuses, status).label}
+                  {sellerPaymentStatus(status).label}
                 </option>
               ),
             )}
           </select>
         </label>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4">
         {cards.map(([label, value, color]) => (
           <div key={String(label)} className="rounded-2xl border bg-white p-5">
             <p className="text-sm text-slate-500">{label}</p>
@@ -207,8 +204,7 @@ export default function StoreFinancePage() {
                   <tr>
                     <th className="p-3">Tarih / Abonelik</th>
                     <th className="p-3">Durum</th>
-                    <th className="p-3 text-right">İade</th>
-                    <th className="p-3 text-right">Net</th>
+                    <th className="p-3 text-right">Net hakediş</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
@@ -221,10 +217,9 @@ export default function StoreFinancePage() {
                         </span>
                       </td>
                       <td className="p-3">
-                        <StatusBadge domain="payment" status={item.status} />
-                      </td>
-                      <td className="p-3 text-right text-danger-600">
-                        −{money(item.refundedAmount)}
+                        <StatusBadge tone={sellerPaymentStatus(item.status).tone}>
+                          {sellerPaymentStatus(item.status).label}
+                        </StatusBadge>
                       </td>
                       <td className="p-3 text-right font-bold">
                         {money(item.netAmount)}
@@ -243,6 +238,10 @@ export default function StoreFinancePage() {
         <aside className="space-y-4">
           <div className="rounded-2xl border bg-white p-5">
             <h3 className="font-black">Hakediş durumu</h3>
+            <p className="mt-1 text-xs text-slate-500">
+              Haftanın son geçerli teslimatı tamamlandıktan sonra, o hafta
+              teslim edilen öğünler üzerinden hesaplanır.
+            </p>
             <div className="mt-4 space-y-3 text-sm">
               {[
                 ["Bekleyen", data.pendingPayout],

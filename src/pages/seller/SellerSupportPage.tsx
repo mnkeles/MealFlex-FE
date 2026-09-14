@@ -57,9 +57,9 @@ const faqs = [
   },
   {
     category: "Gelir",
-    question: "Gelir ve iade hareketlerini nereden izlerim?",
+    question: "Gelir ve hakediş hareketlerini nereden izlerim?",
     answer:
-      "Mağazanızın Gelir ekranında tarih ve durum filtrelerini kullanarak abonelik bazlı gelir, iade ve ödeme durumlarını görüntüleyebilirsiniz.",
+      "Mağazanızın Gelir ekranında tarih ve durum filtrelerini kullanarak gerçekleşen teslimatlara göre oluşan abonelik bazlı net hakedişleri ve ödeme durumlarını görüntüleyebilirsiniz.",
   },
   {
     category: "Hesap",
@@ -116,7 +116,7 @@ export default function SellerSupportPage() {
     },
     {
       title: "Gelir hareketleri",
-      description: "Gelir, iade ve ödeme durumlarını görüntüleyin.",
+      description: "Gelir, hakediş ve ödeme durumlarını görüntüleyin.",
       path: storePath("payouts"),
       icon: WalletCards,
     },

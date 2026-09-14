@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BellRing,
   Database,
-  KeyRound,
   MailCheck,
   ShieldCheck,
   Smartphone,
@@ -28,10 +27,6 @@ export default function AccountSecurityPanel({
   const [message, setMessage] = useState("");
   const [deleteText, setDeleteText] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
-  const { data: sessions = [] } = useQuery({
-    queryKey: ["account-sessions"],
-    queryFn: accountService.sessions,
-  });
   const { data: preferenceData } = useQuery({
     queryKey: ["notification-preferences"],
     queryFn: accountService.preferences,
@@ -87,11 +82,6 @@ export default function AccountSecurityPanel({
       setPreferences(r);
       setMessage("Bildirim tercihleri kaydedildi.");
     },
-  });
-  const revoke = useMutation({
-    mutationFn: accountService.revokeSession,
-    onSuccess: () =>
-      client.invalidateQueries({ queryKey: ["account-sessions"] }),
   });
   const requestExport = useMutation({
     mutationFn: accountService.requestExport,
@@ -165,34 +155,6 @@ export default function AccountSecurityPanel({
             requestLabel="OTP gönder"
             codePlaceholder="6 haneli OTP"
           />
-        </div>
-      </section>
-      <section className="rounded-xl bg-white p-6 shadow-sm">
-        <h2 className="flex items-center gap-2 font-black">
-          <KeyRound className="h-5 w-5 text-primary-600" />
-          Aktif oturumlar
-        </h2>
-        <div className="mt-4 divide-y">
-          {sessions.map((session) => (
-            <div
-              key={session.id}
-              className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm"
-            >
-              <span>
-                <strong>{session.deviceName}</strong>
-                <span className="block text-xs text-slate-500">
-                  {session.ipAddress} ·{" "}
-                  {new Date(session.lastSeenAt).toLocaleString("tr-TR")}
-                </span>
-              </span>
-              <button
-                onClick={() => revoke.mutate(session.id)}
-                className="text-xs font-bold text-danger-600"
-              >
-                Oturumu kapat
-              </button>
-            </div>
-          ))}
         </div>
       </section>
       <section className="rounded-xl bg-white p-6 shadow-sm">
