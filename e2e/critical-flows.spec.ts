@@ -395,6 +395,10 @@ test('satıcı paneli telefon, tablet ve masaüstünde taşmaz; panel daraltıla
   })
   expect(logoAlignment.centerDifference).toBeLessThan(2)
   expect(logoAlignment.leftInset).toBeGreaterThan(8)
+  await page.getByRole('button', { name: 'Hesap menüsü' }).click()
+  await expect.poll(() => sidebar.evaluate(element => element.getBoundingClientRect().width)).toBe(288)
+  await expect(page.getByRole('menu', { name: 'Hesap işlemleri' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Menüyü daralt' })).toBeVisible()
   await expect(page.getByLabel('Mağaza bölümleri').evaluate(element => element.scrollWidth >= element.clientWidth)).resolves.toBeTruthy()
 })
 

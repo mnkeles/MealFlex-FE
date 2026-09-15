@@ -323,9 +323,17 @@ export default function SellerLayout() {
           )}
           <button
             type="button"
-            onClick={() => setAccountMenuOpen((value) => !value)}
+            onClick={() => {
+              if (isSidebarCollapsed) {
+                setIsSidebarCollapsed(false);
+                setAccountMenuOpen(true);
+                return;
+              }
+              setAccountMenuOpen((value) => !value);
+            }}
             aria-haspopup="menu"
             aria-expanded={accountMenuOpen}
+            aria-label={isSidebarCollapsed ? "Hesap menüsü" : undefined}
             title={isSidebarCollapsed ? "Hesap menüsü" : undefined}
             className={`flex w-full items-center rounded-xl text-left transition hover:bg-slate-50 ${isSidebarCollapsed ? "h-11 justify-center" : "gap-3 px-2 py-2"}`}
           >
