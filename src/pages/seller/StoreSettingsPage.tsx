@@ -1102,8 +1102,8 @@ export default function StoreSettingsPage() {
               Tarih aralığı
             </button>
           </div>
-          <div className="mb-4 grid gap-2 sm:grid-cols-[auto_auto_minmax(12rem,1fr)_auto] sm:items-end">
-            <label className="text-xs font-bold text-slate-600">
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end">
+            <label className="text-xs font-bold text-slate-600 sm:w-36">
               {closedDateMode === "range" ? "Başlangıç" : "Kapalı gün"}
             <input
               type="date"
@@ -1120,7 +1120,7 @@ export default function StoreSettingsPage() {
             />
             </label>
             {closedDateMode === "range" && (
-              <label className="text-xs font-bold text-slate-600">
+              <label className="text-xs font-bold text-slate-600 sm:w-36">
                 Bitiş
                 <input
                   type="date"
@@ -1137,7 +1137,7 @@ export default function StoreSettingsPage() {
                 />
               </label>
             )}
-            <label className="text-xs font-bold text-slate-600">
+            <label className="text-xs font-bold text-slate-600 sm:min-w-0 sm:flex-1">
               Sebep
             <input
               type="text"
@@ -1162,7 +1162,7 @@ export default function StoreSettingsPage() {
                 closedDateForm.closedDate < earliestClosedDate ||
                 addClosedDateMutation.isPending
               }
-              className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
+              className="w-full shrink-0 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-50 sm:w-auto"
             >
               {closedDateMode === "range" ? "Aralığı ekle" : "Ekle"}
             </button>
