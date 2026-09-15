@@ -702,6 +702,53 @@ test('satıcı teslimat konumunu cihazdan alır ve koordinatları gelişmiş ala
   await expect(dialog.getByLabel('Kurye boylamı')).toHaveValue('32.859742')
 })
 
+test('satıcı teslim edilemeyen teslimat için yalnız açıklama girer', async ({ page }) => {
+  await loginAs(page, 'SELLER')
+  const delivery = {
+    id: 26,
+    subscriptionId: 1,
+    deliveryDate: '2026-09-08',
+    deliveryTime: '12:30',
+    personCount: 8,
+    menuName: 'Kurumsal Menü',
+    customerName: 'Test Müşteri',
+    deliveryAddress: 'Ankara',
+    status: 'IN_TRANSIT',
+  }
+  let update: Record<string, unknown> | undefined
+  await page.route('**/api/**', async route => {
+    const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/v1/seller/stores/2')) return json(route, { id: 2, name: 'Test Mutfağı', status: 'ACTIVE', temporarilyClosed: false, rating: 5, reviewCount: 1, categories: [], availableDeliveryTimes: [] })
+    if (path.endsWith('/v1/seller/stores/2/deliveries/today')) return json(route, [delivery])
+    if (path.endsWith('/v1/seller/stores/2/deliveries/route-plan')) return json(route, { method: '', stops: [] })
+    if (path.endsWith('/v1/seller/stores/2/delivery-slots')) return json(route, [])
+    if (path.endsWith('/v1/seller/stores/2/deliveries/26/status')) {
+      update = route.request().postDataJSON() as Record<string, unknown>
+      return json(route, { ...delivery, status: 'DELIVERY_ATTEMPTED' })
+    }
+    if (path.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/seller/stores/2/operations')
+  await page.getByRole('button', { name: 'Teslim edilemedi' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Teslim edilemedi' })
+  const save = dialog.getByRole('button', { name: 'Durumu güncelle' })
+  await expect(dialog.getByLabel('Açıklama')).toBeFocused()
+  await expect(dialog.getByLabel('Tahmini teslim zamanı')).toHaveCount(0)
+  await expect(dialog.getByLabel('Gecikme (dk)')).toHaveCount(0)
+  await expect(dialog.getByRole('button', { name: 'Konumumu kullan' })).toHaveCount(0)
+  await expect(dialog.getByLabel('Operasyon notu')).toHaveCount(0)
+  await expect(save).toBeDisabled()
+
+  await dialog.getByLabel('Açıklama').fill('Müşteriye ulaşılamadı.')
+  await save.click()
+  await expect.poll(() => update).toEqual({
+    status: 'DELIVERY_ATTEMPTED',
+    failureReason: 'Müşteriye ulaşılamadı.',
+  })
+})
+
 test('toplu teslimat güncellemesi onay ister ve kısmi hata sonucunu açıklar', async ({ page }) => {
   await loginAs(page, 'SELLER')
   const deliveries = [20, 21, 22].map(id => ({ id, subscriptionId: id, deliveryDate: '2026-09-08', deliveryTime: '12:30', personCount: 8, menuName: 'Kurumsal Menü', customerName: `Müşteri ${id}`, deliveryAddress: 'Ankara', status: 'SCHEDULED' }))

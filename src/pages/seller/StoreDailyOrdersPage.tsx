@@ -337,24 +337,32 @@ export default function StoreDailyOrdersPage() {
   };
   const submitDialog = () => {
     if (!dialog) return;
+    const isFailureUpdate =
+      dialog.target === "DELIVERY_ATTEMPTED" || dialog.target === "FAILED";
     updateMutation.mutate({
       id: dialog.delivery.id,
-      data: {
-        status: dialog.target,
-        estimatedDeliveryAt: form.estimatedDeliveryAt
-          ? new Date(form.estimatedDeliveryAt).toISOString()
-          : undefined,
-        delayMinutes: form.delayMinutes ? Number(form.delayMinutes) : undefined,
-        deliveryCode: form.deliveryCode || undefined,
-        failureReason: form.failureReason || undefined,
-        notes: form.notes || undefined,
-        courierLatitude: form.courierLatitude
-          ? Number(form.courierLatitude)
-          : undefined,
-        courierLongitude: form.courierLongitude
-          ? Number(form.courierLongitude)
-          : undefined,
-      },
+      data: isFailureUpdate
+        ? {
+            status: dialog.target,
+            failureReason: form.failureReason.trim(),
+          }
+        : {
+            status: dialog.target,
+            estimatedDeliveryAt: form.estimatedDeliveryAt
+              ? new Date(form.estimatedDeliveryAt).toISOString()
+              : undefined,
+            delayMinutes: form.delayMinutes
+              ? Number(form.delayMinutes)
+              : undefined,
+            deliveryCode: form.deliveryCode || undefined,
+            notes: form.notes || undefined,
+            courierLatitude: form.courierLatitude
+              ? Number(form.courierLatitude)
+              : undefined,
+            courierLongitude: form.courierLongitude
+              ? Number(form.courierLongitude)
+              : undefined,
+          },
     });
   };
   const openCompensationDialog = (delivery: Delivery) => {
@@ -964,11 +972,12 @@ export default function StoreDailyOrdersPage() {
           }
         >
             <p className="mt-1 text-sm text-slate-500">
-              #{dialog.delivery.id} teslimatı için operasyon bilgisini girin.
+              {requiresFailureReason
+                ? `#${dialog.delivery.id} teslimatının neden gerçekleşemediğini yazın.`
+                : `#${dialog.delivery.id} teslimatı için operasyon bilgisini girin.`}
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {(dialog.target === "IN_TRANSIT" ||
-                dialog.target === "DELIVERY_ATTEMPTED") && (
+              {!requiresFailureReason && dialog.target === "IN_TRANSIT" && (
                 <label className="text-xs font-bold text-slate-600 sm:col-span-2">
                   Tahmini teslim zamanı
                   <input
@@ -984,8 +993,7 @@ export default function StoreDailyOrdersPage() {
                   />
                 </label>
               )}
-              {(dialog.target === "IN_TRANSIT" ||
-                dialog.target === "DELIVERY_ATTEMPTED") && (
+              {!requiresFailureReason && dialog.target === "IN_TRANSIT" && (
                 <label className="text-xs font-bold text-slate-600">
                   Gecikme (dk)
                   <input
@@ -1021,20 +1029,21 @@ export default function StoreDailyOrdersPage() {
               )}
               {requiresFailureReason && (
                 <label className="text-xs font-bold text-slate-600 sm:col-span-2">
-                  Başarısızlık nedeni *
+                  Açıklama *
                   <textarea
+                    data-delivery-dialog-initial-focus
                     required
                     rows={3}
                     value={form.failureReason}
                     onChange={(event) =>
                       setForm({ ...form, failureReason: event.target.value })
                     }
+                    placeholder="Örn. Müşteriye ulaşılamadı."
                     className="mt-1 w-full rounded-xl border p-3 text-sm font-normal"
                   />
                 </label>
               )}
-              {(dialog.target === "IN_TRANSIT" ||
-                dialog.target === "DELIVERY_ATTEMPTED") && (
+              {!requiresFailureReason && dialog.target === "IN_TRANSIT" && (
                 <div className="sm:col-span-2">
                   <button
                     type="button"
@@ -1093,17 +1102,19 @@ export default function StoreDailyOrdersPage() {
                   </details>
                 </div>
               )}
-              <label className="text-xs font-bold text-slate-600 sm:col-span-2">
-                Operasyon notu
-                <textarea
-                  rows={2}
-                  value={form.notes}
-                  onChange={(event) =>
-                    setForm({ ...form, notes: event.target.value })
-                  }
-                  className="mt-1 w-full rounded-xl border p-3 text-sm font-normal"
-                />
-              </label>
+              {!requiresFailureReason && (
+                <label className="text-xs font-bold text-slate-600 sm:col-span-2">
+                  Operasyon notu
+                  <textarea
+                    rows={2}
+                    value={form.notes}
+                    onChange={(event) =>
+                      setForm({ ...form, notes: event.target.value })
+                    }
+                    className="mt-1 w-full rounded-xl border p-3 text-sm font-normal"
+                  />
+                </label>
+              )}
             </div>
             {requiresDeliveryCode && (
               <p className="mt-3 text-xs text-slate-500">
