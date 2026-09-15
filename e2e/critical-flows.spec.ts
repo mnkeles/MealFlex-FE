@@ -402,6 +402,40 @@ test('satıcı paneli telefon, tablet ve masaüstünde taşmaz; panel daraltıla
   await expect(page.getByLabel('Mağaza bölümleri').evaluate(element => element.scrollWidth >= element.clientWidth)).resolves.toBeTruthy()
 })
 
+test('satıcı destek formu iletişim bilgileriyle e-posta talebi oluşturur', async ({ page }) => {
+  await loginAs(page, 'SELLER')
+  let supportRequest: Record<string, unknown> | undefined
+  await page.route('**/api/**', route => {
+    const url = new URL(route.request().url())
+    if (url.pathname.endsWith('/v1/support/requests') && route.request().method() === 'POST') {
+      supportRequest = route.request().postDataJSON() as Record<string, unknown>
+      return route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify({ id: 42, emailStatus: 'SENT', createdAt: '2026-09-15T12:00:00Z' }) })
+    }
+    if (url.pathname.includes('unread-count')) return json(route, { count: 0 })
+    if (url.pathname.endsWith('/v1/seller/stores')) return json(route, [])
+    return json(route, [])
+  })
+
+  await page.goto('/seller/support')
+  await expect(page.getByLabel('Ad soyad')).toHaveValue('Test Kullanıcı')
+  await expect(page.getByLabel('E-posta')).toHaveValue('test@mealflex.local')
+  await page.getByLabel(/Telefon/).fill('+90 555 111 22 33')
+  await page.getByLabel('Kategori', { exact: true }).selectOption('TECHNICAL')
+  await page.getByLabel('Konu').fill('Mağaza ekranı açılmıyor')
+  await page.getByLabel('Mesajınız').fill('Mağaza yönetimi ekranını açarken beklenmeyen bir hata görüyorum.')
+  await page.getByRole('button', { name: 'Destek talebi gönder' }).click()
+
+  await expect(page.getByText('Destek talebiniz alındı.')).toBeVisible()
+  await expect(page.getByText(/Talep numaranız #42/)).toBeVisible()
+  expect(supportRequest).toMatchObject({
+    contactName: 'Test Kullanıcı',
+    contactEmail: 'test@mealflex.local',
+    contactPhone: '+90 555 111 22 33',
+    category: 'TECHNICAL',
+    subject: 'Mağaza ekranı açılmıyor',
+  })
+})
+
 test('abonelik listesi API hatasını boş liste gibi göstermez', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
   await page.route('**/api/**', route => {

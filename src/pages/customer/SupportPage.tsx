@@ -5,7 +5,6 @@ import {
   ArrowRight,
   CircleHelp,
   CreditCard,
-  LifeBuoy,
   MapPinned,
   MessageSquareWarning,
   Search,
@@ -17,6 +16,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import PageHeader from "@/components/ui/PageHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import { complaintResolutionLabel } from "@/constants/complaintResolutions";
+import SupportContactForm from "@/components/support/SupportContactForm";
 
 const faqs = [
   {
@@ -139,30 +139,7 @@ export default function SupportPage() {
         description="Sorularınıza yanıt bulun, ilgili işlemlere ulaşın ve oluşturduğunuz destek taleplerini takip edin."
       />
 
-      <section className="rounded-2xl bg-slate-950 p-5 text-white shadow-card sm:p-7">
-        <div className="flex items-start gap-4">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/10 text-primary-300">
-            <LifeBuoy className="h-6 w-6" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-xl font-black">Size nasıl yardımcı olabiliriz?</h2>
-            <p className="mt-1 text-sm leading-6 text-slate-300">
-              Abonelik, ödeme, teslimat veya hesap konusuyla arama yapın.
-            </p>
-            <label className="mt-4 flex h-12 items-center gap-3 rounded-xl bg-white px-4 text-slate-600 shadow-sm">
-              <Search className="h-5 w-5 shrink-0" aria-hidden="true" />
-              <span className="sr-only">Destek içeriğinde ara</span>
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Örnek: haftalık ücret ne zaman kesilir?"
-                className="h-full min-w-0 flex-1 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-              />
-            </label>
-          </div>
-        </div>
-      </section>
+      <SupportContactForm />
 
       <section>
         <h2 className="text-lg font-black text-ink">Hızlı işlemler</h2>
@@ -216,6 +193,12 @@ export default function SupportPage() {
             </button>
           ))}
         </div>
+        <label className="mt-4 flex h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 text-slate-600">
+          <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span className="sr-only">Destek içeriğinde ara</span>
+          <input type="search" value={search} onChange={(event) => setSearch(event.target.value)}
+            placeholder="Sık sorulan sorularda ara" className="h-full min-w-0 flex-1 bg-transparent text-sm outline-none" />
+        </label>
         {filteredFaqs.length ? (
           <div className="mt-4 divide-y divide-slate-100">
             {filteredFaqs.map((item) => (
