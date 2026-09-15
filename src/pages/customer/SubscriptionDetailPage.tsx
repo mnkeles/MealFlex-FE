@@ -271,6 +271,7 @@ export default function SubscriptionDetailPage() {
   });
   const [message, setMessage] = useState("");
   const [newPaymentMethodId, setNewPaymentMethodId] = useState<number>();
+  const [actionDeliveryId, setActionDeliveryId] = useState<number>();
   const [skipDeliveryId, setSkipDeliveryId] = useState<number>();
   const [showFreeze, setShowFreeze] = useState(false);
   const [showExtend, setShowExtend] = useState(false);
@@ -403,15 +404,18 @@ export default function SubscriptionDetailPage() {
   const skipDelivery = useMutation({
     mutationFn: (deliveryId: number) =>
       subscriptionService.skipDelivery(id, deliveryId),
-    onSuccess: (result) => {
+    onSuccess: () => {
       setSkipDeliveryId(undefined);
       setMessage(
-        `${result.adjustmentAmount.toLocaleString("tr-TR")} ${result.currency} tutarındaki düzeltme oluşturuldu.`,
+        "Gün atlama talebiniz satıcı onayına gönderildi. Teslimat, satıcı onaylayana kadar planlı kalır.",
       );
       refresh();
     },
-    onError: () =>
-      setMessage("Teslimat atlanamadı. Değişiklik son saati geçmiş olabilir."),
+    onError: (error: unknown) =>
+      setMessage(
+        (error as { response?: { data?: { message?: string } } }).response?.data
+          ?.message || "Gün atlama talebi gönderilemedi. Değişiklik son saati geçmiş olabilir.",
+      ),
   });
   const freezeSubscription = useMutation({
     mutationFn: () =>
@@ -466,6 +470,7 @@ export default function SubscriptionDetailPage() {
       );
       return;
     }
+    setActionDeliveryId(undefined);
     setModifyDeliveryId(delivery.id);
     setModifyForm({
       deliveryTime: toShortTime(delivery.deliveryTime),
@@ -558,6 +563,9 @@ export default function SubscriptionDetailPage() {
     (paymentSummary?.payment ? [paymentSummary.payment] : []);
   const modifyingDelivery = data.deliveries.find(
     (delivery) => delivery.id === modifyDeliveryId,
+  );
+  const actionDelivery = data.deliveries.find(
+    (delivery) => delivery.id === actionDeliveryId,
   );
   const modifyingDeliveryAddress = [
     data.addressTitle || sub.addressTitle,
@@ -800,8 +808,8 @@ export default function SubscriptionDetailPage() {
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-xl font-black">Değişiklik taleplerim</h2>
               <p className="mt-1 text-sm text-slate-500">
-                Saat ve kişi sayısı taleplerinizin satıcı kararlarını
-                buradan takip edebilirsiniz.
+                Teslimat değişikliği ve gün atlama taleplerinizin satıcı
+                kararlarını buradan takip edebilirsiniz.
               </p>
               <div className="mt-4 space-y-3">
                 {deliveryChangeRequests.map((request) => {
@@ -843,18 +851,24 @@ export default function SubscriptionDetailPage() {
                           {config.label}
                         </span>
                       </div>
-                      <p className="mt-2 text-sm text-slate-600">
-                        Saat:{" "}
-                        <strong>
-                          {request.oldDeliveryTime} →{" "}
-                          {request.requestedDeliveryTime}
-                        </strong>{" "}
-                        · Kişi:{" "}
-                        <strong>
-                          {request.oldPersonCount} →{" "}
-                          {request.requestedPersonCount}
-                        </strong>
-                      </p>
+                      {request.requestType === "SKIP" ? (
+                        <p className="mt-2 text-sm font-semibold text-slate-700">
+                          Bu teslimat gününü atlama talebi
+                        </p>
+                      ) : (
+                        <p className="mt-2 text-sm text-slate-600">
+                          Saat:{" "}
+                          <strong>
+                            {request.oldDeliveryTime} →{" "}
+                            {request.requestedDeliveryTime}
+                          </strong>{" "}
+                          · Kişi:{" "}
+                          <strong>
+                            {request.oldPersonCount} →{" "}
+                            {request.requestedPersonCount}
+                          </strong>
+                        </p>
+                      )}
                       {request.decisionReason && (
                         <p className="mt-2 rounded-xl bg-danger-50 p-3 text-sm text-danger-700">
                           <strong>Ret gerekçesi:</strong>{" "}
@@ -863,7 +877,12 @@ export default function SubscriptionDetailPage() {
                       )}
                       {request.customerNote && (
                         <p className="mt-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-700">
-                          <strong>Teslimat notu:</strong> {request.customerNote}
+                          <strong>
+                            {request.requestType === "SKIP"
+                              ? "Talep nedeni:"
+                              : "Teslimat notu:"}
+                          </strong>{" "}
+                          {request.customerNote}
                         </p>
                       )}
                     </article>
@@ -877,18 +896,19 @@ export default function SubscriptionDetailPage() {
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-6 [&::-webkit-details-marker]:hidden">
                 <div>
                   <h2 className="text-xl font-black">
-                    Gelecek teslimat için değişiklik talebi
+                    Teslimat işlemleri
                   </h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    Teslimat saati veya kişi sayısı için değişiklik talebi
-                    gönderin.
+                    Bir tarih seçerek değişiklik ya da gün atlama talebi
+                    gönderin; birden fazla gün için tarih aralığını dondurun.
                   </p>
                 </div>
                 <ChevronDown className="h-5 w-5 shrink-0 text-slate-500 transition-transform group-open:rotate-180" />
               </summary>
               <div className="border-t border-info-100 px-6 pb-6 pt-4">
                 <p className="text-sm text-slate-500">
-                  Satıcı onay veya ret kararını size bildirim olarak iletir.
+                  Tarih üzerindeki iki işlem de satıcı onayına gönderilir.
+                  Satıcı kararını size bildirim olarak iletir.
                 </p>
                 {pendingChangeDeliveryIds.size > 0 && (
                   <p className="mt-3 rounded-xl bg-warning-50 p-3 text-sm font-semibold text-warning-700">
@@ -896,7 +916,14 @@ export default function SubscriptionDetailPage() {
                     Satıcının kararından sonra yeniden talep oluşturabilirsiniz.
                   </p>
                 )}
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowFreeze(true)}
+                    className="rounded-xl bg-info-600 px-4 py-2 text-sm font-bold text-white"
+                  >
+                    Tarih aralığını dondur
+                  </button>
                   {data.deliveries
                     .filter(
                       (delivery) =>
@@ -909,7 +936,7 @@ export default function SubscriptionDetailPage() {
                     .map((delivery) => (
                       <button
                         key={delivery.id}
-                        onClick={() => openModify(delivery)}
+                        onClick={() => setActionDeliveryId(delivery.id)}
                         disabled={pendingChangeDeliveryIds.has(delivery.id)}
                         title={
                           pendingChangeDeliveryIds.has(delivery.id)
@@ -923,54 +950,7 @@ export default function SubscriptionDetailPage() {
                         )}{" "}
                         {pendingChangeDeliveryIds.has(delivery.id)
                           ? "için talep onayı bekleniyor"
-                          : "teslimatı için talep gönder"}
-                      </button>
-                    ))}
-                </div>
-              </div>
-            </details>
-          )}
-          {["APPROVED", "ACTIVE"].includes(sub.status) && (
-            <details className="group rounded-3xl border border-info-200 bg-white shadow-sm">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-6 [&::-webkit-details-marker]:hidden">
-                <div>
-                  <h2 className="text-xl font-black">
-                    Teslimat değişiklikleri
-                  </h2>
-                  <p className="mt-1 text-sm text-slate-500">
-                    Gelecek bir günü atlayın veya tarih aralığını dondurun.
-                    Uygun tutar otomatik iade edilir.
-                  </p>
-                </div>
-                <ChevronDown className="h-5 w-5 shrink-0 text-slate-500 transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="border-t border-info-100 px-6 pb-6 pt-4">
-                <button
-                  onClick={() => setShowFreeze(true)}
-                  className="rounded-xl bg-info-600 px-4 py-2 text-sm font-bold text-white"
-                >
-                  Tarih aralığını dondur
-                </button>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {data.deliveries
-                    .filter(
-                      (delivery) =>
-                        delivery.status === "SCHEDULED" &&
-                        new Date(
-                          `${delivery.deliveryDate}T${delivery.deliveryTime}`,
-                        ) > new Date(),
-                    )
-                    .slice(0, 8)
-                    .map((delivery) => (
-                      <button
-                        key={delivery.id}
-                        onClick={() => setSkipDeliveryId(delivery.id)}
-                        className="rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:border-info-300 hover:text-info-700"
-                      >
-                        {new Date(delivery.deliveryDate).toLocaleDateString(
-                          "tr-TR",
-                        )}{" "}
-                        gününü atla
+                            : "teslimatı"}
                       </button>
                     ))}
                 </div>
@@ -1398,6 +1378,59 @@ export default function SubscriptionDetailPage() {
         </aside>
       </div>
 
+      {actionDelivery && (
+        <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            <h2 className="text-xl font-black">Teslimat işlemi seçin</h2>
+            <p className="mt-2 text-sm text-slate-500">
+              {new Date(`${actionDelivery.deliveryDate}T12:00:00`).toLocaleDateString(
+                "tr-TR",
+                { day: "numeric", month: "long", year: "numeric" },
+              )}{" "}
+              tarihli teslimat için yapmak istediğiniz işlemi seçin. Her iki
+              talep de satıcının onayına gönderilir.
+            </p>
+            <div className="mt-5 grid gap-3">
+              <button
+                type="button"
+                onClick={() => openModify(actionDelivery)}
+                className="rounded-2xl border border-info-200 p-4 text-left hover:bg-info-50"
+              >
+                <span className="flex items-center gap-2 font-black text-info-800">
+                  <Clock3 className="h-5 w-5" /> Saat veya kişi sayısını değiştir
+                </span>
+                <span className="mt-1 block text-sm text-slate-500">
+                  Teslimat saatini, kişi sayısını veya teslimat notunu güncelleyin.
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActionDeliveryId(undefined);
+                  setSkipDeliveryId(actionDelivery.id);
+                }}
+                className="rounded-2xl border border-warning-200 p-4 text-left hover:bg-warning-50"
+              >
+                <span className="flex items-center gap-2 font-black text-warning-800">
+                  <CalendarDays className="h-5 w-5" /> Bu teslimat gününü atla
+                </span>
+                <span className="mt-1 block text-sm text-slate-500">
+                  Satıcı onaylarsa teslimat takvimden çıkarılır ve ücret düzeltmesi yapılır.
+                </span>
+              </button>
+            </div>
+            <div className="mt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setActionDeliveryId(undefined)}
+                className="rounded-xl px-4 py-2 text-sm font-bold text-slate-600"
+              >
+                Vazgeç
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {modifyDeliveryId && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
           <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6">
@@ -1560,9 +1593,9 @@ export default function SubscriptionDetailPage() {
       )}
       <ConfirmModal
         open={!!skipDeliveryId}
-        title="Bu teslimat gününü atla"
-        message="Teslimat operasyon takviminden çıkarılacak ve günlük ücret için otomatik iade/düzeltme oluşturulacak."
-        confirmLabel="Günü atla"
+        title="Gün atlama talebi gönder"
+        message="Talep satıcının onayına gönderilecek. Satıcı onaylayana kadar teslimat planlı kalacak; onaydan sonra takvimden çıkarılıp uygun ücret düzeltmesi oluşturulacak."
+        confirmLabel="Onaya gönder"
         pending={skipDelivery.isPending}
         onClose={() => setSkipDeliveryId(undefined)}
         onConfirm={() => skipDeliveryId && skipDelivery.mutate(skipDeliveryId)}

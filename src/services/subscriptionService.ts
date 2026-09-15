@@ -59,6 +59,7 @@ export interface DeliveryModificationRequestResult {
   deliveryId: number;
   customerName?: string;
   deliveryDate: string;
+  requestType: "CHANGE" | "SKIP";
   oldDeliveryTime: string;
   requestedDeliveryTime: string;
   oldPersonCount: number;
@@ -170,7 +171,7 @@ export const subscriptionService = {
     subscriptionId: number,
     deliveryId: number,
     reason?: string,
-  ): Promise<DeliveryChangeResult> {
+  ): Promise<DeliveryModificationRequestResult> {
     return (
       await api.post(
         `/v1/subscriptions/${subscriptionId}/deliveries/${deliveryId}/skip`,

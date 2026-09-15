@@ -698,7 +698,7 @@ test('müşteri değişiklik talebini teslimat takviminden izler', async ({ page
   await loginAs(page, 'CUSTOMER')
   await page.route('**/api/**', route => {
     const url = route.request().url()
-    if (url.includes('/delivery-change-requests')) return json(route, [{ id: 9, subscriptionId: 1, deliveryId: 11, deliveryDate: '2026-09-10', oldDeliveryTime: '12:00', requestedDeliveryTime: '13:00', oldPersonCount: 5, requestedPersonCount: 7, priceDifference: 200, status: 'PENDING', requestedAt: '2026-08-29T12:00:00Z' }])
+    if (url.includes('/delivery-change-requests')) return json(route, [{ id: 9, subscriptionId: 1, deliveryId: 11, deliveryDate: '2026-09-10', requestType: 'CHANGE', oldDeliveryTime: '12:00', requestedDeliveryTime: '13:00', oldPersonCount: 5, requestedPersonCount: 7, priceDifference: 200, status: 'PENDING', requestedAt: '2026-08-29T12:00:00Z' }])
     if (url.includes('/extension-requests')) return json(route, [])
     if (url.endsWith('/v1/subscriptions/1/events')) return json(route, [])
     if (url.endsWith('/v1/subscriptions/1')) return json(route, { subscription: { id: 1, storeId: 2, storeName: 'Test Mutfağı', menuId: 3, menuName: 'Ev Menüsü', addressId: 4, personCount: 5, pricePerPerson: 100, deliveryTime: '12:00', startDate: '2026-09-10', endDate: '2026-09-14', serviceDayCount: 5, totalAmount: 2500, status: 'ACTIVE', createdAt: '2026-08-20T10:00:00Z' }, deliveries: [{ id: 11, subscriptionId: 1, deliveryDate: '2026-09-10', deliveryTime: '12:00', personCount: 5, menuName: 'Ev Menüsü', customerName: 'Test Kullanıcı', deliveryAddress: 'Ankara', status: 'IN_TRANSIT', courierName: 'Mehmet Kurye', courierPhone: '+905321234567', courierPhoneMasked: '•••• ••• 4567' }], reviewed: false })
@@ -712,7 +712,7 @@ test('müşteri değişiklik talebini teslimat takviminden izler', async ({ page
   await expect(page.getByRole('link', { name: 'Mehmet Kurye adlı kuryeyi ara' })).toHaveAttribute('href', 'tel:+905321234567')
   await expect(page.getByText(/•••• ••• 4567/)).toBeVisible()
   await expect(page.getByText('Değişiklik onayı bekliyor')).toBeVisible()
-  await page.locator('summary').filter({ hasText: 'Gelecek teslimat için değişiklik talebi' }).click()
+  await page.locator('summary').filter({ hasText: 'Teslimat işlemleri' }).click()
   await expect(page.getByText(/ikinci talep gönderilemez/)).toBeVisible()
   await expect(page.getByText('5 → 7')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBeTruthy()
@@ -722,15 +722,15 @@ test('satıcı değişiklik talebi kutusunda sayaç ve karar alanlarını görü
   await loginAs(page, 'SELLER')
   await page.route('**/api/**', route => {
     const url = route.request().url()
-    if (url.includes('/delivery-change-requests')) return json(route, [{ id: 9, subscriptionId: 1, deliveryId: 11, customerName: 'Ahmet Yılmaz', deliveryDate: '2026-09-10', oldDeliveryTime: '12:00', requestedDeliveryTime: '13:00', oldPersonCount: 5, requestedPersonCount: 7, oldAddressId: 3, requestedAddressId: 4, oldAddress: 'Ev · Çankaya / Ankara', requestedAddress: 'Ofis · Etimesgut / Ankara', priceDifference: 200, status: 'PENDING', requestedAt: '2026-08-29T12:00:00Z' }])
+    if (url.includes('/delivery-change-requests')) return json(route, [{ id: 9, subscriptionId: 1, deliveryId: 11, customerName: 'Ahmet Yılmaz', deliveryDate: '2026-09-10', requestType: 'CHANGE', oldDeliveryTime: '12:00', requestedDeliveryTime: '13:00', oldPersonCount: 5, requestedPersonCount: 7, oldAddressId: 3, requestedAddressId: 4, oldAddress: 'Ev · Çankaya / Ankara', requestedAddress: 'Ofis · Etimesgut / Ankara', priceDifference: 200, status: 'PENDING', requestedAt: '2026-08-29T12:00:00Z' }])
     if (url.includes('/unread-count')) return json(route, { count: 0 })
     if (url.includes('/subscriptions/stores/2')) return json(route, pageResult())
     if (url.endsWith('/v1/seller/stores/2')) return json(route, { id: 2, name: 'Test Mutfağı', minPersonCount: 1, status: 'ACTIVE', rating: 5, reviewCount: 1, temporarilyClosed: false, categories: [], availableDeliveryTimes: [] })
     return json(route, [])
   })
   await page.goto('/seller/stores/2/pending')
-  await page.getByRole('tab', { name: 'Teslimat değişikliği (1)' }).click()
-  await expect(page.getByText('Teslimat değişikliği talepleri')).toBeVisible()
+  await page.getByRole('tab', { name: 'Teslimat talepleri (1)' }).click()
+  await expect(page.getByText('Teslimat işlem talepleri')).toBeVisible()
   await expect(page.getByText('Ahmet Yılmaz')).toBeVisible()
   await expect(page.getByText(/Kişi:/)).toContainText('5 → 7')
   await expect(page.getByText(/Adres:.*Ev.*Ofis/)).toBeVisible()
@@ -1207,6 +1207,7 @@ async function openDeliveryChangeScenario(page: Page) {
   const delivery = { id: 11, subscriptionId: 1, deliveryDate, deliveryTime: '12:30', personCount: 5, menuName: 'Ev Menüsü', customerName: 'Test Kullanıcı', deliveryAddress: 'Test adresi', addressId: 11, menuId: 3, status: 'SCHEDULED' }
   const changes: Record<string, unknown>[] = []
   let requestBody: Record<string, unknown> | undefined
+  let skipRequested = false
   await page.route('**/api/**', route => {
     const url = new URL(route.request().url())
     if (url.pathname.endsWith('/v1/addresses')) return json(route, [address])
@@ -1215,7 +1216,12 @@ async function openDeliveryChangeScenario(page: Page) {
     if (url.pathname.endsWith('/v1/subscriptions/1/delivery-change-requests')) return json(route, changes)
     if (url.pathname.endsWith('/v1/subscriptions/1/deliveries/11/change')) {
       requestBody = route.request().postDataJSON() as Record<string, unknown>
-      changes.push({ id: 9, subscriptionId: 1, deliveryId: 11, deliveryDate, oldDeliveryTime: '12:30', requestedDeliveryTime: requestBody.deliveryTime, oldPersonCount: 5, requestedPersonCount: requestBody.personCount, priceDifference: Number(requestBody.personCount || 5) === 7 ? 100 : 0, status: 'PENDING', requestedAt: '2099-08-20T10:00:00Z' })
+      changes.push({ id: 9, subscriptionId: 1, deliveryId: 11, deliveryDate, requestType: 'CHANGE', oldDeliveryTime: '12:30', requestedDeliveryTime: requestBody.deliveryTime, oldPersonCount: 5, requestedPersonCount: requestBody.personCount, priceDifference: Number(requestBody.personCount || 5) === 7 ? 100 : 0, status: 'PENDING', requestedAt: '2099-08-20T10:00:00Z' })
+      return json(route, changes[0])
+    }
+    if (url.pathname.endsWith('/v1/subscriptions/1/deliveries/11/skip')) {
+      skipRequested = true
+      changes.push({ id: 10, subscriptionId: 1, deliveryId: 11, deliveryDate, requestType: 'SKIP', oldDeliveryTime: '12:30', requestedDeliveryTime: '12:30', oldPersonCount: 5, requestedPersonCount: 5, priceDifference: -250, status: 'PENDING', requestedAt: '2099-08-20T10:00:00Z' })
       return json(route, changes[0])
     }
     if (url.pathname.includes('/v1/payments/subscriptions/1')) return json(route, null)
@@ -1223,13 +1229,14 @@ async function openDeliveryChangeScenario(page: Page) {
     return json(route, [])
   })
   await page.goto('/subscriptions/1')
-  await page.locator('summary').filter({ hasText: 'Gelecek teslimat için değişiklik talebi' }).click()
-  await page.getByRole('button', { name: /teslimatı için talep gönder/i }).click()
-  return { getRequestBody: () => requestBody }
+  await page.locator('summary').filter({ hasText: 'Teslimat işlemleri' }).click()
+  await page.getByRole('button', { name: /teslimatı$/i }).click()
+  return { getRequestBody: () => requestBody, wasSkipRequested: () => skipRequested }
 }
 
 test('yalnız teslimat saati değiştiğinde satıcı onay talebi gönderilir', async ({ page }) => {
   const scenario = await openDeliveryChangeScenario(page)
+  await page.getByRole('button', { name: /Saat veya kişi sayısını değiştir/i }).click()
   await page.getByLabel('Teslimat saati', { exact: true }).selectOption('13:30')
   await page.getByRole('button', { name: 'Talep gönder', exact: true }).click()
   await expect(page.getByText(/Değişiklik talebiniz satıcı onayına gönderildi/)).toBeVisible()
@@ -1240,9 +1247,21 @@ test('yalnız teslimat saati değiştiğinde satıcı onay talebi gönderilir', 
 
 test('yalnız kişi sayısı değiştiğinde fiyat farkıyla satıcı onay talebi gönderilir', async ({ page }) => {
   const scenario = await openDeliveryChangeScenario(page)
+  await page.getByRole('button', { name: /Saat veya kişi sayısını değiştir/i }).click()
   await page.getByLabel('Kişi sayısı', { exact: true }).selectOption('7')
   await page.getByRole('button', { name: 'Talep gönder', exact: true }).click()
   await expect(page.getByText(/Değişiklik talebiniz satıcı onayına gönderildi/)).toBeVisible()
   expect(scenario.getRequestBody()).toMatchObject({ deliveryTime: '12:30', personCount: 7 })
   await expect(page.getByText('5 → 7')).toBeVisible()
+})
+
+test('müşteri seçtiği teslimat için satıcı onaylı gün atlama talebi gönderir', async ({ page }) => {
+  const scenario = await openDeliveryChangeScenario(page)
+  await page.getByRole('button', { name: /Bu teslimat gününü atla/i }).click()
+  await expect(page.getByText(/Satıcı onaylayana kadar teslimat planlı kalacak/)).toBeVisible()
+  await page.getByRole('button', { name: 'Onaya gönder' }).click()
+  await expect(page.getByText(/Gün atlama talebiniz satıcı onayına gönderildi/)).toBeVisible()
+  expect(scenario.wasSkipRequested()).toBeTruthy()
+  await expect(page.getByText('Bu teslimat gününü atlama talebi')).toBeVisible()
+  await expect(page.getByRole('button', { name: /talep onayı bekleniyor/i }).first()).toBeDisabled()
 })

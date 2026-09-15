@@ -313,7 +313,7 @@ export default function StorePendingPage() {
         {[
           ["SUBSCRIPTIONS", "Abonelik", allSubscriptions.length],
           ["EXTENSIONS", "Dönem uzatma", extensionRequests.data?.length || 0],
-          ["DELIVERY_CHANGES", "Teslimat değişikliği", changeRequests.data?.length || 0],
+          ["DELIVERY_CHANGES", "Teslimat talepleri", changeRequests.data?.length || 0],
         ].map(([value, label, count]) => (
           <button
             key={value}
@@ -336,11 +336,11 @@ export default function StorePendingPage() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 className="font-black text-info-950">
-                Teslimat değişikliği talepleri
+                Teslimat işlem talepleri
               </h3>
               <p className="text-sm text-info-700">
-                Müşterilerin teslimat saati ve kişi sayısı için gönderdiği
-                talepleri karara bağlayın.
+                Müşterilerin teslimat değişikliği ve gün atlama taleplerini
+                karara bağlayın.
               </p>
             </div>
             <span className="rounded-full bg-info-600 px-3 py-1 text-xs font-black text-white">
@@ -359,18 +359,26 @@ export default function StorePendingPage() {
                     <p className="mt-1 text-sm text-slate-600">
                       {new Date(request.deliveryDate).toLocaleDateString(
                         "tr-TR",
-                      )}{" "}
-                      · Saat:{" "}
-                      <strong>
-                        {request.oldDeliveryTime} →{" "}
-                        {request.requestedDeliveryTime}
-                      </strong>{" "}
-                      · Kişi:{" "}
-                      <strong>
-                        {request.oldPersonCount} →{" "}
-                        {request.requestedPersonCount}
-                      </strong>
+                      )}
                     </p>
+                    {request.requestType === "SKIP" ? (
+                      <p className="mt-2 inline-flex rounded-full bg-warning-100 px-3 py-1 text-xs font-black text-warning-800">
+                        Teslimat gününü atlama talebi
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-sm text-slate-600">
+                        Saat:{" "}
+                        <strong>
+                          {request.oldDeliveryTime} →{" "}
+                          {request.requestedDeliveryTime}
+                        </strong>{" "}
+                        · Kişi:{" "}
+                        <strong>
+                          {request.oldPersonCount} →{" "}
+                          {request.requestedPersonCount}
+                        </strong>
+                      </p>
+                    )}
                     {request.requestedAddress && (
                       <p className="mt-1 text-sm text-slate-600">
                         Adres:{" "}
@@ -380,7 +388,10 @@ export default function StorePendingPage() {
                     )}
                     {request.customerNote && (
                       <p className="mt-2 rounded-lg bg-info-50 p-3 text-sm text-info-800">
-                        <strong>Müşteri notu:</strong> {request.customerNote}
+                        <strong>
+                          {request.requestType === "SKIP" ? "Talep nedeni:" : "Müşteri notu:"}
+                        </strong>{" "}
+                        {request.customerNote}
                       </p>
                     )}
                   </div>
