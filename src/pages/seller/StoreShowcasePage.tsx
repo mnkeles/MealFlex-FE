@@ -633,7 +633,7 @@ export default function StoreShowcasePage() {
               )}
             </div>
             <div className="flex items-center gap-3 p-4">
-              <div className="-mt-10 grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border-4 border-white bg-white shadow-sm">
+              <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                 {store?.logoUrl ? (
                   <img src={store.logoUrl} alt="" className="h-full w-full object-contain" />
                 ) : (
