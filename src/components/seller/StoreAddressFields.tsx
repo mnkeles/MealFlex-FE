@@ -1,5 +1,4 @@
 import {
-  CircleMarker,
   MapContainer,
   TileLayer,
   useMapEvents,
@@ -7,6 +6,8 @@ import {
 import { LocateFixed } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import LocationSelects from "@/components/address/LocationSelects";
+import LocationPin from "@/components/maps/LocationPin";
+import { modernMapTiles } from "@/components/maps/mapStyle";
 
 export interface StoreAddressValue {
   addressTitle: string;
@@ -51,13 +52,7 @@ function MapClick({
   useMapEvents({
     click: (event) => onChange(event.latlng.lat, event.latlng.lng),
   });
-  return (
-    <CircleMarker
-      center={[latitude, longitude]}
-      radius={9}
-      pathOptions={{ color: "#dc3626", fillColor: "#dc3626", fillOpacity: 1 }}
-    />
-  );
+  return <LocationPin latitude={latitude} longitude={longitude} />;
 }
 
 export default function StoreAddressFields({
@@ -178,15 +173,11 @@ export default function StoreAddressFields({
           </button>
         </div>
         <MapContainer
-          key={`${latitude}-${longitude}`}
           center={[latitude, longitude]}
           zoom={13}
           className="h-64 w-full"
         >
-          <TileLayer
-            attribution="&copy; OpenStreetMap contributors"
-            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+          <TileLayer {...modernMapTiles} />
           <MapClick
             latitude={latitude}
             longitude={longitude}

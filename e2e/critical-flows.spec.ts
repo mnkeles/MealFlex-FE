@@ -1021,6 +1021,26 @@ test('adres formu il, ilçe ve mahalle seçimlerini birbirine bağlı getirir', 
   await expect(page.getByLabel('Mahalle').locator('option')).toHaveText(['Mahalle seçin', 'İvedik OSB'])
 })
 
+test('adres haritası tıklanınca yakınlaştırmayı korur ve pin gösterir', async ({ page }) => {
+  await loginAs(page, 'CUSTOMER')
+  await page.route('**/api/**', route => {
+    const url = route.request().url()
+    if (url.includes('/v1/addresses')) return json(route, [])
+    if (url.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/addresses')
+  await page.getByRole('button', { name: /yeni adres/i }).click()
+  const map = page.locator('.leaflet-container')
+  await expect(map).toBeVisible()
+  await expect(page.locator('.mealflex-location-pin')).toBeVisible()
+  await map.evaluate(element => element.setAttribute('data-map-instance', 'preserved'))
+  await map.click({ position: { x: 180, y: 180 } })
+  await expect(map).toHaveAttribute('data-map-instance', 'preserved')
+  await expect(page.locator('.mealflex-location-pin')).toBeVisible()
+})
+
 test('konum servisi hata verirse adres formunda açık hata gösterilir', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
   await page.route('**/api/**', route => {

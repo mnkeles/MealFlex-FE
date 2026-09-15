@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  CircleMarker,
   MapContainer,
   TileLayer,
   useMapEvents,
@@ -11,6 +10,8 @@ import "leaflet/dist/leaflet.css";
 import { addressService } from "@/services/addressService";
 import { useCustomerAddress } from "@/contexts/CustomerAddressContext";
 import LocationSelects from "@/components/address/LocationSelects";
+import LocationPin from "@/components/maps/LocationPin";
+import { modernMapTiles } from "@/components/maps/mapStyle";
 import type { Address } from "@/types";
 import PageHeader from "@/components/ui/PageHeader";
 import Button from "@/components/ui/Button";
@@ -57,13 +58,7 @@ function MapClick({
     click: (event) =>
       onChange({ latitude: event.latlng.lat, longitude: event.latlng.lng }),
   });
-  return (
-    <CircleMarker
-      center={[value.latitude, value.longitude]}
-      radius={9}
-      pathOptions={{ color: "#dc3626", fillColor: "#dc3626", fillOpacity: 1 }}
-    />
-  );
+  return <LocationPin latitude={value.latitude} longitude={value.longitude} />;
 }
 
 function addressPreview(
@@ -336,15 +331,12 @@ export default function AddressesPage() {
                 </button>
               </div>
               <MapContainer
-                key={`${form.latitude}-${form.longitude}-${editingId || "new"}`}
+                key={editingId || "new"}
                 center={[form.latitude, form.longitude]}
                 zoom={13}
                 className="h-72 w-full lg:h-[31rem]"
               >
-                <TileLayer
-                  attribution="&copy; OpenStreetMap contributors"
-                  url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
+                <TileLayer {...modernMapTiles} />
                 <MapClick
                   value={form}
                   onChange={(point) => {
