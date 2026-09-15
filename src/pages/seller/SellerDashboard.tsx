@@ -23,11 +23,6 @@ export default function SellerDashboard() {
     storeId: number;
     store?: StoreType;
   }>();
-  const revenueQuery = useQuery({
-    queryKey: ["seller-revenue-summary", storeId],
-    queryFn: () => sellerService.getRevenueStats(storeId),
-    enabled: !!storeId,
-  });
   const deliveriesQuery = useQuery({
     queryKey: ["seller-deliveries-today", storeId],
     queryFn: () => sellerService.getTodaysDeliveries(storeId),
@@ -50,17 +45,14 @@ export default function SellerDashboard() {
       sellerService.getSubscriptionsForStore(storeId, "ACTIVE", 0, 1),
     enabled: !!storeId,
   });
-  const revenue = revenueQuery.data;
   const deliveries = deliveriesQuery.data ?? [];
   const pendingSubs = pendingSubsQuery.data;
   const activeSubs = activeSubsQuery.data;
   const hasDataError =
-    revenueQuery.isError ||
     deliveriesQuery.isError ||
     pendingSubsQuery.isError ||
     activeSubsQuery.isError;
   const retryData = () => {
-    void revenueQuery.refetch();
     void deliveriesQuery.refetch();
     void pendingSubsQuery.refetch();
     void activeSubsQuery.refetch();
@@ -104,7 +96,7 @@ export default function SellerDashboard() {
           </Button>
         </div>
       )}
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Bugünkü teslimatlar"
           value={deliveriesQuery.isError ? "—" : deliveries.length}
@@ -132,17 +124,6 @@ export default function SellerDashboard() {
           icon={<ChefHat className="h-5 w-5" />}
           detail="Bugünün toplam üretim ihtiyacı"
           tone="danger"
-        />
-        <StatCard
-          label="Abonelik sözleşme tutarı"
-          value={
-            revenueQuery.isError
-              ? "—"
-              : `${(revenue?.totalRevenue ?? 0).toLocaleString("tr-TR")} ₺`
-          }
-          icon={<CalendarCheck2 className="h-5 w-5" />}
-          detail="Aktif ve tamamlanmış aboneliklerin toplamı"
-          tone="success"
         />
       </section>
 
