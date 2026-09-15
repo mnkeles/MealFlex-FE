@@ -380,8 +380,21 @@ test('satıcı paneli telefon, tablet ve masaüstünde taşmaz; panel daraltıla
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBeTruthy()
   }
   await page.setViewportSize({ width: 1366, height: 768 })
+  await expect(page.getByText(/Sistem (çalışıyor|bağlantısı yok|kontrol ediliyor)/)).toHaveCount(0)
   await page.getByRole('button', { name: 'Menüyü daralt' }).click()
   await expect(page.getByRole('button', { name: 'Menüyü genişlet' })).toBeVisible()
+  const sidebar = page.locator('aside').first()
+  await expect.poll(() => sidebar.evaluate(element => element.getBoundingClientRect().width)).toBe(80)
+  const logoAlignment = await sidebar.evaluate(element => {
+    const sidebarBox = element.getBoundingClientRect()
+    const logoBox = element.querySelector('[aria-label="MealFlex"]')!.getBoundingClientRect()
+    return {
+      centerDifference: Math.abs((logoBox.x + logoBox.width / 2) - (sidebarBox.x + sidebarBox.width / 2)),
+      leftInset: logoBox.x - sidebarBox.x,
+    }
+  })
+  expect(logoAlignment.centerDifference).toBeLessThan(2)
+  expect(logoAlignment.leftInset).toBeGreaterThan(8)
   await expect(page.getByLabel('Mağaza bölümleri').evaluate(element => element.scrollWidth >= element.clientWidth)).resolves.toBeTruthy()
 })
 

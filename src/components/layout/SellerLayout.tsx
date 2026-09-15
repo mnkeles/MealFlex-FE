@@ -14,20 +14,15 @@ import {
   CircleHelp,
   ClipboardCheck,
   Gauge,
-  LoaderCircle,
   LogOut,
-  Server,
   ShieldCheck,
   SlidersHorizontal,
   Store,
   UserRound,
-  Wifi,
-  WifiOff,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { sellerService } from "@/services/sellerService";
-import { systemService } from "@/services/systemService";
 import MealFlexLogo from "@/components/brand/MealFlexLogo";
 import { confirmSellerStoreNavigation } from "@/utils/sellerStoreNavigation";
 
@@ -76,14 +71,6 @@ export default function SellerLayout() {
   const { data: stores = [] } = useQuery({
     queryKey: ["seller-stores-switcher", user?.userId],
     queryFn: sellerService.getMyStores,
-  });
-  const systemHealth = useQuery({
-    queryKey: ["system-health"],
-    queryFn: systemService.health,
-    enabled: online,
-    retry: false,
-    refetchInterval: 30_000,
-    refetchOnWindowFocus: true,
   });
   const routeStoreId =
     Number(location.pathname.match(/\/seller\/stores\/(\d+)/)?.[1]) ||
@@ -174,35 +161,6 @@ export default function SellerLayout() {
         { path: "/seller/profile", label: "Profil", icon: UserRound },
       ];
 
-  const systemStatus = !online
-    ? {
-        label: "Çevrimdışı",
-        className: "text-warning-700",
-        chipClassName: "bg-warning-50 text-warning-700",
-        icon: WifiOff,
-      }
-    : systemHealth.isPending
-      ? {
-          label: "Sistem kontrol ediliyor",
-          className: "text-slate-500",
-          chipClassName: "bg-slate-50 text-slate-600",
-          icon: LoaderCircle,
-        }
-      : systemHealth.isError || systemHealth.data?.status !== "UP"
-        ? {
-            label: "Sistem bağlantısı yok",
-            className: "text-danger-700",
-            chipClassName: "bg-danger-50 text-danger-700",
-            icon: Server,
-          }
-        : {
-            label: "Sistem çalışıyor",
-            className: "text-success-700",
-            chipClassName: "bg-success-50 text-success-700",
-            icon: Wifi,
-          };
-  const SystemStatusIcon = systemStatus.icon;
-
   const handleLogout = () => {
     if (!confirmSellerStoreNavigation()) return;
     setAccountMenuOpen(false);
@@ -237,10 +195,10 @@ export default function SellerLayout() {
         </div>
       )}
       <aside
-        className={`hidden min-h-screen fixed z-40 overflow-hidden border-r border-slate-200 bg-white transition-[width] duration-300 ease-in-out md:block ${isSidebarCollapsed ? "w-16" : "w-72"}`}
+        className={`fixed z-40 hidden min-h-screen overflow-visible border-r border-slate-200 bg-white transition-[width] duration-300 ease-in-out md:block ${isSidebarCollapsed ? "w-20" : "w-72"}`}
       >
         <div
-          className={`flex h-[89px] items-center border-b border-slate-100 ${isSidebarCollapsed ? "justify-center px-2" : "justify-between px-6"}`}
+          className={`relative flex h-[89px] items-center border-b border-slate-100 ${isSidebarCollapsed ? "justify-center px-3" : "justify-between px-6"}`}
         >
           <div>
             <Link to="/seller/stores" onClick={guardNavigation}>
@@ -259,7 +217,7 @@ export default function SellerLayout() {
           <button
             type="button"
             onClick={() => setIsSidebarCollapsed((value) => !value)}
-            className="rounded-xl p-2 text-slate-500 transition-colors hover:bg-primary-50 hover:text-primary-600"
+            className={`rounded-xl p-2 text-slate-500 transition-colors hover:bg-primary-50 hover:text-primary-600 ${isSidebarCollapsed ? "absolute -right-4 top-7 border border-slate-200 bg-white shadow-card" : ""}`}
             aria-label={
               isSidebarCollapsed ? "Menüyü genişlet" : "Menüyü daralt"
             }
@@ -308,18 +266,6 @@ export default function SellerLayout() {
           className={`absolute bottom-0 left-0 right-0 border-t border-slate-100 ${isSidebarCollapsed ? "p-2 text-center" : "p-4"}`}
           ref={accountMenuRef}
         >
-          {!isSidebarCollapsed && (
-            <div
-              className={`mb-3 flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold ${systemStatus.chipClassName}`}
-              title="MealFlex servislerinin erişilebilirlik durumu"
-            >
-              <SystemStatusIcon
-                className={`h-3.5 w-3.5 ${systemHealth.isPending ? "animate-spin" : ""}`}
-              />
-              {systemStatus.label}
-            </div>
-          )}
-
           {accountMenuOpen && (
             <div
               role="menu"
@@ -404,7 +350,7 @@ export default function SellerLayout() {
         </div>
       </aside>
       <div
-        className={`min-w-0 flex-1 overflow-x-hidden transition-[margin] duration-300 ease-in-out ${isSidebarCollapsed ? "md:ml-16" : "md:ml-72"}`}
+        className={`min-w-0 flex-1 overflow-x-hidden transition-[margin] duration-300 ease-in-out ${isSidebarCollapsed ? "md:ml-20" : "md:ml-72"}`}
       >
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:hidden">
           <Link to="/seller/stores" onClick={guardNavigation}>
@@ -444,15 +390,6 @@ export default function SellerLayout() {
             </select>
           </label>
           <div className="flex items-center gap-3">
-            <span
-              className={`flex items-center gap-1.5 text-xs font-bold ${systemStatus.className}`}
-              title="MealFlex servislerinin erişilebilirlik durumu"
-            >
-              <SystemStatusIcon
-                className={`h-4 w-4 ${systemHealth.isPending ? "animate-spin" : ""}`}
-              />
-              {systemStatus.label}
-            </span>
             <Link
               to="/seller/notifications"
               onClick={guardNavigation}
