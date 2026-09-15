@@ -381,21 +381,27 @@ export default function CreateSubscriptionPage() {
   });
   const paymentConfiguration = paymentConfigurationQuery.data;
   const hostedCheckout = paymentConfiguration?.hostedCheckout === true;
-  const { data: paymentMethods = [], refetch: refetchPaymentMethods } =
+  const {
+    data: paymentMethods = [],
+    isLoading: paymentMethodsLoading,
+    isSuccess: paymentMethodsLoaded,
+    refetch: refetchPaymentMethods,
+  } =
     useQuery({
       queryKey: ["payment-methods"],
       queryFn: paymentService.methods,
-      enabled: paymentConfiguration?.hostedCheckout === false,
+      enabled: paymentConfigurationQuery.isSuccess,
     });
   useEffect(() => {
-    if (!paymentMethodId && paymentMethods.length)
-      setPaymentMethodId(
-        (
-          paymentMethods.find((method) => method.defaultMethod) ||
-          paymentMethods[0]
-        ).id,
-      );
-  }, [paymentMethodId, paymentMethods]);
+    if (!paymentMethodsLoaded) return;
+    if (paymentMethods.some((method) => method.id === paymentMethodId)) return;
+    setPaymentMethodId(
+      (
+        paymentMethods.find((method) => method.defaultMethod) ||
+        paymentMethods[0]
+      )?.id,
+    );
+  }, [paymentMethodId, paymentMethods, paymentMethodsLoaded]);
   useEffect(() => {
     if (store)
       setPersonCount((value) =>
@@ -452,7 +458,7 @@ export default function CreateSubscriptionPage() {
     deliveryTime,
     startDate,
     endDate,
-    paymentMethodId: hostedCheckout ? undefined : paymentMethodId,
+    paymentMethodId,
     commercialTermsAccepted,
     recurringPaymentConsent: hostedCheckout
       ? commercialTermsAccepted
@@ -577,8 +583,8 @@ export default function CreateSubscriptionPage() {
       setError("Güncel tutar hesaplanmadan talep gönderilemez. Önizlemeyi yenileyin.");
       return;
     }
-    if (!hostedCheckout && !paymentMethodId) {
-      setError("Devam etmek için kayıtlı bir ödeme yöntemi seçin.");
+    if (!paymentMethodId) {
+      setError("Abonelik talebi oluşturmadan önce kayıtlı bir kart seçin.");
       return;
     }
     if (!commercialTermsAccepted) {
@@ -679,7 +685,7 @@ export default function CreateSubscriptionPage() {
       (!availableDeliveryTimes?.length ||
         deliveryTimesQuery.isFetching ||
         deliveryTimesQuery.isError)) ||
-    (step === 3 && !previewIsCurrent);
+    (step === 3 && (!previewIsCurrent || !paymentMethodId));
   const runPrimaryAction = () =>
     step < 3 ? next() : submitSubscription();
 
@@ -780,49 +786,71 @@ export default function CreateSubscriptionPage() {
                       ? "Ödeme yapılandırması alınamadı. Kart bilgisi girmeyin; sayfayı yenileyip tekrar deneyin."
                       : "Güvenli ödeme yöntemi hazırlanıyor…"}
                   </div>
-                ) : hostedCheckout ? (
-                  <div className="mt-5 rounded-2xl border border-success-200 bg-success-50 p-5 text-sm leading-6 text-success-800">
-                    <strong className="block text-base text-success-900">
-                      Kartınızı şimdi girmeyeceksiniz
-                    </strong>
-                    Satıcı talebinizi onayladıktan sonra iyzico’nun güvenli ödeme
-                    sayfasına yönlendirileceksiniz. Kart numarası ve güvenlik kodu
-                    MealFlex sunucularına ulaşmaz; sonraki haftalarda yalnız iyzico
-                    kart tokenı kullanılır.
-                  </div>
                 ) : (
                   <>
-                    <div className="mt-5 grid gap-3">
-                      {paymentMethods.map((method) => (
-                    <button
-                      key={method.id}
-                      onClick={() => setPaymentMethodId(method.id)}
-                      className={`flex items-center justify-between rounded-xl border p-4 text-left ${paymentMethodId === method.id ? "border-primary-500 bg-primary-50 ring-2 ring-primary-100" : "border-slate-200"}`}
-                    >
-                      <span>
-                        <strong>
-                          {method.brand} •••• {method.lastFour}
-                        </strong>
-                        <span className="mt-1 block text-xs text-slate-500">
-                          Son kullanım{" "}
-                          {String(method.expiryMonth).padStart(2, "0")}/
-                          {method.expiryYear}
-                        </span>
-                      </span>
-                      {paymentMethodId === method.id && (
-                        <Check className="h-5 w-5 text-primary-600" />
-                      )}
-                    </button>
-                      ))}
-                    </div>
                     <div className="mt-5">
-                      <MockCardTokenizationForm
-                        onAdded={async (method) => {
-                          await refetchPaymentMethods();
-                          setPaymentMethodId(method.id);
-                        }}
-                      />
+                      <h3 className="text-sm font-black text-slate-800">
+                        Kayıtlı kartınızı seçin
+                      </h3>
+                      {paymentMethodsLoading ? (
+                        <p className="mt-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+                          Kayıtlı kartlar yükleniyor…
+                        </p>
+                      ) : paymentMethods.length ? (
+                        <div className="mt-3 grid gap-3">
+                          {paymentMethods.map((method) => (
+                            <button
+                              type="button"
+                              key={method.id}
+                              onClick={() => setPaymentMethodId(method.id)}
+                              className={`flex items-center justify-between rounded-xl border p-4 text-left ${paymentMethodId === method.id ? "border-primary-500 bg-primary-50 ring-2 ring-primary-100" : "border-slate-200"}`}
+                            >
+                              <span>
+                                <strong>
+                                  {method.brand} •••• {method.lastFour}
+                                </strong>
+                                <span className="mt-1 block text-xs text-slate-500">
+                                  Son kullanım{" "}
+                                  {String(method.expiryMonth).padStart(2, "0")}/
+                                  {method.expiryYear}
+                                </span>
+                              </span>
+                              {paymentMethodId === method.id && (
+                                <Check className="h-5 w-5 text-primary-600" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="mt-3 rounded-2xl border border-warning-200 bg-warning-50 p-4 text-sm text-warning-800">
+                          <strong className="block">Kayıtlı kartınız bulunmuyor</strong>
+                          Abonelik talebi gönderebilmek için önce bir kart eklemelisiniz.
+                        </div>
+                      )}
                     </div>
+                    {hostedCheckout ? (
+                      <div className="mt-5 rounded-2xl border border-blue-100 bg-blue-50 p-5 text-sm leading-6 text-slate-700">
+                        Kart bilgilerinizi yalnız iyzico’nun güvenli sayfasına girersiniz;
+                        MealFlex kart numarası veya CVV almaz.
+                        <Link
+                          to="/payment-methods"
+                          onClick={saveDraft}
+                          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-3 font-bold text-white"
+                        >
+                          <CreditCard className="h-4 w-4" />
+                          {paymentMethods.length ? "Kartları yönet" : "iyzico ile kart ekle"}
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="mt-5">
+                        <MockCardTokenizationForm
+                          onAdded={async (method) => {
+                            await refetchPaymentMethods();
+                            setPaymentMethodId(method.id);
+                          }}
+                        />
+                      </div>
+                    )}
                   </>
                 )}
                 <label className="mt-5 flex items-start gap-3 rounded-xl border border-slate-200 p-4 text-sm leading-6">
@@ -837,12 +865,12 @@ export default function CreateSubscriptionPage() {
                   <span>
                     <strong>
                       {hostedCheckout
-                        ? "Mesafeli satış ve abonelik koşullarını; haftalık tahsilatlar için kartımın iyzico’da güvenle saklanmasını kabul ediyorum."
+                        ? "Mesafeli satış ve abonelik koşullarını; haftalık tahsilatların seçtiğim iyzico kartından yapılmasını kabul ediyorum."
                         : "Mesafeli satış ve abonelik koşullarını okudum, kabul ediyorum."}
                     </strong>
                     <span className="block text-xs text-slate-500">
                       {hostedCheckout
-                        ? "Satıcı onayından sonra ilk haftalık ödeme iyzico üzerinden alınır. Sonraki haftalar kayıtlı iyzico tokenıyla tahsil edilir."
+                        ? "Satıcı onayından sonra ilk haftalık ödeme iyzico üzerinden tamamlanır. Sonraki haftalar kayıtlı iyzico tokenıyla tahsil edilir."
                         : "İptalde teslim edilmemiş günler oranında iade uygulanır."}
                     </span>
                   </span>
@@ -1212,7 +1240,11 @@ export default function CreateSubscriptionPage() {
             ) : (
               <button
                 onClick={submitSubscription}
-                disabled={createMutation.isPending || !previewIsCurrent}
+                disabled={
+                  createMutation.isPending ||
+                  !previewIsCurrent ||
+                  !paymentMethodId
+                }
                 className="hidden rounded-xl bg-primary-600 px-6 py-3 text-sm font-bold text-white disabled:opacity-50 lg:block"
               >
                 {createMutation.isPending

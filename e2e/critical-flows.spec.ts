@@ -1073,6 +1073,49 @@ test('abonelik formu beş hizmet günü, kupon ve ödeme yöntemiyle aynı topla
   expect(createRequest).toMatchObject({ storeId: 2, menuId: 3, addressId: 11, personCount: 3, deliveryTime: '13:30', startDate, endDate, paymentMethodId: 90, couponCode: 'HOSGELDIN', commercialTermsAccepted: true })
 })
 
+test('iyzico kartı olmayan müşteri abonelik talebi gönderemez', async ({ page }) => {
+  await loginAs(page, 'CUSTOMER')
+  await page.addInitScript(() => localStorage.setItem('mealflex-active-address-id', '11'))
+  const formatDate = (date: Date) => date.toISOString().slice(0, 10)
+  const startDate = formatDate(new Date(Date.now() + 3 * 86400000))
+  const endDate = formatDate(new Date(Date.now() + 7 * 86400000))
+  const address = { id: 11, title: 'Ofis', city: 'Ankara', district: 'Etimesgut', fullAddress: 'Test adresi', latitude: 39.94, longitude: 32.86, defaultAddress: true }
+  const store = { id: 2, name: 'Test Mutfağı', minPersonCount: 1, effectiveMinPersonCount: 1, status: 'ACTIVE', rating: 4.8, reviewCount: 12, temporarilyClosed: false, categories: [], availableDeliveryTimes: ['12:30'], nextAvailableDeliveryDate: startDate }
+  const menu = { id: 3, storeId: 2, name: 'Ev Menüsü', pricePerPerson: 120, active: true, dietTags: [], allergens: [], items: [] }
+  let createRequests = 0
+  await page.route('**/api/**', route => {
+    const url = new URL(route.request().url())
+    if (url.pathname.endsWith('/v1/addresses')) return json(route, [address])
+    if (url.pathname.endsWith('/v1/stores/2')) return json(route, store)
+    if (url.pathname.endsWith('/v1/stores/2/delivery-times')) return json(route, ['12:30'])
+    if (url.pathname.endsWith('/v1/stores/2/menus/3')) return json(route, menu)
+    if (url.pathname.endsWith('/v1/payments/configuration')) return json(route, { provider: 'IYZICO', hostedCheckout: true })
+    if (url.pathname.endsWith('/v1/payments/methods')) return json(route, [])
+    if (url.pathname.endsWith('/v1/subscriptions/preview')) {
+      return json(route, { storeId: 2, menuId: 3, distanceKm: 2.1, minimumPersonCount: 1, serviceDayCount: 5, serviceDates: [startDate], excludedDates: [], pricePerPerson: 120, priceEffectiveFrom: startDate, totalAmount: 600 })
+    }
+    if (url.pathname.endsWith('/v1/subscriptions') && route.request().method() === 'POST') {
+      createRequests += 1
+      return json(route, { id: 77 })
+    }
+    if (url.pathname.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/subscribe?storeId=2&menuId=3&addressId=11')
+  await page.getByRole('button', { name: /Devam Et/i }).click()
+  await page.getByLabel('Başlangıç tarihi').fill(startDate)
+  await page.getByLabel('Bitiş tarihi').fill(endDate)
+  await page.getByRole('button', { name: /Devam Et/i }).click()
+  await page.getByLabel('Uygun teslimat saati').selectOption('12:30')
+  await page.getByRole('button', { name: /Devam Et/i }).click()
+
+  await expect(page.getByText('Kayıtlı kartınız bulunmuyor')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'iyzico ile kart ekle' })).toHaveAttribute('href', '/payment-methods')
+  await expect(page.getByRole('button', { name: /^(Abonelik Talebini Gönder|Talebi gönder)$/i })).toBeDisabled()
+  expect(createRequests).toBe(0)
+})
+
 test('ödeme bekleyen müşteri iyzico güvenli ödeme sayfasına yönlendirilir', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
   const subscription = { id: 1, storeId: 2, storeName: 'Test Mutfağı', menuId: 3, menuName: 'Ev Menüsü', addressId: 11, addressTitle: 'Ofis', deliveryAddress: 'Test adresi', personCount: 3, pricePerPerson: 120, deliveryTime: '12:30', startDate: '2099-09-01', endDate: '2099-09-05', serviceDayCount: 5, totalAmount: 1800, status: 'PAYMENT_PENDING', approvedAt: '2099-08-21T10:00:00Z', createdAt: '2099-08-20T10:00:00Z' }
