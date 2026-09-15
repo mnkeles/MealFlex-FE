@@ -69,30 +69,6 @@ export default function SellerDashboard() {
     (sum, delivery) => sum + delivery.personCount,
     0,
   );
-  const operationSlots = [
-    {
-      label: "Sabah",
-      count: deliveries.filter(
-        (delivery) => Number(delivery.deliveryTime.slice(0, 2)) < 12,
-      ).length,
-      tone: "bg-info-500",
-    },
-    {
-      label: "Öğle",
-      count: deliveries.filter((delivery) => {
-        const hour = Number(delivery.deliveryTime.slice(0, 2));
-        return hour >= 12 && hour < 17;
-      }).length,
-      tone: "bg-warning-500",
-    },
-    {
-      label: "Akşam",
-      count: deliveries.filter(
-        (delivery) => Number(delivery.deliveryTime.slice(0, 2)) >= 17,
-      ).length,
-      tone: "bg-info-500",
-    },
-  ];
   const criticalDeliveries = deliveries
     .filter(
       (delivery) =>
@@ -225,7 +201,7 @@ export default function SellerDashboard() {
           <div>
             <h2 className="mf-section-title">Günlük operasyon özeti</h2>
             <p className="mf-muted mt-1">
-              Teslimat yoğunluğunu saat dilimlerine göre planlayın.
+              Bugünkü teslimat ve talep işlemlerine hızlıca ulaşın.
             </p>
           </div>
           <div className="flex gap-2">
@@ -242,27 +218,6 @@ export default function SellerDashboard() {
               Teslimatları yönet
             </Link>
           </div>
-        </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          {operationSlots.map((slot) => (
-            <div key={slot.label} className="rounded-xl bg-slate-50 p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-slate-700">
-                  {slot.label}
-                </span>
-                <strong className="text-xl text-ink">{slot.count}</strong>
-              </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
-                <div
-                  className={`h-full ${slot.tone}`}
-                  style={{
-                    width: `${deliveries.length ? Math.max(8, (slot.count / deliveries.length) * 100) : 0}%`,
-                  }}
-                />
-              </div>
-              <p className="mt-2 text-xs text-slate-500">planlı teslimat</p>
-            </div>
-          ))}
         </div>
       </section>
 
