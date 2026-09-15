@@ -246,6 +246,23 @@ export interface AdminComplaint {
   resolvedAt?: string;
 }
 
+export interface AdminSupportRequest {
+  id: number;
+  userId: number;
+  accountRole: "CUSTOMER" | "SELLER";
+  contactName: string;
+  contactEmail: string;
+  contactPhone?: string;
+  category: string;
+  subject: string;
+  message: string;
+  status: "NEW" | "IN_PROGRESS" | "ANSWERED" | "CLOSED";
+  adminResponse?: string;
+  respondedAt?: string;
+  respondedBy?: string;
+  createdAt: string;
+}
+
 export interface AdminSellerDocument {
   id: number;
   storeId: number;
@@ -318,6 +335,19 @@ const sensitiveActionConfig = (action: AdminSensitiveAction) => ({
 });
 
 export const adminService = {
+  getSupportRequests: (status?: string) =>
+    api
+      .get<Page<AdminSupportRequest>>("/v1/admin/support-requests", {
+        params: { page: 0, size: 100, sort: "createdAt,desc", status: status || undefined },
+      })
+      .then((r) => r.data),
+  updateSupportRequest: (
+    id: number,
+    data: { status: "IN_PROGRESS" | "ANSWERED" | "CLOSED"; response?: string },
+  ) =>
+    api
+      .put<AdminSupportRequest>(`/v1/admin/support-requests/${id}`, data)
+      .then((r) => r.data),
   getServiceDemands: () =>
     api
       .get<ServiceDemandSummary[]>("/v1/admin/service-demands")

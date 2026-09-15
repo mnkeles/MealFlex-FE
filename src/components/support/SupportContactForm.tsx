@@ -52,7 +52,7 @@ export default function SupportContactForm() {
           <h2 className="text-xl font-black">Bize ulaşın</h2>
           <p className="mt-1 text-sm leading-6 text-slate-300">
             İletişim bilgilerinizi ve yaşadığınız sorunu yazın. Talebiniz MealFlex
-            destek ekibine e-posta olarak iletilir.
+            destek ekibinin yönetim ekranına iletilir.
           </p>
         </div>
       </div>
@@ -61,8 +61,8 @@ export default function SupportContactForm() {
         <div role="status" className="mt-5 rounded-2xl bg-success-50 p-5 text-success-900">
           <strong>Destek talebiniz alındı.</strong>
           <p className="mt-1 text-sm">
-            Talep numaranız #{request.data.id}. Ekibimiz verdiğiniz e-posta adresi
-            üzerinden sizinle iletişime geçecek.
+            Talep numaranız #{request.data.id}. Ekibimiz talebinizi yanıtladığında
+            uygulama içinden bildirim alacaksınız.
           </p>
           <button
             type="button"

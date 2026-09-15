@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   Menu,
   Search,
+  LifeBuoy,
   ShieldAlert,
   ShieldCheck,
   Store,
@@ -63,6 +64,7 @@ const menuGroups = [
   {
     label: "Destek",
     items: [
+      { path: "/admin/support-requests", label: "Destek talepleri", icon: LifeBuoy },
       { path: "/admin/complaints", label: "Şikâyetler", icon: AlertTriangle },
     ],
   },

@@ -18,7 +18,7 @@ export type SupportRequestInput = {
 
 export type SupportRequestResult = {
   id: number;
-  emailStatus: "SENT" | "PENDING" | "RETRY" | "FAILED";
+  status: "NEW" | "IN_PROGRESS" | "ANSWERED" | "CLOSED";
   createdAt: string;
 };
 
@@ -27,4 +27,3 @@ export const supportService = {
     return (await api.post("/v1/support/requests", input)).data;
   },
 };
-

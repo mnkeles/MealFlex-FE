@@ -11,6 +11,7 @@ export function getNotificationLink(
   if (item.targetUrl) return item.targetUrl;
   if (!item.referenceId) return undefined;
   if (role === "CUSTOMER") {
+    if (item.referenceType === "SUPPORT_REQUEST") return "/support";
     if (item.referenceType === "SUBSCRIPTION")
       return `/subscriptions/${item.referenceId}`;
     if (item.referenceType === "SUBSCRIPTION_DELIVERY")
@@ -22,10 +23,12 @@ export function getNotificationLink(
       return "/payments";
   }
   if (role === "SELLER") {
+    if (item.referenceType === "SUPPORT_REQUEST") return "/seller/support";
     if (item.referenceType === "STORE") return `/seller/stores/${item.referenceId}/dashboard`;
     if (item.referenceType === "ACCOUNT") return "/seller/security";
   }
   if (role === "ADMIN") {
+    if (item.referenceType === "SUPPORT_REQUEST") return "/admin/support-requests";
     if (item.referenceType === "STORE") return `/admin/stores/${item.referenceId}`;
     if (item.referenceType === "COMPLAINT") return "/admin/complaints";
     if (item.referenceType === "PAYMENT" || item.referenceType === "REFUND") return "/admin/finance";

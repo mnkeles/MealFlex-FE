@@ -803,6 +803,36 @@ test('admin şikâyet karar merkezine yalnız admin rolü erişir', async ({ pag
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBeTruthy()
 })
 
+test('admin destek talebini yanıtlar ve uygulama bildirimi oluşturur', async ({ page }) => {
+  await loginAs(page, 'ADMIN')
+  let updatePayload: Record<string, unknown> | undefined
+  const supportRequest = {
+    id: 14, userId: 7, accountRole: 'CUSTOMER', contactName: 'Ayşe Yılmaz',
+    contactEmail: 'ayse@example.com', contactPhone: '05550000000', category: 'PAYMENT',
+    subject: 'Ödeme ekranı sorunu', message: 'Kartımı eklerken beklenmeyen bir hata görüyorum.',
+    status: 'NEW', createdAt: '2026-09-15T10:00:00Z',
+  }
+  await page.route('**/api/**', async route => {
+    const url = route.request().url()
+    if (url.includes('/v1/admin/support-requests/14') && route.request().method() === 'PUT') {
+      updatePayload = route.request().postDataJSON()
+      return json(route, { ...supportRequest, ...updatePayload, adminResponse: updatePayload?.response, respondedAt: '2026-09-15T11:00:00Z' })
+    }
+    if (url.includes('/v1/admin/support-requests')) return json(route, pageResult([supportRequest]))
+    if (url.includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/admin/support-requests')
+  await page.getByRole('button', { name: /#14.*Ödeme ekranı sorunu/s }).click()
+  await page.getByLabel('İşlem durumu').selectOption('ANSWERED')
+  await page.getByLabel('Kullanıcıya yanıt').fill('Kartınızı kaldırıp yeniden ekleyerek deneyebilirsiniz.')
+  await page.getByRole('button', { name: 'Talebi güncelle' }).click()
+
+  await expect(page.getByText(/kullanıcıya bildirim gönderildi/)).toBeVisible()
+  expect(updatePayload).toEqual({ status: 'ANSWERED', response: 'Kartınızı kaldırıp yeniden ekleyerek deneyebilirsiniz.' })
+})
+
 test('müşteri admin ekranına yönlendirilemez', async ({ page }) => {
   await loginAs(page, 'CUSTOMER')
   await page.route('**/api/**', route => json(route, route.request().url().includes('unread-count') ? { count: 0 } : []))

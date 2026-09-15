@@ -76,6 +76,7 @@ import AdminSubscriptionsPage from "@/pages/admin/AdminSubscriptionsPage";
 import AdminFinancePage from "@/pages/admin/AdminFinancePage";
 import AdminReconciliationPage from "@/pages/admin/AdminReconciliationPage";
 import AdminComplaintsPage from "@/pages/admin/AdminComplaintsPage";
+import AdminSupportRequestsPage from "@/pages/admin/AdminSupportRequestsPage";
 import AdminSellerOnboardingPage from "@/pages/admin/AdminSellerOnboardingPage";
 import AdminAuditSearchPage from "@/pages/admin/AdminAuditSearchPage";
 import AdminRiskPage from "@/pages/admin/AdminRiskPage";
@@ -346,6 +347,7 @@ export default function App() {
               element={<AdminReconciliationPage />}
             />
             <Route path="complaints" element={<AdminComplaintsPage />} />
+            <Route path="support-requests" element={<AdminSupportRequestsPage />} />
             <Route
               path="seller-onboarding"
               element={<AdminSellerOnboardingPage />}
