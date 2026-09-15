@@ -62,6 +62,7 @@ export default function StoreCard({
             {!!store.categories?.length && (
               <p className="mt-1 line-clamp-1 text-[11px] font-semibold text-primary-600">
                 {store.categories
+                  .slice(0, 5)
                   .map((value) => discoveryLabels[value] || value)
                   .join(" · ")}
               </p>

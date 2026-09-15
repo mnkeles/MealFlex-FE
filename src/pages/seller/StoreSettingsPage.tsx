@@ -47,16 +47,20 @@ const serviceDayChangeEffectiveDate = () => {
   }).format(date);
 };
 
-const categoryOptions = [
-  "TURK_MUTFAGI",
-  "EV_YEMEKLERI",
-  "SAGLIKLI",
-  "VEGAN",
-  "IZGARA",
-  "SULU_YEMEK",
-  "DUNYA_MUTFAGI",
-  "FIT_MENULER",
+const customerTagGroups = [
+  {
+    title: "Mutfak tarzı",
+    description: "Yemek yaklaşımınızı ve öne çıkan mutfağınızı seçin.",
+    values: ["TURK_MUTFAGI", "EV_YEMEKLERI", "DUNYA_MUTFAGI", "IZGARA"],
+  },
+  {
+    title: "Menü özellikleri",
+    description: "Müşterilerin menü seçerken bilmesini istediğiniz özellikleri ekleyin.",
+    values: ["SAGLIKLI", "VEGAN", "FIT_MENULER", "SULU_YEMEK"],
+  },
 ];
+const categoryOptions = customerTagGroups.flatMap((group) => group.values);
+const maxCustomerTags = 5;
 
 const defaultChangeCutoffTime = "17:00";
 
@@ -75,7 +79,7 @@ const normalizeCategoryCodes = (categories: string[] | undefined) =>
         )
         .filter((value): value is string => Boolean(value)),
     ),
-  );
+  ).slice(0, maxCustomerTags);
 
 const days = [
   "MONDAY",
@@ -489,6 +493,21 @@ export default function StoreSettingsPage() {
     });
   };
 
+  const toggleCustomerTag = (value: string) => {
+    setForm((current) => {
+      const isSelected = current.categories.includes(value);
+      if (!isSelected && current.categories.length >= maxCustomerTags) {
+        return current;
+      }
+      return {
+        ...current,
+        categories: isSelected
+          ? current.categories.filter((item) => item !== value)
+          : [...current.categories, value],
+      };
+    });
+  };
+
   const distanceRuleMutation = useMutation({
     mutationFn: (rules: { distanceKm: number; minPersonCount: number }[]) =>
       sellerService.updateStoreById(storeId, {
@@ -722,33 +741,58 @@ export default function StoreSettingsPage() {
                 rows={3}
               />
             </div>
-            <fieldset className="md:col-span-2">
-              <legend className="mb-2 text-sm font-medium text-slate-700">
-                İşletme / mutfak kategorileri
+            <fieldset className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 md:col-span-2">
+              <legend className="px-1 text-sm font-bold text-slate-900">
+                Müşteriye gösterilecek etiketler
               </legend>
-              <div className="flex flex-wrap gap-2">
-                {categoryOptions.map((value) => (
-                  <label
-                    key={value}
-                    className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-bold ${form.categories.includes(value) ? "border-primary-300 bg-primary-50 text-primary-700" : "border-slate-200 text-slate-600"}`}
-                  >
-                    <input
-                      type="checkbox"
-                      className="sr-only"
-                      checked={form.categories.includes(value)}
-                      onChange={() =>
-                        setForm({
-                          ...form,
-                          categories: form.categories.includes(value)
-                            ? form.categories.filter((item) => item !== value)
-                            : [...form.categories, value],
-                        })
-                      }
-                    />
-                    {discoveryLabels[value]}
-                  </label>
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <p className="text-xs leading-5 text-slate-600">
+                    Mağazanızı tanımlayan en fazla {maxCustomerTags} etiketi seçin.
+                    Seçtikleriniz müşteri vitrininde gösterilir.
+                  </p>
+                </div>
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-bold ${form.categories.length === maxCustomerTags ? "bg-primary-100 text-primary-700" : "bg-white text-slate-600"}`}
+                  aria-live="polite"
+                >
+                  {form.categories.length} / {maxCustomerTags} seçildi
+                </span>
+              </div>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                {customerTagGroups.map((group) => (
+                  <section key={group.title} className="rounded-xl border border-slate-200 bg-white p-3">
+                    <h3 className="text-xs font-bold text-slate-800">{group.title}</h3>
+                    <p className="mt-1 min-h-10 text-xs leading-5 text-slate-500">{group.description}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {group.values.map((value) => {
+                        const isSelected = form.categories.includes(value);
+                        const isUnavailable = !isSelected && form.categories.length >= maxCustomerTags;
+                        return (
+                          <label
+                            key={value}
+                            className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${isSelected ? "cursor-pointer border-primary-300 bg-primary-50 text-primary-700" : isUnavailable ? "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400" : "cursor-pointer border-slate-200 text-slate-600 hover:border-primary-200 hover:text-primary-700"}`}
+                          >
+                            <input
+                              type="checkbox"
+                              className="sr-only"
+                              checked={isSelected}
+                              disabled={isUnavailable}
+                              onChange={() => toggleCustomerTag(value)}
+                            />
+                            {discoveryLabels[value]}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </section>
                 ))}
               </div>
+              {form.categories.length === maxCustomerTags && (
+                <p className="mt-3 text-xs font-medium text-primary-700">
+                  En fazla {maxCustomerTags} etiket seçebilirsiniz. Yeni bir etiket seçmek için önce seçili olanlardan birini kaldırın.
+                </p>
+              )}
             </fieldset>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">

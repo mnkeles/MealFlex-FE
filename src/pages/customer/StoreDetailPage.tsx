@@ -255,15 +255,23 @@ export default function StoreDetailPage() {
                 </p>
               )}
               {!!store.categories?.length && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {store.categories.map((value) => (
-                    <span
-                      key={value}
-                      className="rounded-full bg-primary-50 px-3 py-1 text-xs font-bold text-primary-700"
-                    >
-                      {discoveryLabels[value] || value}
-                    </span>
-                  ))}
+                <div className="mt-4 rounded-2xl bg-primary-50/70 p-3.5">
+                  <p className="text-xs font-bold text-primary-900">
+                    Mutfak tarzı ve menü özellikleri
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                    Bu işletmenin müşterileriyle paylaştığı öne çıkan bilgiler.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {store.categories.slice(0, 5).map((value) => (
+                      <span
+                        key={value}
+                        className="rounded-full bg-white px-3 py-1 text-xs font-bold text-primary-700 shadow-sm"
+                      >
+                        {discoveryLabels[value] || value}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
               <div className="mt-4 flex flex-wrap gap-3 text-sm">
