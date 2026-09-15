@@ -115,7 +115,7 @@ test('satıcı menüyü tarih aralığına uygular ve geçersiz aralığı gönd
 
 test('mağaza ayarları taslağı korunur ve mesafe kaydı yalnız sunucudaki mağaza verisini kullanır', async ({ page }) => {
   await login(page, 'SELLER')
-  const store = { id: 2, name: 'Kayıtlı Catering', description: 'Kayıtlı açıklama', status: 'ACTIVE', categories: [], availableDeliveryTimes: [], rating: 0, reviewCount: 0, latitude: 39.93, longitude: 32.85 }
+  const store = { id: 2, name: 'Kayıtlı Catering', description: 'Kayıtlı açıklama', status: 'ACTIVE', categories: ['Türk Mutfağı', 'Ev Yemekleri'], availableDeliveryTimes: [], rating: 0, reviewCount: 0, latitude: 39.93, longitude: 32.85 }
   const secondStore = { ...store, id: 3, name: 'İkinci Mağaza' }
   let distanceRules = [{ id: 1, distanceKm: 5, minPersonCount: 3 }]
   let updatePayload: Record<string, unknown> | undefined
@@ -145,6 +145,7 @@ test('mağaza ayarları taslağı korunur ve mesafe kaydı yalnız sunucudaki ma
   await expect(page.getByText('Mesafe kuralları kaydedildi.')).toBeVisible()
   expect(updatePayload?.name).toBe('Kayıtlı Catering')
   expect(updatePayload?.description).toBe('Kayıtlı açıklama')
+  expect(updatePayload?.categories).toEqual(['TURK_MUTFAGI', 'EV_YEMEKLERI'])
   await expect(nameInput).toHaveValue('Kaydedilmemiş Taslak')
   await expect(page.getByLabel('Kaydedilmemiş değişiklik var')).toHaveCount(1)
 

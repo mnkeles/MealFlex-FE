@@ -58,6 +58,23 @@ const categoryOptions = [
   "FIT_MENULER",
 ];
 
+const categoryCodeByLabel = new Map(
+  categoryOptions.map((code) => [discoveryLabels[code], code]),
+);
+
+const normalizeCategoryCodes = (categories: string[] | undefined) =>
+  Array.from(
+    new Set(
+      (categories || [])
+        .map((value) =>
+          categoryOptions.includes(value)
+            ? value
+            : categoryCodeByLabel.get(value.trim()),
+        )
+        .filter((value): value is string => Boolean(value)),
+    ),
+  );
+
 const days = [
   "MONDAY",
   "TUESDAY",
@@ -103,7 +120,7 @@ const formFromStore = (store: Store) => ({
   directions: store.directions || "",
   logoUrl: store.logoUrl || "",
   coverImageUrl: store.coverImageUrl || "",
-  categories: store.categories || [],
+  categories: normalizeCategoryCodes(store.categories),
   latitude: String(store.latitude ?? 39.9334),
   longitude: String(store.longitude ?? 32.8597),
 });
@@ -146,7 +163,7 @@ const savedStorePayload = (store: Store) => ({
   directions: store.directions,
   logoUrl: store.logoUrl,
   coverImageUrl: store.coverImageUrl,
-  categories: store.categories,
+  categories: normalizeCategoryCodes(store.categories),
   latitude: store.latitude ?? 39.9334,
   longitude: store.longitude ?? 32.8597,
 });
@@ -463,7 +480,7 @@ export default function StoreSettingsPage() {
       directions: form.directions || undefined,
       logoUrl: form.logoUrl || undefined,
       coverImageUrl: form.coverImageUrl || undefined,
-      categories: form.categories,
+      categories: normalizeCategoryCodes(form.categories),
       latitude: Number(form.latitude),
       longitude: Number(form.longitude),
     });
