@@ -115,7 +115,7 @@ test('satıcı menüyü tarih aralığına uygular ve geçersiz aralığı gönd
 
 test('mağaza ayarları taslağı korunur ve mesafe kaydı yalnız sunucudaki mağaza verisini kullanır', async ({ page }) => {
   await login(page, 'SELLER')
-  const store = { id: 2, name: 'Kayıtlı Catering', description: 'Kayıtlı açıklama', status: 'ACTIVE', categories: ['Türk Mutfağı', 'Ev Yemekleri'], availableDeliveryTimes: [], rating: 0, reviewCount: 0, latitude: 39.93, longitude: 32.85 }
+  const store = { id: 2, name: 'Kayıtlı Catering', description: 'Kayıtlı açıklama', status: 'ACTIVE', categories: ['Türk Mutfağı', 'Ev Yemekleri'], changeCutoffTime: '16:30:00', availableDeliveryTimes: [], rating: 0, reviewCount: 0, latitude: 39.93, longitude: 32.85 }
   const secondStore = { ...store, id: 3, name: 'İkinci Mağaza' }
   let distanceRules = [{ id: 1, distanceKm: 5, minPersonCount: 3 }]
   let updatePayload: Record<string, unknown> | undefined
@@ -134,6 +134,9 @@ test('mağaza ayarları taslağı korunur ve mesafe kaydı yalnız sunucudaki ma
   })
 
   await page.goto('/seller/stores/2/settings')
+  const cutoffTime = page.locator('#store-profile input[type="time"]')
+  await expect(cutoffTime).toHaveValue('16:30')
+  await expect(page.getByText('Müşteri, ertesi gün yapılacak teslimatlar için bir önceki gün bu saate kadar güncelleme talebi gönderebilir.')).toBeVisible()
   const nameInput = page.locator('#store-profile form input[type="text"]').first()
   await nameInput.fill('Kaydedilmemiş Taslak')
   await expect(page.getByText(/Kaydedilmemiş değişiklikler var/)).toBeVisible()
@@ -146,6 +149,7 @@ test('mağaza ayarları taslağı korunur ve mesafe kaydı yalnız sunucudaki ma
   expect(updatePayload?.name).toBe('Kayıtlı Catering')
   expect(updatePayload?.description).toBe('Kayıtlı açıklama')
   expect(updatePayload?.categories).toEqual(['TURK_MUTFAGI', 'EV_YEMEKLERI'])
+  expect(updatePayload?.changeCutoffTime).toBe('16:30')
   await expect(nameInput).toHaveValue('Kaydedilmemiş Taslak')
   await expect(page.getByLabel('Kaydedilmemiş değişiklik var')).toHaveCount(1)
 

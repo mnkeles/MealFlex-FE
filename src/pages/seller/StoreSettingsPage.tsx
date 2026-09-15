@@ -58,6 +58,8 @@ const categoryOptions = [
   "FIT_MENULER",
 ];
 
+const defaultChangeCutoffTime = "17:00";
+
 const categoryCodeByLabel = new Map(
   categoryOptions.map((code) => [discoveryLabels[code], code]),
 );
@@ -107,7 +109,7 @@ const formFromStore = (store: Store) => ({
   description: store.description || "",
   maxPersonCount: store.maxPersonCount ? String(store.maxPersonCount) : "",
   dailyCapacity: store.dailyCapacity ? String(store.dailyCapacity) : "",
-  changeCutoffHours: String(store.changeCutoffHours || 24),
+  changeCutoffTime: store.changeCutoffTime?.slice(0, 5) || defaultChangeCutoffTime,
   productionAddress: store.productionAddress || "",
   addressTitle: store.addressTitle || "",
   city: store.city || "",
@@ -150,7 +152,8 @@ const savedStorePayload = (store: Store) => ({
   description: store.description,
   maxPersonCount: store.maxPersonCount,
   dailyCapacity: store.dailyCapacity,
-  changeCutoffHours: store.changeCutoffHours,
+  changeCutoffTime:
+    store.changeCutoffTime?.slice(0, 5) || defaultChangeCutoffTime,
   productionAddress: store.productionAddress,
   addressTitle: store.addressTitle,
   city: store.city,
@@ -180,7 +183,7 @@ export default function StoreSettingsPage() {
     description: "",
     maxPersonCount: "",
     dailyCapacity: "",
-    changeCutoffHours: "24",
+    changeCutoffTime: defaultChangeCutoffTime,
     logoUrl: "",
     coverImageUrl: "",
     categories: [] as string[],
@@ -467,7 +470,7 @@ export default function StoreSettingsPage() {
         ? Number(form.maxPersonCount)
         : undefined,
       dailyCapacity: form.dailyCapacity ? Number(form.dailyCapacity) : undefined,
-      changeCutoffHours: Number(form.changeCutoffHours),
+      changeCutoffTime: form.changeCutoffTime || defaultChangeCutoffTime,
       productionAddress: form.productionAddress || undefined,
       addressTitle: form.addressTitle || undefined,
       city: form.city || undefined,
@@ -749,21 +752,20 @@ export default function StoreSettingsPage() {
             </fieldset>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                Teslimat Değişiklik Son Saati
+                Bir önceki gün değişiklik son saati
               </label>
               <input
-                type="number"
-                min="1"
-                max="168"
-                value={form.changeCutoffHours}
+                type="time"
+                value={form.changeCutoffTime}
                 onChange={(e) =>
-                  setForm({ ...form, changeCutoffHours: e.target.value })
+                  setForm({ ...form, changeCutoffTime: e.target.value })
                 }
+                required
                 className="w-full px-3 py-2 border rounded-lg text-sm"
               />
               <p className="mt-1 text-xs text-slate-500">
-                Müşteri teslimattan en geç bu kadar saat önce teslimatında
-                güncelleme yapabilir.
+                Müşteri, ertesi gün yapılacak teslimatlar için bir önceki gün
+                bu saate kadar güncelleme talebi gönderebilir.
               </p>
             </div>
           </div>

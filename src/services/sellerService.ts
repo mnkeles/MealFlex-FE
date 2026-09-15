@@ -327,7 +327,7 @@ export const sellerService = {
       description?: string;
       maxPersonCount?: number;
       dailyCapacity?: number;
-      changeCutoffHours?: number;
+      changeCutoffTime?: string;
       logoUrl?: string;
       coverImageUrl?: string;
       maxDeliveryDistanceKm?: number;

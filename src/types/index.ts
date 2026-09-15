@@ -46,7 +46,7 @@ export interface Store {
   effectiveMinPersonCount?: number;
   maxPersonCount?: number;
   dailyCapacity?: number;
-  changeCutoffHours?: number;
+  changeCutoffTime?: string;
   productionAddress?: string;
   addressTitle?: string;
   city?: string;
