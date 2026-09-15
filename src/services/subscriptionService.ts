@@ -59,7 +59,7 @@ export interface DeliveryModificationRequestResult {
   deliveryId: number;
   customerName?: string;
   deliveryDate: string;
-  requestType: "CHANGE" | "SKIP";
+  requestType: "CHANGE" | "CANCEL";
   oldDeliveryTime: string;
   requestedDeliveryTime: string;
   oldPersonCount: number;
@@ -167,14 +167,14 @@ export const subscriptionService = {
     return response.data;
   },
 
-  async skipDelivery(
+  async cancelDelivery(
     subscriptionId: number,
     deliveryId: number,
     reason?: string,
   ): Promise<DeliveryModificationRequestResult> {
     return (
       await api.post(
-        `/v1/subscriptions/${subscriptionId}/deliveries/${deliveryId}/skip`,
+        `/v1/subscriptions/${subscriptionId}/deliveries/${deliveryId}/cancel`,
         null,
         { params: { reason } },
       )

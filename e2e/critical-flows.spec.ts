@@ -1207,7 +1207,7 @@ async function openDeliveryChangeScenario(page: Page) {
   const delivery = { id: 11, subscriptionId: 1, deliveryDate, deliveryTime: '12:30', personCount: 5, menuName: 'Ev Menüsü', customerName: 'Test Kullanıcı', deliveryAddress: 'Test adresi', addressId: 11, menuId: 3, status: 'SCHEDULED' }
   const changes: Record<string, unknown>[] = []
   let requestBody: Record<string, unknown> | undefined
-  let skipRequested = false
+  let cancellationRequested = false
   await page.route('**/api/**', route => {
     const url = new URL(route.request().url())
     if (url.pathname.endsWith('/v1/addresses')) return json(route, [address])
@@ -1219,9 +1219,9 @@ async function openDeliveryChangeScenario(page: Page) {
       changes.push({ id: 9, subscriptionId: 1, deliveryId: 11, deliveryDate, requestType: 'CHANGE', oldDeliveryTime: '12:30', requestedDeliveryTime: requestBody.deliveryTime, oldPersonCount: 5, requestedPersonCount: requestBody.personCount, priceDifference: Number(requestBody.personCount || 5) === 7 ? 100 : 0, status: 'PENDING', requestedAt: '2099-08-20T10:00:00Z' })
       return json(route, changes[0])
     }
-    if (url.pathname.endsWith('/v1/subscriptions/1/deliveries/11/skip')) {
-      skipRequested = true
-      changes.push({ id: 10, subscriptionId: 1, deliveryId: 11, deliveryDate, requestType: 'SKIP', oldDeliveryTime: '12:30', requestedDeliveryTime: '12:30', oldPersonCount: 5, requestedPersonCount: 5, priceDifference: -250, status: 'PENDING', requestedAt: '2099-08-20T10:00:00Z' })
+    if (url.pathname.endsWith('/v1/subscriptions/1/deliveries/11/cancel')) {
+      cancellationRequested = true
+      changes.push({ id: 10, subscriptionId: 1, deliveryId: 11, deliveryDate, requestType: 'CANCEL', oldDeliveryTime: '12:30', requestedDeliveryTime: '12:30', oldPersonCount: 5, requestedPersonCount: 5, priceDifference: -250, status: 'PENDING', requestedAt: '2099-08-20T10:00:00Z' })
       return json(route, changes[0])
     }
     if (url.pathname.includes('/v1/payments/subscriptions/1')) return json(route, null)
@@ -1231,7 +1231,7 @@ async function openDeliveryChangeScenario(page: Page) {
   await page.goto('/subscriptions/1')
   await page.locator('summary').filter({ hasText: 'Teslimat işlemleri' }).click()
   await page.getByRole('button', { name: /teslimatı$/i }).click()
-  return { getRequestBody: () => requestBody, wasSkipRequested: () => skipRequested }
+  return { getRequestBody: () => requestBody, wasCancellationRequested: () => cancellationRequested }
 }
 
 test('yalnız teslimat saati değiştiğinde satıcı onay talebi gönderilir', async ({ page }) => {
@@ -1255,13 +1255,13 @@ test('yalnız kişi sayısı değiştiğinde fiyat farkıyla satıcı onay taleb
   await expect(page.getByText('5 → 7')).toBeVisible()
 })
 
-test('müşteri seçtiği teslimat için satıcı onaylı gün atlama talebi gönderir', async ({ page }) => {
+test('müşteri seçtiği teslimat için satıcı onaylı yemek servisi iptal talebi gönderir', async ({ page }) => {
   const scenario = await openDeliveryChangeScenario(page)
-  await page.getByRole('button', { name: /Bu teslimat gününü atla/i }).click()
+  await page.getByRole('button', { name: /Yemek servisini iptal et/i }).click()
   await expect(page.getByText(/Satıcı onaylayana kadar teslimat planlı kalacak/)).toBeVisible()
   await page.getByRole('button', { name: 'Onaya gönder' }).click()
-  await expect(page.getByText(/Gün atlama talebiniz satıcı onayına gönderildi/)).toBeVisible()
-  expect(scenario.wasSkipRequested()).toBeTruthy()
-  await expect(page.getByText('Bu teslimat gününü atlama talebi')).toBeVisible()
+  await expect(page.getByText(/Yemek servisi iptal talebiniz satıcı onayına gönderildi/)).toBeVisible()
+  expect(scenario.wasCancellationRequested()).toBeTruthy()
+  await expect(page.getByText('Yemek servisi iptal talebi', { exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: /talep onayı bekleniyor/i }).first()).toBeDisabled()
 })

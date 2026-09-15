@@ -170,7 +170,7 @@ export interface DeliveryChangeRequest {
   deliveryId: number;
   customerName: string;
   deliveryDate: string;
-  requestType: "CHANGE" | "SKIP";
+  requestType: "CHANGE" | "CANCEL";
   oldDeliveryTime: string;
   requestedDeliveryTime: string;
   oldPersonCount: number;

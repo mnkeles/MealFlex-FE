@@ -272,7 +272,7 @@ export default function SubscriptionDetailPage() {
   const [message, setMessage] = useState("");
   const [newPaymentMethodId, setNewPaymentMethodId] = useState<number>();
   const [actionDeliveryId, setActionDeliveryId] = useState<number>();
-  const [skipDeliveryId, setSkipDeliveryId] = useState<number>();
+  const [cancelDeliveryId, setCancelDeliveryId] = useState<number>();
   const [showFreeze, setShowFreeze] = useState(false);
   const [showExtend, setShowExtend] = useState(false);
   const [extensionEndDate, setExtensionEndDate] = useState("");
@@ -401,20 +401,20 @@ export default function SubscriptionDetailPage() {
     },
     onError: () => setMessage("Otomatik yenileme tercihi güncellenemedi."),
   });
-  const skipDelivery = useMutation({
+  const cancelDelivery = useMutation({
     mutationFn: (deliveryId: number) =>
-      subscriptionService.skipDelivery(id, deliveryId),
+      subscriptionService.cancelDelivery(id, deliveryId),
     onSuccess: () => {
-      setSkipDeliveryId(undefined);
+      setCancelDeliveryId(undefined);
       setMessage(
-        "Gün atlama talebiniz satıcı onayına gönderildi. Teslimat, satıcı onaylayana kadar planlı kalır.",
+        "Yemek servisi iptal talebiniz satıcı onayına gönderildi. Teslimat, satıcı onaylayana kadar planlı kalır.",
       );
       refresh();
     },
     onError: (error: unknown) =>
       setMessage(
         (error as { response?: { data?: { message?: string } } }).response?.data
-          ?.message || "Gün atlama talebi gönderilemedi. Değişiklik son saati geçmiş olabilir.",
+          ?.message || "Yemek servisi iptal talebi gönderilemedi. Değişiklik son saati geçmiş olabilir.",
       ),
   });
   const freezeSubscription = useMutation({
@@ -808,7 +808,7 @@ export default function SubscriptionDetailPage() {
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-xl font-black">Değişiklik taleplerim</h2>
               <p className="mt-1 text-sm text-slate-500">
-                Teslimat değişikliği ve gün atlama taleplerinizin satıcı
+                Teslimat değişikliği ve yemek servisi iptal taleplerinizin satıcı
                 kararlarını buradan takip edebilirsiniz.
               </p>
               <div className="mt-4 space-y-3">
@@ -851,9 +851,9 @@ export default function SubscriptionDetailPage() {
                           {config.label}
                         </span>
                       </div>
-                      {request.requestType === "SKIP" ? (
+                      {request.requestType === "CANCEL" ? (
                         <p className="mt-2 text-sm font-semibold text-slate-700">
-                          Bu teslimat gününü atlama talebi
+                          Yemek servisi iptal talebi
                         </p>
                       ) : (
                         <p className="mt-2 text-sm text-slate-600">
@@ -878,7 +878,7 @@ export default function SubscriptionDetailPage() {
                       {request.customerNote && (
                         <p className="mt-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-700">
                           <strong>
-                            {request.requestType === "SKIP"
+                            {request.requestType === "CANCEL"
                               ? "Talep nedeni:"
                               : "Teslimat notu:"}
                           </strong>{" "}
@@ -899,7 +899,7 @@ export default function SubscriptionDetailPage() {
                     Teslimat işlemleri
                   </h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    Bir tarih seçerek değişiklik ya da gün atlama talebi
+                    Bir tarih seçerek değişiklik ya da yemek servisi iptal talebi
                     gönderin; birden fazla gün için tarih aralığını dondurun.
                   </p>
                 </div>
@@ -1407,15 +1407,15 @@ export default function SubscriptionDetailPage() {
                 type="button"
                 onClick={() => {
                   setActionDeliveryId(undefined);
-                  setSkipDeliveryId(actionDelivery.id);
+                  setCancelDeliveryId(actionDelivery.id);
                 }}
                 className="rounded-2xl border border-warning-200 p-4 text-left hover:bg-warning-50"
               >
                 <span className="flex items-center gap-2 font-black text-warning-800">
-                  <CalendarDays className="h-5 w-5" /> Bu teslimat gününü atla
+                  <CalendarDays className="h-5 w-5" /> Yemek servisini iptal et
                 </span>
                 <span className="mt-1 block text-sm text-slate-500">
-                  Satıcı onaylarsa teslimat takvimden çıkarılır ve ücret düzeltmesi yapılır.
+                  Satıcı onaylarsa yemek servisi iptal edilir ve ücret düzeltmesi yapılır.
                 </span>
               </button>
             </div>
@@ -1592,13 +1592,13 @@ export default function SubscriptionDetailPage() {
         </div>
       )}
       <ConfirmModal
-        open={!!skipDeliveryId}
-        title="Gün atlama talebi gönder"
-        message="Talep satıcının onayına gönderilecek. Satıcı onaylayana kadar teslimat planlı kalacak; onaydan sonra takvimden çıkarılıp uygun ücret düzeltmesi oluşturulacak."
+        open={!!cancelDeliveryId}
+        title="Yemek servisi iptal talebi gönder"
+        message="Talep satıcının onayına gönderilecek. Satıcı onaylayana kadar teslimat planlı kalacak; onaydan sonra yemek servisi iptal edilip uygun ücret düzeltmesi oluşturulacak."
         confirmLabel="Onaya gönder"
-        pending={skipDelivery.isPending}
-        onClose={() => setSkipDeliveryId(undefined)}
-        onConfirm={() => skipDeliveryId && skipDelivery.mutate(skipDeliveryId)}
+        pending={cancelDelivery.isPending}
+        onClose={() => setCancelDeliveryId(undefined)}
+        onConfirm={() => cancelDeliveryId && cancelDelivery.mutate(cancelDeliveryId)}
       />
       {showFreeze && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">

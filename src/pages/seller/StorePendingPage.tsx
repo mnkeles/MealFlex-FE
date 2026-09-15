@@ -339,7 +339,7 @@ export default function StorePendingPage() {
                 Teslimat işlem talepleri
               </h3>
               <p className="text-sm text-info-700">
-                Müşterilerin teslimat değişikliği ve gün atlama taleplerini
+                Müşterilerin teslimat değişikliği ve yemek servisi iptal taleplerini
                 karara bağlayın.
               </p>
             </div>
@@ -361,9 +361,9 @@ export default function StorePendingPage() {
                         "tr-TR",
                       )}
                     </p>
-                    {request.requestType === "SKIP" ? (
+                    {request.requestType === "CANCEL" ? (
                       <p className="mt-2 inline-flex rounded-full bg-warning-100 px-3 py-1 text-xs font-black text-warning-800">
-                        Teslimat gününü atlama talebi
+                        Yemek servisi iptal talebi
                       </p>
                     ) : (
                       <p className="mt-1 text-sm text-slate-600">
@@ -389,7 +389,7 @@ export default function StorePendingPage() {
                     {request.customerNote && (
                       <p className="mt-2 rounded-lg bg-info-50 p-3 text-sm text-info-800">
                         <strong>
-                          {request.requestType === "SKIP" ? "Talep nedeni:" : "Müşteri notu:"}
+                          {request.requestType === "CANCEL" ? "Talep nedeni:" : "Müşteri notu:"}
                         </strong>{" "}
                         {request.customerNote}
                       </p>
