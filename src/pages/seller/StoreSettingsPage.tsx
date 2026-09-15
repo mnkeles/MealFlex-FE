@@ -745,8 +745,8 @@ export default function StoreSettingsPage() {
                 className="w-full px-3 py-2 border rounded-lg text-sm"
               />
               <p className="mt-1 text-xs text-slate-500">
-                Müşteri teslimattan en geç bu kadar saat önce gün atlayabilir
-                veya dondurabilir.
+                Müşteri teslimattan en geç bu kadar saat önce teslimatında
+                güncelleme yapabilir.
               </p>
             </div>
           </div>
