@@ -51,10 +51,12 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config as RetryableRequest | undefined;
+    const isAuthenticationRequest = originalRequest?.url?.includes("/v1/auth/");
 
     if (
       error.response?.status === 401 &&
       originalRequest &&
+      !isAuthenticationRequest &&
       !originalRequest._retry &&
       !originalRequest.url?.includes("/v1/auth/refresh")
     ) {

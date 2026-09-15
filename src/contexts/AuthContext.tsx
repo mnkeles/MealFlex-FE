@@ -57,6 +57,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
     const response = await authService.login({ email, password });
     await queryClient.cancelQueries();
     queryClient.clear();

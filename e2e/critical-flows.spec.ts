@@ -281,6 +281,35 @@ test('yanlış giriş bağlamı rol bilgisini açıklamadan genel kimlik doğrul
   await expect(dialog.getByText(/satıcı hesabı|\/seller\/login/i)).toHaveCount(0)
 })
 
+test('giriş isteği tarayıcıdaki eski tokenı taşımaz', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('accessToken', 'expired-access-token')
+    localStorage.setItem('refreshToken', 'expired-refresh-token')
+  })
+  let authorizationHeader: string | undefined
+  await page.route('**/api/**', route => {
+    if (route.request().url().endsWith('/v1/auth/login')) {
+      authorizationHeader = route.request().headers().authorization
+      return json(route, {
+        accessToken: 'new-access-token', refreshToken: 'new-refresh-token', userId: 7,
+        email: 'customer.yenimahalle1@test.mealflex.local', firstName: 'Ali', lastName: 'Aksoy', role: 'CUSTOMER',
+      })
+    }
+    if (route.request().url().includes('unread-count')) return json(route, { count: 0 })
+    return json(route, [])
+  })
+
+  await page.goto('/login')
+  await page.getByRole('button', { name: 'Giriş Yap', exact: true }).click()
+  const dialog = page.getByRole('dialog', { name: 'Tekrar hoş geldiniz' })
+  await dialog.getByLabel('E-posta').fill('customer.yenimahalle1@test.mealflex.local')
+  await dialog.locator('input[name="password"]').fill('password')
+  await dialog.locator('form').getByRole('button', { name: 'Giriş yap' }).click()
+
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('accessToken'))).toBe('new-access-token')
+  expect(authorizationHeader).toBeUndefined()
+})
+
 test('rol bazlı giriş adresleri doğru ekranı açar ve korunan alanları doğru girişe yönlendirir', async ({ page }) => {
   await page.goto('/seller/login')
   await expect(page.getByText('Satıcı hesabı', { exact: true })).toBeVisible()
