@@ -342,6 +342,11 @@ export default function StorePendingPage() {
                 Müşterilerin teslimat değişikliği ve yemek servisi iptal taleplerini
                 karara bağlayın.
               </p>
+              <p className="mt-1 text-sm text-info-700">
+                Talepleri mevcut teslimat saatinden en az 2 saat önce onaylayabilirsiniz.
+                Onay yalnızca aktif veya onaylanmış aboneliklerin henüz hazırlanmaya
+                başlanmamış teslimatlarında yapılabilir.
+              </p>
             </div>
             <span className="rounded-full bg-info-600 px-3 py-1 text-xs font-black text-white">
               {changeRequests.data.length} talep
