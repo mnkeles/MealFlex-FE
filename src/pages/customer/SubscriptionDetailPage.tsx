@@ -18,6 +18,7 @@ import {
   Users,
 } from "lucide-react";
 import { subscriptionService } from "@/services/subscriptionService";
+import { storeService } from "@/services/storeService";
 import type { Delivery, SubscriptionEvent } from "@/types";
 import { paymentService } from "@/services/paymentService";
 import ConfirmModal from "@/components/common/ConfirmModal";
@@ -299,6 +300,23 @@ export default function SubscriptionDetailPage() {
     queryFn: () => subscriptionService.getSubscription(id),
     enabled: !!id,
   });
+  const deliveryBeingModified = data?.deliveries.find(
+    (delivery) => delivery.id === modifyDeliveryId,
+  );
+  const { data: validDeliveryTimes = [] } = useQuery({
+    queryKey: [
+      "delivery-change-times",
+      data?.subscription.storeId,
+      deliveryBeingModified?.deliveryDate,
+    ],
+    queryFn: () =>
+      storeService.getDeliveryTimes(
+        data!.subscription.storeId,
+        deliveryBeingModified!.deliveryDate,
+        deliveryBeingModified!.deliveryDate,
+      ),
+    enabled: !!data?.subscription.storeId && !!deliveryBeingModified,
+  });
   const { data: events = [] } = useQuery({
     queryKey: ["subscription-events", id],
     queryFn: () => subscriptionService.getSubscriptionEvents(id),
@@ -576,9 +594,7 @@ export default function SubscriptionDetailPage() {
   const subscriptionPayments =
     paymentSummary?.payments ??
     (paymentSummary?.payment ? [paymentSummary.payment] : []);
-  const modifyingDelivery = data.deliveries.find(
-    (delivery) => delivery.id === modifyDeliveryId,
-  );
+  const modifyingDelivery = deliveryBeingModified;
   const actionDelivery = data.deliveries.find(
     (delivery) => delivery.id === actionDeliveryId,
   );
@@ -596,13 +612,23 @@ export default function SubscriptionDetailPage() {
       Number(modifyForm.personCount) !== modifyingDelivery.personCount ||
       modifyForm.customerNote.trim() !== (modifyingDelivery.customerNote || ""));
   const modificationTimeOptions = modifyingDelivery
-    ? Array.from(
-        new Set(
-          Array.from({ length: 9 }, (_, index) =>
-            timeWithOffset(modifyingDelivery.deliveryTime, (index - 4) * 15),
+    ? (() => {
+        const nearbyTimes = Array.from(
+          new Set(
+            Array.from({ length: 9 }, (_, index) =>
+              timeWithOffset(modifyingDelivery.deliveryTime, (index - 4) * 15),
+            ),
           ),
-        ),
-      )
+        );
+        const permittedTimes = new Set(
+          validDeliveryTimes.map((time) => toShortTime(time)),
+        );
+        // While the current delivery-slot query is loading, retain only the
+        // existing time. This never offers a value the store cannot serve.
+        return permittedTimes.size
+          ? nearbyTimes.filter((time) => permittedTimes.has(time))
+          : [toShortTime(modifyingDelivery.deliveryTime)];
+      })()
     : [];
   const modificationPersonBounds = modifyingDelivery
     ? {

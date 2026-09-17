@@ -1432,6 +1432,7 @@ async function openDeliveryChangeScenario(page: Page) {
     const url = new URL(route.request().url())
     if (url.pathname.endsWith('/v1/addresses')) return json(route, [address])
     if (url.pathname.endsWith('/v1/subscriptions/1')) return json(route, { subscription, deliveries: [delivery], reviewed: true })
+    if (url.pathname.endsWith('/v1/stores/2/delivery-times')) return json(route, ['11:30', '12:00', '12:30', '13:00', '13:30'])
     if (url.pathname.endsWith('/v1/subscriptions/1/events')) return json(route, [])
     if (url.pathname.endsWith('/v1/subscriptions/1/delivery-change-requests')) return json(route, changes)
     if (url.pathname.endsWith('/v1/subscriptions/1/deliveries/11/change')) {
