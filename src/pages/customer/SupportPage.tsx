@@ -142,7 +142,7 @@ export default function SupportPage() {
       <SupportContactForm />
 
       <section>
-        <h2 className="text-lg font-black text-ink">Hızlı işlemler</h2>
+        <h2 className="text-lg font-semibold text-ink">Hızlı işlemler</h2>
         <p className="mt-1 text-sm text-slate-500">
           Sık kullanılan müşteri ekranlarına doğrudan ulaşın.
         </p>
@@ -151,16 +151,16 @@ export default function SupportPage() {
             <Link
               key={item.title}
               to={item.to}
-              className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-lg"
+              className="group rounded-xl border border-slate-200 bg-white p-5 shadow-card transition hover:border-primary-200 hover:shadow-lg"
             >
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-600">
                 <Icon className="h-5 w-5" />
               </span>
-              <h3 className="mt-4 font-black text-ink">{item.title}</h3>
+              <h3 className="mt-4 font-semibold text-ink">{item.title}</h3>
               <p className="mt-1 min-h-10 text-sm leading-5 text-slate-500">
                 {item.description}
               </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-xs font-black text-primary-600">
+              <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-primary-600">
                 Ekranı aç
                 <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
               </span>
@@ -169,13 +169,13 @@ export default function SupportPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
         <div className="flex items-center gap-3">
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-600">
             <CircleHelp className="h-5 w-5" />
           </span>
           <div>
-            <h2 className="text-lg font-black text-ink">Sık sorulan sorular</h2>
+            <h2 className="text-lg font-semibold text-ink">Sık sorulan sorular</h2>
             <p className="text-sm text-slate-500">
               {filteredFaqs.length} yardım içeriği gösteriliyor.
             </p>
@@ -203,7 +203,7 @@ export default function SupportPage() {
           <div className="mt-4 divide-y divide-slate-100">
             {filteredFaqs.map((item) => (
               <details key={item.question} className="group py-4">
-                <summary className="cursor-pointer list-none pr-8 text-sm font-black text-slate-800 marker:hidden">
+                <summary className="cursor-pointer list-none pr-8 text-sm font-semibold text-slate-800 marker:hidden">
                   <span className="mr-2 text-primary-600">+</span>
                   {item.question}
                 </summary>
@@ -225,7 +225,7 @@ export default function SupportPage() {
       <section>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-xl font-black text-ink">Destek taleplerim</h2>
+            <h2 className="text-xl font-semibold text-ink">Destek taleplerim</h2>
             <p className="mt-1 text-sm leading-6 text-slate-500">
               Yeni sorun bildirmek için Aboneliklerim sayfasından ilgili teslimatı
               açın ve Destek ve işlemler bölümünü kullanın.
@@ -233,16 +233,16 @@ export default function SupportPage() {
           </div>
           <Link
             to="/subscriptions"
-            className="inline-flex items-center gap-1 text-sm font-black text-primary-600"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600"
           >
             Aboneliklerime git <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
         {isLoading ? (
-          <div className="mt-5 h-40 animate-pulse rounded-2xl bg-slate-200" />
+          <div className="mt-5 h-40 animate-pulse rounded-xl bg-slate-200" />
         ) : !data?.content.length ? (
-          <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-card">
+          <div className="mt-5 rounded-xl border border-slate-200 bg-white p-10 text-center shadow-card">
             <MessageSquareWarning className="mx-auto h-10 w-10 text-slate-300" />
             <p className="mt-3 font-semibold">Destek talebiniz bulunmuyor.</p>
             <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-500">
@@ -255,11 +255,11 @@ export default function SupportPage() {
             {data.content.map((item) => (
               <article
                 key={item.id}
-                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <h3 className="font-black">
+                    <h3 className="font-semibold">
                       Talep #{item.id} · {item.reason}
                     </h3>
                     <p className="mt-1 text-sm text-slate-500">

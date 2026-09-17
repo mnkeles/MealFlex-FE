@@ -137,7 +137,7 @@ function SelectedDeliveryCalendar({
   };
 
   return (
-    <div className="mt-5 rounded-2xl border border-primary-100 bg-primary-50/50 p-4 sm:p-5">
+    <div className="mt-5 rounded-xl border border-primary-100 bg-primary-50/50 p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-bold text-primary-800">
@@ -157,7 +157,7 @@ function SelectedDeliveryCalendar({
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <p className="min-w-32 text-center text-sm font-black capitalize text-slate-900">
+          <p className="min-w-32 text-center text-sm font-semibold capitalize text-slate-900">
             {monthStart.toLocaleDateString("tr-TR", {
               month: "long",
               year: "numeric",
@@ -606,7 +606,7 @@ export default function CreateSubscriptionPage() {
           <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-success-100">
             <CheckCircle2 className="h-10 w-10 text-success-600" />
           </div>
-          <h1 className="mt-6 text-2xl font-black text-ink">
+          <h1 className="mt-6 text-2xl font-semibold text-ink">
             Talebiniz satıcıya gönderildi
           </h1>
           <p className="mt-3 leading-7 text-slate-600">
@@ -655,7 +655,7 @@ export default function CreateSubscriptionPage() {
       </div>
     );
   if (addressesLoading || !store || !menu || !addressId)
-    return <div className="h-80 animate-pulse rounded-3xl bg-slate-200" />;
+    return <div className="h-80 animate-pulse rounded-xl bg-slate-200" />;
   const preview = previewMutation.data ?? lastPreview;
   const selectedAddress = addresses.find((address) => address.id === addressId);
   const selectedPaymentMethod = paymentMethods.find(
@@ -703,7 +703,7 @@ export default function CreateSubscriptionPage() {
         description="Menü, teslimat ve ödeme bilgilerinizi adım adım tamamlayın. Talebiniz satıcı onayından sonra başlar."
       />
       <div className="mt-5 grid gap-7 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <main className="rounded-3xl border border-slate-200 bg-white p-5 shadow-card sm:p-8">
+        <main className="rounded-xl border border-slate-200 bg-white p-5 shadow-card sm:p-8">
           <ol
             className="mt-7 grid grid-cols-5 gap-2"
             aria-label="Abonelik oluşturma adımları"
@@ -760,7 +760,7 @@ export default function CreateSubscriptionPage() {
                     <CreditCard />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black">Ödeme yöntemi</h2>
+                    <h2 className="text-xl font-semibold">Ödeme yöntemi</h2>
                     <p className="text-sm text-slate-500">
                       Tahsilat, satıcı onayından sonra ilk teslimat haftasında başlar.
                     </p>
@@ -780,7 +780,7 @@ export default function CreateSubscriptionPage() {
                 {!paymentConfiguration ? (
                   <div
                     role={paymentConfigurationQuery.isError ? "alert" : "status"}
-                    className={`mt-5 rounded-2xl border p-5 text-sm leading-6 ${paymentConfigurationQuery.isError ? "border-danger-200 bg-danger-50 text-danger-700" : "border-slate-200 bg-slate-50 text-slate-600"}`}
+                    className={`mt-5 rounded-xl border p-5 text-sm leading-6 ${paymentConfigurationQuery.isError ? "border-danger-200 bg-danger-50 text-danger-700" : "border-slate-200 bg-slate-50 text-slate-600"}`}
                   >
                     {paymentConfigurationQuery.isError
                       ? "Ödeme yapılandırması alınamadı. Kart bilgisi girmeyin; sayfayı yenileyip tekrar deneyin."
@@ -789,7 +789,7 @@ export default function CreateSubscriptionPage() {
                 ) : (
                   <>
                     <div className="mt-5">
-                      <h3 className="text-sm font-black text-slate-800">
+                      <h3 className="text-sm font-semibold text-slate-800">
                         Kayıtlı kartınızı seçin
                       </h3>
                       {paymentMethodsLoading ? (
@@ -822,14 +822,14 @@ export default function CreateSubscriptionPage() {
                           ))}
                         </div>
                       ) : (
-                        <div className="mt-3 rounded-2xl border border-warning-200 bg-warning-50 p-4 text-sm text-warning-800">
+                        <div className="mt-3 rounded-xl border border-warning-200 bg-warning-50 p-4 text-sm text-warning-800">
                           <strong className="block">Kayıtlı kartınız bulunmuyor</strong>
                           Abonelik talebi gönderebilmek için önce bir kart eklemelisiniz.
                         </div>
                       )}
                     </div>
                     {hostedCheckout ? (
-                      <div className="mt-5 rounded-2xl border border-blue-100 bg-blue-50 p-5 text-sm leading-6 text-slate-700">
+                      <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-5 text-sm leading-6 text-slate-700">
                         Kart bilgilerinizi yalnız iyzico’nun güvenli sayfasına girersiniz;
                         MealFlex kart numarası veya CVV almaz.
                         <Link
@@ -884,7 +884,7 @@ export default function CreateSubscriptionPage() {
                     <Users />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black">
+                    <h2 className="text-xl font-semibold">
                       Kaç kişilik yemek istiyorsunuz?
                     </h2>
                     <p className="text-sm text-slate-500">
@@ -914,7 +914,7 @@ export default function CreateSubscriptionPage() {
                     <CalendarDays />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black">
+                    <h2 className="text-xl font-semibold">
                       Abonelik tarihlerini belirleyin
                     </h2>
                     <p className="text-sm text-slate-500">
@@ -985,7 +985,7 @@ export default function CreateSubscriptionPage() {
                     <MapPin />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black">Teslimat bilgileri</h2>
+                    <h2 className="text-xl font-semibold">Teslimat bilgileri</h2>
                     <p className="text-sm text-slate-500">
                       Yemeğin nereye ve saat kaçta geleceğini seçin.
                     </p>
@@ -1058,7 +1058,7 @@ export default function CreateSubscriptionPage() {
             )}
             {step === 3 && preview && (
               <section>
-                <h2 className="text-xl font-black">Abonelik özetiniz</h2>
+                <h2 className="text-xl font-semibold">Abonelik özetiniz</h2>
                 {!previewIsCurrent && (
                   <div role="status" className="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
                     Güncel tutar henüz doğrulanmadı.
@@ -1072,7 +1072,7 @@ export default function CreateSubscriptionPage() {
                     </button>
                   </div>
                 )}
-                <div className="mt-6 divide-y rounded-2xl border border-slate-200 px-5">
+                <div className="mt-6 divide-y rounded-xl border border-slate-200 px-5">
                   {[
                     ["Menü", menu.name],
                     [
@@ -1113,7 +1113,7 @@ export default function CreateSubscriptionPage() {
                     toplamdan çıkarıldı.
                   </p>
                 )}
-                <div className="mt-6 rounded-2xl bg-slate-950 p-5 text-white">
+                <div className="mt-6 rounded-xl bg-slate-950 p-5 text-white">
                   <div className="space-y-2 text-sm text-slate-300">
                     <div className="flex justify-between gap-3">
                       <span>
@@ -1135,7 +1135,7 @@ export default function CreateSubscriptionPage() {
                   </div>
                   <div className="mt-3 flex items-end justify-between border-t border-white/15 pt-3">
                     <span className="font-semibold">Toplam tutar</span>
-                    <span className="text-3xl font-black text-warning-300">
+                    <span className="text-3xl font-semibold text-warning-300">
                       {preview.totalAmount.toLocaleString("tr-TR")} ₺
                     </span>
                   </div>
@@ -1182,7 +1182,7 @@ export default function CreateSubscriptionPage() {
                             </p>
                             <div className="mt-2 flex items-start justify-between gap-3">
                               <div>
-                                <p className="text-sm font-black text-slate-900">
+                                <p className="text-sm font-semibold text-slate-900">
                                   {new Date(
                                     `${charge.chargeDate}T12:00:00`,
                                   ).toLocaleDateString("tr-TR", {
@@ -1255,11 +1255,11 @@ export default function CreateSubscriptionPage() {
           </div>
         </main>
 
-        <aside className="hidden h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-card lg:sticky lg:top-24 lg:block">
-          <p className="text-xs font-black uppercase tracking-[.12em] text-primary-600">
+        <aside className="hidden h-fit rounded-xl border border-slate-200 bg-white p-5 shadow-card lg:sticky lg:top-24 lg:block">
+          <p className="text-xs font-semibold uppercase tracking-[.12em] text-primary-600">
             Seçtiğiniz menü
           </p>
-          <h2 className="mt-2 text-lg font-black text-ink">{store.name}</h2>
+          <h2 className="mt-2 text-lg font-semibold text-ink">{store.name}</h2>
           <p className="mt-1 text-sm font-semibold text-slate-600">
             {menu.name}
           </p>
@@ -1270,7 +1270,7 @@ export default function CreateSubscriptionPage() {
           >
             Menüyü değiştir
           </button>
-          <p className="mt-3 text-2xl font-black text-primary-600">
+          <p className="mt-3 text-2xl font-semibold text-primary-600">
             {menu.pricePerPerson.toLocaleString("tr-TR")} ₺{" "}
             <span className="text-xs font-normal text-slate-500">
               / kişi / gün
@@ -1315,7 +1315,7 @@ export default function CreateSubscriptionPage() {
             type="button"
             onClick={runPrimaryAction}
             disabled={mobilePrimaryDisabled}
-            className="flex min-h-12 shrink-0 items-center gap-1 rounded-xl bg-primary-600 px-4 text-sm font-black text-white disabled:opacity-50"
+            className="flex min-h-12 shrink-0 items-center gap-1 rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white disabled:opacity-50"
           >
             {previewMutation.isPending || createMutation.isPending
               ? "İşleniyor..."
@@ -1333,10 +1333,10 @@ export default function CreateSubscriptionPage() {
         title="Abonelik özeti"
         onClose={() => setMobileSummaryOpen(false)}
       >
-        <p className="text-xs font-black uppercase tracking-[.12em] text-primary-600">
+        <p className="text-xs font-semibold uppercase tracking-[.12em] text-primary-600">
           Seçtiğiniz menü
         </p>
-        <h2 className="mt-1 text-lg font-black">{store.name}</h2>
+        <h2 className="mt-1 text-lg font-semibold">{store.name}</h2>
         <p className="text-sm font-semibold text-slate-600">{menu.name}</p>
         <button
           type="button"
@@ -1348,7 +1348,7 @@ export default function CreateSubscriptionPage() {
         >
           Menüyü değiştir
         </button>
-        <p className="mt-4 text-2xl font-black text-primary-600">
+        <p className="mt-4 text-2xl font-semibold text-primary-600">
           {menu.pricePerPerson.toLocaleString("tr-TR")} ₺{" "}
           <span className="text-xs font-normal text-slate-500">
             / kişi / gün

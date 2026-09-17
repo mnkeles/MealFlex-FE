@@ -158,7 +158,7 @@ export default function RegisterPage({
                       <Icon className="h-4 w-4" />
                     </span>
                     <span>
-                      <span className="block text-sm font-black text-ink">
+                      <span className="block text-sm font-semibold text-ink">
                         {item.title}
                       </span>
                       <span className="mt-0.5 block text-xs leading-5 text-slate-600">

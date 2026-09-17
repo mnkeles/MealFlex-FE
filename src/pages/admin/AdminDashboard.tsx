@@ -196,10 +196,10 @@ export default function AdminDashboard() {
       {dashboardHasError && (
         <section
           role="alert"
-          className="flex flex-col gap-3 rounded-2xl border border-danger-100 bg-danger-50 p-4 sm:flex-row sm:items-center sm:justify-between"
+          className="flex flex-col gap-3 rounded-xl border border-danger-100 bg-danger-50 p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div>
-            <p className="font-black text-danger-800">
+            <p className="font-semibold text-danger-800">
               Bazı dashboard verileri yüklenemedi
             </p>
             <p className="mt-1 text-sm text-danger-700">
@@ -304,9 +304,9 @@ export default function AdminDashboard() {
         </div>
         <div className="grid gap-3 p-5 sm:grid-cols-2 xl:grid-cols-4">
           <div
-            className={`rounded-2xl border p-4 ${operations?.delayedDeliveries ? "border-danger-100 bg-danger-50" : "border-slate-100 bg-slate-50"}`}
+            className={`rounded-xl border p-4 ${operations?.delayedDeliveries ? "border-danger-100 bg-danger-50" : "border-slate-100 bg-slate-50"}`}
           >
-            <p className="text-2xl font-black text-ink">
+            <p className="text-2xl font-semibold text-ink">
               {operations?.delayedDeliveries ?? 0}
             </p>
             <p className="mt-1 text-sm font-bold text-slate-700">
@@ -317,9 +317,9 @@ export default function AdminDashboard() {
             </p>
           </div>
           <div
-            className={`rounded-2xl border p-4 ${operations?.slaComplaints ? "border-warning-100 bg-warning-50" : "border-slate-100 bg-slate-50"}`}
+            className={`rounded-xl border p-4 ${operations?.slaComplaints ? "border-warning-100 bg-warning-50" : "border-slate-100 bg-slate-50"}`}
           >
-            <p className="text-2xl font-black text-ink">
+            <p className="text-2xl font-semibold text-ink">
               {operations?.slaComplaints ?? 0}
             </p>
             <p className="mt-1 text-sm font-bold text-slate-700">
@@ -330,9 +330,9 @@ export default function AdminDashboard() {
             </p>
           </div>
           <div
-            className={`rounded-2xl border p-4 ${operations?.paymentReviewRequired ? "border-danger-100 bg-danger-50" : "border-slate-100 bg-slate-50"}`}
+            className={`rounded-xl border p-4 ${operations?.paymentReviewRequired ? "border-danger-100 bg-danger-50" : "border-slate-100 bg-slate-50"}`}
           >
-            <p className="text-2xl font-black text-ink">
+            <p className="text-2xl font-semibold text-ink">
               {operations?.failedPayments ?? 0}
             </p>
             <p className="mt-1 text-sm font-bold text-slate-700">
@@ -343,9 +343,9 @@ export default function AdminDashboard() {
             </p>
           </div>
           <div
-            className={`rounded-2xl border p-4 ${operations?.openRiskCases ? "border-danger-100 bg-danger-50" : "border-slate-100 bg-slate-50"}`}
+            className={`rounded-xl border p-4 ${operations?.openRiskCases ? "border-danger-100 bg-danger-50" : "border-slate-100 bg-slate-50"}`}
           >
-            <p className="text-2xl font-black text-ink">
+            <p className="text-2xl font-semibold text-ink">
               {operations?.openRiskCases ?? 0}
             </p>
             <p className="mt-1 text-sm font-bold text-slate-700">
@@ -378,12 +378,12 @@ export default function AdminDashboard() {
                   <StatusBadge tone={alertTone(alert.type)}>
                     {alert.type}
                   </StatusBadge>
-                  <span className="rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-black text-slate-600">
+                  <span className="rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-600">
                     #{alert.id}
                   </span>
                   <Link
                     to={alertTarget(alert.type)}
-                    className="rounded-lg border border-primary-200 px-2.5 py-1.5 text-xs font-black text-primary-700 hover:bg-primary-50"
+                    className="rounded-lg border border-primary-200 px-2.5 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-50"
                   >
                     Kaydı aç
                   </Link>
@@ -392,10 +392,10 @@ export default function AdminDashboard() {
             ))
           ) : (
             <div className="py-12 text-center">
-              <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-success-50 text-success-600">
+              <span className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-success-50 text-success-600">
                 <AlertTriangle className="h-6 w-6" />
               </span>
-              <p className="mt-3 font-black text-ink">
+              <p className="mt-3 font-semibold text-ink">
                 Seçili aralıkta kritik uyarı yok
               </p>
               <p className="mt-1 text-sm text-slate-500">
@@ -441,7 +441,7 @@ export default function AdminDashboard() {
                     <td className="px-5 py-3 font-semibold text-ink">{item.city}</td>
                     <td className="px-5 py-3 text-slate-700">{item.district}</td>
                     <td className="px-5 py-3 text-slate-600">{item.neighborhood || "—"}</td>
-                    <td className="px-5 py-3 text-right font-black text-primary-700">
+                    <td className="px-5 py-3 text-right font-semibold text-primary-700">
                       {item.requestCount}
                     </td>
                   </tr>

@@ -34,18 +34,22 @@ export default function SellerNotificationsPage() {
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-6">Bildirimler</h1>
+    <div className="mf-page">
+      <div className="border-b border-[#e6e1d8] pb-5">
+        <p className="customer-eyebrow">Hesap akışı</p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink">Bildirimler</h1>
+        <p className="mt-1 text-sm text-slate-500">Talepler, ödemeler ve operasyon gelişmeleri burada toplanır.</p>
+      </div>
 
       {isLoading ? (
         <div className="text-center py-12 text-slate-500">Yükleniyor...</div>
       ) : !data?.content.length ? (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center text-slate-500">
+        <div className="mf-surface p-12 text-center text-slate-500">
           Bildirim bulunmuyor.
         </div>
       ) : (
         <>
-          <div className="bg-white rounded-xl shadow-sm divide-y">
+          <div className="mf-surface divide-y">
             {data.content.map((n) => (
               <div
                 key={n.id}

@@ -56,9 +56,13 @@ export default function SellerMenusPage() {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Menüler</h1>
+    <div className="mf-page">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e6e1d8] pb-5">
+        <div>
+          <p className="customer-eyebrow">Ürün yönetimi</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink">Menüler</h1>
+          <p className="mt-1 text-sm text-slate-500">Fiyatları, içerikleri ve alerjen bilgilerini tek yerde yönetin.</p>
+        </div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700"
@@ -70,7 +74,7 @@ export default function SellerMenusPage() {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-xl shadow-sm p-6 mb-6"
+          className="mf-surface p-6 mb-6"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
@@ -81,7 +85,7 @@ export default function SellerMenusPage() {
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
+                className="mf-input"
                 required
               />
             </div>
@@ -96,7 +100,7 @@ export default function SellerMenusPage() {
                 onChange={(e) =>
                   setForm({ ...form, pricePerPerson: e.target.value })
                 }
-                className="w-full px-3 py-2 border rounded-lg text-sm"
+                className="mf-input"
                 required
               />
             </div>
@@ -109,7 +113,7 @@ export default function SellerMenusPage() {
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
                 }
-                className="w-full px-3 py-2 border rounded-lg text-sm"
+                className="mf-input"
                 rows={2}
               />
             </div>
@@ -170,13 +174,13 @@ export default function SellerMenusPage() {
       {isLoading ? (
         <div className="text-center py-12 text-slate-500">Yükleniyor...</div>
       ) : menus.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center text-slate-500">
+        <div className="mf-surface p-12 text-center text-slate-500">
           Henüz menü oluşturulmamış.
         </div>
       ) : (
         <div className="space-y-4">
           {menus.map((menu) => (
-            <div key={menu.id} className="bg-white rounded-xl shadow-sm p-5">
+            <div key={menu.id} className="mf-surface p-5">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">

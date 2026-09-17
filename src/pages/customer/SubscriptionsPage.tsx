@@ -43,10 +43,10 @@ const groups: Record<Tab, SubscriptionStatus[]> = {
 
 function SubscriptionCard({ item }: { item: Subscription }) {
   return (
-    <article className="mf-surface group p-5 transition hover:-translate-y-0.5 hover:shadow-floating sm:p-6">
+    <article className="mf-surface group p-5 transition hover:shadow-floating sm:p-6">
       <Link to={`/subscriptions/${item.id}`} className="block">
         <div className="flex items-start gap-4">
-          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl">
+          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl">
             <MediaPlaceholder
               src={item.storeLogoUrl}
               alt={`${item.storeName} logosu`}
@@ -57,7 +57,7 @@ function SubscriptionCard({ item }: { item: Subscription }) {
           <div className="min-w-0 flex-1">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <h2 className="font-black text-ink transition group-hover:text-primary-600">
+                <h2 className="font-semibold text-ink transition group-hover:text-primary-600">
                   {item.storeName}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">{item.menuName}</p>
@@ -140,7 +140,7 @@ export default function SubscriptionsPage() {
           </Link>
         }
       />
-      <div className="flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-card">
+      <div className="flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-card">
         {tabs.map((item) => (
           <button
             key={item.value}
@@ -159,7 +159,7 @@ export default function SubscriptionsPage() {
               {[1, 2, 3].map((index) => (
                 <div
                   key={index}
-                  className="h-44 animate-pulse rounded-2xl bg-slate-200"
+                  className="h-44 animate-pulse rounded-xl bg-slate-200"
                 />
               ))}
             </>

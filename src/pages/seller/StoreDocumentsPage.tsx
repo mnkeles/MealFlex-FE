@@ -74,9 +74,13 @@ export default function StoreDocumentsPage() {
     : 0;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Belgeler ve mağaza onayı</h2>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e6e1d8] pb-5">
+        <div>
+          <p className="customer-eyebrow">Uyumluluk</p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Belgeler ve mağaza onayı</h2>
+          <p className="mt-1 text-sm text-slate-500">Geçerlilik tarihlerini ve inceleme durumlarını tek listede takip edin.</p>
+        </div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
@@ -85,7 +89,7 @@ export default function StoreDocumentsPage() {
         </button>
       </div>
       {onboarding && (
-        <section className="bg-white rounded-xl shadow-sm p-5 mb-6">
+        <section className="mf-surface p-5 mb-6">
           <div className="flex justify-between gap-4">
             <div>
               <h3 className="font-medium">Yayın hazırlığı</h3>
@@ -134,7 +138,7 @@ export default function StoreDocumentsPage() {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-xl shadow-sm p-6 mb-6"
+          className="mf-surface p-6 mb-6"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <label className="text-sm font-medium">
@@ -194,11 +198,11 @@ export default function StoreDocumentsPage() {
       {isLoading ? (
         <div className="text-center py-12 text-slate-500">Yükleniyor...</div>
       ) : documents.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center text-slate-500">
+        <div className="mf-surface p-12 text-center text-slate-500">
           Henüz belge yüklenmemiş.
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm divide-y">
+        <div className="mf-surface divide-y">
           {documents.map((doc) => (
             <div
               key={doc.id}

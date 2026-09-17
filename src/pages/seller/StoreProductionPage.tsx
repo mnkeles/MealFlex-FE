@@ -152,7 +152,7 @@ export default function StoreProductionPage() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-xl font-black">Operasyon ve Üretim Takvimi</h2>
+          <h2 className="text-xl font-semibold">Operasyon ve Üretim Takvimi</h2>
           <p className="mt-1 text-sm text-slate-500">
             Porsiyonları menü ve teslimat saatine göre mutfak için hazırlayın.
           </p>
@@ -184,7 +184,7 @@ export default function StoreProductionPage() {
           </button>
         </div>
       </div>
-      <div className="flex flex-wrap items-end gap-3 rounded-2xl border bg-white p-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-xl border bg-white p-4">
         <div className="flex rounded-xl bg-slate-100 p-1">
           <button
             onClick={() => setMode("day")}
@@ -221,20 +221,20 @@ export default function StoreProductionPage() {
         {(data) => (
           <>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border bg-white p-5">
+              <div className="rounded-xl border bg-white p-5">
                 <UtensilsCrossed className="h-5 w-5 text-primary-600" />
                 <p className="mt-3 text-sm text-slate-500">Toplam porsiyon</p>
-                <p className="text-3xl font-black">{data.totalPortions}</p>
+                <p className="text-3xl font-semibold">{data.totalPortions}</p>
               </div>
-              <div className="rounded-2xl border bg-white p-5">
+              <div className="rounded-xl border bg-white p-5">
                 <Users className="h-5 w-5 text-info-600" />
                 <p className="mt-3 text-sm text-slate-500">Teslimat</p>
-                <p className="text-3xl font-black">{data.totalDeliveries}</p>
+                <p className="text-3xl font-semibold">{data.totalDeliveries}</p>
               </div>
             </div>
             <section>
               <div className="mb-2">
-                <h3 className="font-black">Takvim</h3>
+                <h3 className="font-semibold">Takvim</h3>
               </div>
               <div
                 className={`grid gap-3 ${mode === "week" ? "sm:grid-cols-2 xl:grid-cols-7" : ""}`}
@@ -242,12 +242,12 @@ export default function StoreProductionPage() {
                 {data.days.map((day) => (
                   <article
                     key={day.date}
-                    className={`rounded-2xl border p-4 ${day.closedDateId ? "border-danger-200 bg-danger-50" : "bg-white"}`}
+                    className={`rounded-xl border p-4 ${day.closedDateId ? "border-danger-200 bg-danger-50" : "bg-white"}`}
                   >
                     <p className="text-xs font-bold uppercase text-slate-500">
                       {trDate(day.date)}
                     </p>
-                    <p className="mt-2 text-2xl font-black">{day.portions}</p>
+                    <p className="mt-2 text-2xl font-semibold">{day.portions}</p>
                     <p className="text-xs text-slate-500">
                       porsiyon · {day.deliveryCount} teslimat
                     </p>
@@ -255,7 +255,7 @@ export default function StoreProductionPage() {
                       <button
                         disabled={openDay.isPending}
                         onClick={() => openDay.mutate(day.closedDateId!)}
-                        className="mt-3 text-xs font-black text-success-700"
+                        className="mt-3 text-xs font-semibold text-success-700"
                       >
                         Günü yeniden aç
                       </button>
@@ -268,7 +268,7 @@ export default function StoreProductionPage() {
                             : ""
                         }
                         onClick={() => closeDay.mutate(day.date)}
-                        className="mt-3 text-xs font-black text-danger-600 disabled:cursor-not-allowed disabled:opacity-35"
+                        className="mt-3 text-xs font-semibold text-danger-600 disabled:cursor-not-allowed disabled:opacity-35"
                       >
                         Günü kapat
                       </button>
@@ -278,8 +278,8 @@ export default function StoreProductionPage() {
               </div>
             </section>
             <div className="grid gap-5 lg:grid-cols-2">
-              <section className="rounded-2xl border bg-white p-5">
-                <h3 className="font-black">Menü bazlı porsiyon</h3>
+              <section className="rounded-xl border bg-white p-5">
+                <h3 className="font-semibold">Menü bazlı porsiyon</h3>
                 <div className="mt-4 space-y-4">
                   {data.menus.map((menu) => (
                     <div key={menu.menuId}>
@@ -304,8 +304,8 @@ export default function StoreProductionPage() {
                   )}
                 </div>
               </section>
-              <section className="rounded-2xl border bg-white p-5">
-                <h3 className="font-black">Teslimat saati yoğunluğu</h3>
+              <section className="rounded-xl border bg-white p-5">
+                <h3 className="font-semibold">Teslimat saati yoğunluğu</h3>
                 <div className="mt-3 divide-y">
                   {data.timeSlots.map((slot) => (
                     <div
@@ -329,9 +329,9 @@ export default function StoreProductionPage() {
                 </div>
               </section>
             </div>
-            <section className="overflow-hidden rounded-2xl border bg-white">
+            <section className="overflow-hidden rounded-xl border bg-white">
               <div className="border-b p-4">
-                <h3 className="font-black">Toplu hazırlık listesi</h3>
+                <h3 className="font-semibold">Toplu hazırlık listesi</h3>
               </div>
               {rows.length ? (
                 <div className="overflow-x-auto">
@@ -355,7 +355,7 @@ export default function StoreProductionPage() {
                             </span>
                           </td>
                           <td className="p-3">{item.menuName}</td>
-                          <td className="p-3 text-lg font-black">
+                          <td className="p-3 text-lg font-semibold">
                             {item.personCount}
                           </td>
                           <td className="p-3">{item.customerName}</td>

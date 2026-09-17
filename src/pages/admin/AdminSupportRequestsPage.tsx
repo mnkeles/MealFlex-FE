@@ -60,10 +60,10 @@ export default function AdminSupportRequestsPage() {
                 <button key={item.id} type="button" onClick={() => open(item)}
                   className={`mf-surface w-full p-4 text-left transition ${selected?.id === item.id ? "ring-2 ring-primary-500" : "hover:border-primary-200"}`}>
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs font-black uppercase tracking-wide text-primary-600">#{item.id} · {statusLabels[item.status]}</span>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-primary-600">#{item.id} · {statusLabels[item.status]}</span>
                     <time className="text-xs text-slate-500">{new Date(item.createdAt).toLocaleDateString("tr-TR")}</time>
                   </div>
-                  <h2 className="mt-2 font-black text-ink">{item.subject}</h2>
+                  <h2 className="mt-2 font-semibold text-ink">{item.subject}</h2>
                   <p className="mt-1 text-sm text-slate-600">{item.contactName} · {item.accountRole === "SELLER" ? "Satıcı" : "Müşteri"}</p>
                 </button>
               ))}
@@ -74,11 +74,11 @@ export default function AdminSupportRequestsPage() {
               ) : (
                 <div className="space-y-5">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-wide text-primary-600">Talep #{selected.id}</p>
-                    <h2 className="mt-1 text-xl font-black text-ink">{selected.subject}</h2>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">Talep #{selected.id}</p>
+                    <h2 className="mt-1 text-xl font-semibold text-ink">{selected.subject}</h2>
                     <p className="mt-2 text-sm text-slate-600">{selected.contactName} · {selected.contactEmail}{selected.contactPhone ? ` · ${selected.contactPhone}` : ""}</p>
                   </div>
-                  <div className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700 whitespace-pre-wrap">{selected.message}</div>
+                  <div className="rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700 whitespace-pre-wrap">{selected.message}</div>
                   <label className="block text-sm font-bold text-slate-700">İşlem durumu
                     <select className="mf-input mt-2" value={status} onChange={(event) => setStatus(event.target.value as typeof status)}>
                       <option value="IN_PROGRESS">İşlemde</option><option value="ANSWERED">Yanıtlandı</option><option value="CLOSED">Kapatıldı</option>
@@ -91,7 +91,7 @@ export default function AdminSupportRequestsPage() {
                   {update.isError && <p role="alert" className="text-sm font-semibold text-danger-600">{parseApiError(update.error, "Talep güncellenemedi.").message}</p>}
                   {update.isSuccess && <p role="status" className="text-sm font-semibold text-success-700">Talep güncellendi{response ? " ve kullanıcıya bildirim gönderildi." : "."}</p>}
                   <button type="button" disabled={update.isPending || (status === "ANSWERED" && response.trim().length === 0)}
-                    onClick={() => update.mutate()} className="rounded-xl bg-primary-600 px-5 py-3 text-sm font-black text-white disabled:opacity-50">
+                    onClick={() => update.mutate()} className="rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">
                     {update.isPending ? "Kaydediliyor…" : "Talebi güncelle"}
                   </button>
                 </div>

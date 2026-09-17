@@ -124,7 +124,7 @@ export default function AdminRiskPage() {
         description="Çoklu hesap/kart kullanımı, anormal iade ve kupon suistimali sinyallerini inceleyin ve gerekçeli karar verin."
       />
 
-      <div className="rounded-2xl border border-info-100 bg-info-50 p-4 text-sm text-info-800">
+      <div className="rounded-xl border border-info-100 bg-info-50 p-4 text-sm text-info-800">
         Risk sinyalleri müşteri hesabını, ödemeyi veya iadeyi otomatik olarak
         değiştirmez. Her karar gerekçe, yönetici ve zaman bilgisiyle kayıt altına
         alınır; verilmiş karar yeniden incelemeye açılabilir.
@@ -259,7 +259,7 @@ export default function AdminRiskPage() {
       {decisionTarget && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/40 p-4">
           <section
-            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-floating"
             role="dialog"
             aria-modal="true"
             aria-label="Risk kararı"
@@ -267,10 +267,10 @@ export default function AdminRiskPage() {
             <div className="flex gap-3">
               <CircleAlert className="text-warning-600" />
               <div>
-                <p className="text-xs font-black uppercase tracking-wide text-primary-600">
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">
                   Risk kararı
                 </p>
-                <h2 className="font-black">
+                <h2 className="font-semibold">
                   {decisionTarget.decision === "ACKNOWLEDGED"
                     ? "Riski onayla ve işlem başlat"
                     : decisionTarget.decision === "DISMISSED"

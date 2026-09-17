@@ -32,9 +32,13 @@ export default function StoreReviewsPage() {
     "★".repeat(rating) + "☆".repeat(5 - rating);
 
   return (
-    <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold">Yorumlar</h2>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e6e1d8] pb-5">
+        <div>
+          <p className="customer-eyebrow">Müşteri geri bildirimi</p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Yorumlar</h2>
+          <p className="mt-1 text-sm text-slate-500">Puanları izleyin ve müşterilere mağaza adına yanıt verin.</p>
+        </div>
         <button
           onClick={() => setUnansweredOnly((value) => !value)}
           className={`rounded-lg border px-3 py-2 text-xs font-bold ${unansweredOnly ? "border-primary-300 bg-primary-50 text-primary-700" : "bg-white text-slate-600"}`}
@@ -66,7 +70,7 @@ export default function StoreReviewsPage() {
                 .map((review) => (
                   <div
                     key={review.id}
-                    className="bg-white rounded-xl shadow-sm p-5"
+                    className="mf-surface p-5"
                   >
                     <div className="flex items-start justify-between">
                       <div>

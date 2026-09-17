@@ -122,7 +122,7 @@ export default function AccountSecurityPanel({
         id="notification-preferences"
         className="scroll-mt-24 rounded-xl bg-white p-6 shadow-sm"
       >
-        <h2 className="flex items-center gap-2 font-black">
+        <h2 className="flex items-center gap-2 font-semibold">
           <ShieldCheck className="h-5 w-5 text-primary-600" />
           Hesap doğrulamaları
         </h2>
@@ -158,7 +158,7 @@ export default function AccountSecurityPanel({
         </div>
       </section>
       <section className="rounded-xl bg-white p-6 shadow-sm">
-        <h2 className="flex items-center gap-2 font-black">
+        <h2 className="flex items-center gap-2 font-semibold">
           <BellRing className="h-5 w-5 text-primary-600" />
           Bildirim kanalları
         </h2>
@@ -194,7 +194,7 @@ export default function AccountSecurityPanel({
         </button>
       </section>
       <section className="rounded-xl bg-white p-6 shadow-sm">
-        <h2 className="flex items-center gap-2 font-black">
+        <h2 className="flex items-center gap-2 font-semibold">
           <Database className="h-5 w-5 text-primary-600" />
           Verilerim ve sözleşmeler
         </h2>
@@ -232,7 +232,7 @@ export default function AccountSecurityPanel({
         </div>
       </section>
       <section className="rounded-xl border border-danger-200 bg-danger-50 p-6">
-        <h2 className="flex items-center gap-2 font-black text-danger-700">
+        <h2 className="flex items-center gap-2 font-semibold text-danger-700">
           <Trash2 className="h-5 w-5" />
           Hesabı sil
         </h2>

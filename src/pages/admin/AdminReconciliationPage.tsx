@@ -91,7 +91,7 @@ export default function AdminReconciliationPage() {
                         {money(item.paidPayoutAmount)}
                       </td>
                       <td
-                        className={`px-4 py-3 font-black ${item.discrepancyAmount ? "text-danger-600" : "text-success-700"}`}
+                        className={`px-4 py-3 font-semibold ${item.discrepancyAmount ? "text-danger-600" : "text-success-700"}`}
                       >
                         {money(item.discrepancyAmount)}
                       </td>
@@ -147,7 +147,7 @@ export default function AdminReconciliationPage() {
       {selected && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/40 p-4">
           <section
-            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-floating"
             role="dialog"
             aria-modal="true"
             aria-label="Mutabakat farkı inceleme"
@@ -155,10 +155,10 @@ export default function AdminReconciliationPage() {
             <div className="flex gap-3">
               <CircleAlert className="text-warning-600" />
               <div>
-                <p className="text-xs font-black uppercase tracking-wide text-primary-600">
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">
                   Finans incelemesi
                 </p>
-                <h2 className="font-black">Mutabakat farkını kapat</h2>
+                <h2 className="font-semibold">Mutabakat farkını kapat</h2>
                 <p className="mt-1 text-sm text-slate-500">
                   Fark: {money(selected.discrepancyAmount)}
                 </p>

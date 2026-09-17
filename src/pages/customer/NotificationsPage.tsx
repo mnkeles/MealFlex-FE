@@ -48,8 +48,8 @@ function NotificationSection({
   role: "CUSTOMER" | "ADMIN";
 }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <h2 className="border-b border-slate-100 px-5 py-3 text-xs font-black uppercase tracking-[.12em] text-slate-500">
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <h2 className="border-b border-slate-100 px-5 py-3 text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
         {title}
       </h2>
       {items.map((item) => {
@@ -65,7 +65,7 @@ function NotificationSection({
             />
             <span className="flex-1">
               <span className="flex items-center gap-2">
-                <span className="text-sm font-black">{item.title}</span>
+                <span className="text-sm font-semibold">{item.title}</span>
                 {item.read && (
                   <CheckCheck
                     className="h-4 w-4 text-success-500"

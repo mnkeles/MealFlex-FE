@@ -3,13 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
-  CalendarCheck,
-  CheckCircle2,
+  CalendarDays,
+  Flame,
+  Globe2,
   Heart,
+  Leaf,
   MapPin,
   RefreshCw,
   Search,
-  Store as StoreIcon,
+  Soup,
   UtensilsCrossed,
 } from "lucide-react";
 import { useCustomerAddress } from "@/contexts/CustomerAddressContext";
@@ -18,14 +20,19 @@ import { subscriptionService } from "@/services/subscriptionService";
 import StoreCard from "@/components/customer/StoreCard";
 import { discoveryLabels } from "@/constants/discovery";
 
+const categoryIcon = (category: string) => {
+  if (category.includes("VEGAN") || category.includes("SAGLIK")) return Leaf;
+  if (category.includes("IZGARA")) return Flame;
+  if (category.includes("SULU") || category.includes("EV_YEMEK")) return Soup;
+  if (category.includes("DUNYA")) return Globe2;
+  return UtensilsCrossed;
+};
+
 export default function HomePage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const {
-    activeAddress,
-    activeAddressId,
-    isLoading: addressLoading,
-  } = useCustomerAddress();
+  const { activeAddress, activeAddressId, isLoading: addressLoading } =
+    useCustomerAddress();
   const { data: stores, isLoading: storesLoading } = useQuery({
     queryKey: ["home-stores", activeAddressId],
     queryFn: () => storeService.getStores(activeAddressId!, { size: 6 }),
@@ -47,209 +54,169 @@ export default function HomePage() {
   const ongoing = subscriptions?.content.find((item) =>
     ["PAYMENT_PENDING", "APPROVED", "ACTIVE", "PAYMENT_SUSPENDED"].includes(item.status),
   );
-  const completed = subscriptions?.content.find(
-    (item) => item.status === "COMPLETED",
-  );
+  const completed = subscriptions?.content.find((item) => item.status === "COMPLETED");
 
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
     if (!activeAddressId) return navigate("/addresses");
-    navigate(
-      `/stores${search.trim() ? `?search=${encodeURIComponent(search.trim())}` : ""}`,
-    );
+    navigate(`/stores${search.trim() ? `?search=${encodeURIComponent(search.trim())}` : ""}`);
   };
 
-  if (addressLoading)
-    return <div className="h-80 animate-pulse rounded-3xl bg-slate-200" />;
+  if (addressLoading) return <div className="h-80 animate-pulse rounded-xl bg-[#eee8dd]" />;
 
   return (
-    <div className="space-y-10">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-700 via-danger-600 to-warning-500 px-6 py-12 text-white sm:px-10 lg:px-14 lg:py-16">
-        <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-warning-200/25 blur-3xl" />
-        <div className="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-white/20 blur-3xl" />
-        <div className="relative max-w-3xl">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-warning-100">
-            <MapPin className="h-4 w-4" />{" "}
-            {activeAddress
-              ? `${activeAddress.title} · ${activeAddress.district}`
-              : "Teslimat adresinizi seçin"}
-          </span>
-          <h1 className="mt-5 text-3xl font-black leading-tight sm:text-5xl">
-            İş yeriniz için her gün
-            <br />
-            <span className="text-warning-200">iyi yemek, tek abonelik.</span>
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-white/85 sm:text-lg">
-            Adresinize hizmet veren güvenilir işletmeleri keşfedin, haftalık
-            menüyü seçin ve öğünlerinizi planlayın.
+    <div className="space-y-10 lg:space-y-14">
+      <section className="grid overflow-hidden rounded-xl bg-[#243d32] text-white lg:min-h-[440px] lg:grid-cols-[1.04fr_.96fr]">
+        <div className="flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
+          <p className="text-xs font-semibold uppercase tracking-[.18em] text-[#e3c99f]">
+            Haftalık yemek, iyi plan
           </p>
-          <form
-            onSubmit={submitSearch}
-            className="mt-8 flex max-w-2xl gap-2 rounded-2xl bg-white p-2 shadow-2xl"
-          >
-            <Search className="ml-3 mt-3 h-5 w-5 shrink-0 text-slate-500" />
+          <h1 className="customer-display mt-4 max-w-xl text-[2.45rem] leading-[1.07] sm:text-[3.6rem] lg:text-[4rem]">
+            Öğle arası için iyi bir plan.
+          </h1>
+          <p className="mt-5 max-w-md text-sm leading-7 text-[#e7e9e1] sm:text-base">
+            Yakınınızdaki mutfakları keşfedin. Haftalık menünüzü seçin; yemeğiniz
+            her gün iş yerinize gelsin.
+          </p>
+          <form onSubmit={submitSearch} className="mt-7 flex max-w-xl items-center gap-2 rounded-lg bg-white p-1.5 text-ink">
+            <Search className="ml-3 h-5 w-5 shrink-0 text-[#777d74]" />
             <input
+              aria-label="İşletme veya menü ara"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="İşletme veya menü ara"
-              className="min-w-0 flex-1 bg-transparent px-2 text-sm text-slate-900 outline-none sm:text-base"
+              placeholder="Bugün ne yemek istersiniz?"
+              className="min-w-0 flex-1 bg-transparent px-1 py-2 text-sm outline-none placeholder:text-[#81867d] sm:text-base"
             />
-            <button className="rounded-xl bg-primary-600 px-5 py-3 text-sm font-bold text-white hover:bg-primary-700">
-              Keşfet
+            <button className="inline-flex h-10 items-center gap-2 rounded-md bg-primary-600 px-4 text-sm font-semibold text-white transition hover:bg-primary-700">
+              Ara <ArrowRight className="h-4 w-4" />
             </button>
           </form>
+          <p className="mt-4 flex items-center gap-1.5 text-xs text-[#e1dfd1]">
+            <MapPin className="h-3.5 w-3.5" />
+            {activeAddress
+              ? `${activeAddress.title} · ${activeAddress.district} için gösteriliyor`
+              : "Yakınınızdaki mutfaklar için teslimat adresi ekleyin"}
+          </p>
+        </div>
+        <div className="relative min-h-56 overflow-hidden bg-[#ddd0bb] lg:min-h-full">
+          <img
+            src="/images/login-meal-hero.jpg"
+            alt="Hazırlanmış yemekler ve salata"
+            className="absolute inset-0 h-full w-full object-cover object-[67%_55%]"
+          />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/35 to-transparent" />
+          <span className="absolute bottom-5 left-5 text-xs font-medium text-white sm:left-8">
+            Her güne farklı bir sofra
+          </span>
         </div>
       </section>
 
       {!activeAddress && (
-        <section className="rounded-2xl border border-dashed border-primary-300 bg-primary-50 p-8 text-center">
-          <MapPin className="mx-auto h-10 w-10 text-primary-600" />
-          <h2 className="mt-3 text-xl font-bold">
-            Önce teslimat adresinizi ekleyin
-          </h2>
-          <p className="mt-2 text-sm text-slate-600">
-            Yalnızca adresinize gerçekten hizmet veren işletmeleri göstereceğiz.
-          </p>
-          <Link
-            to="/addresses"
-            className="mt-5 inline-flex rounded-xl bg-primary-600 px-5 py-3 text-sm font-bold text-white"
-          >
+        <section className="flex flex-col gap-4 rounded-xl border border-[#e6e1d8] bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-ink">Önce teslimat adresinizi ekleyin</h2>
+            <p className="mt-1 text-sm text-slate-600">Size hizmet veren işletmeleri adresinize göre göstereceğiz.</p>
+          </div>
+          <Link to="/addresses" className="inline-flex shrink-0 items-center justify-center rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700">
             Adres Ekle
           </Link>
-        </section>
-      )}
-
-      {!!metadata?.categories.length && (
-        <section aria-labelledby="category-heading">
-          <div className="flex items-end justify-between gap-3">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[.14em] text-primary-600">
-                Hızlı keşif
-              </p>
-              <h2
-                id="category-heading"
-                className="mt-1 text-xl font-black text-ink"
-              >
-                Ne arıyorsunuz?
-              </h2>
-            </div>
-            <Link
-              to="/stores"
-              className="text-sm font-bold text-primary-700 hover:underline"
-            >
-              Tüm filtreler
-            </Link>
-          </div>
-          <div
-            className="mt-4 flex gap-3 overflow-x-auto pb-2"
-            aria-label="Mutfak kategorileri"
-          >
-            {metadata.categories.slice(0, 8).map((category) => (
-              <Link
-                key={category}
-                to={`/stores?category=${category}`}
-                className="flex min-w-28 flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-mf-xs transition hover:border-primary-300 hover:bg-primary-50"
-              >
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-accent-50 text-lg">
-                  🍽️
-                </span>
-                <span className="mt-3 text-sm font-black text-ink">
-                  {discoveryLabels[category] || category}
-                </span>
-              </Link>
-            ))}
-          </div>
         </section>
       )}
 
       {ongoing && (
         <Link
           to={`/subscriptions/${ongoing.id}`}
-          className="flex flex-col gap-4 rounded-2xl border border-success-200 bg-success-50 p-5 transition hover:shadow-md sm:flex-row sm:items-center"
+          className="group flex flex-col gap-4 rounded-xl border border-[#d9dfd5] bg-[#f0f4ed] px-5 py-4 transition hover:border-[#a6b6a0] sm:flex-row sm:items-center"
         >
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-success-600 text-white">
-            <CalendarCheck />
-          </div>
-          <div className="flex-1">
-            <p className="text-xs font-bold uppercase tracking-wide text-success-700">
-              Devam eden abonelik
-            </p>
-            <h2 className="font-bold text-slate-900">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[#294438] text-white">
+            <CalendarDays className="h-5 w-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="customer-eyebrow block text-[#4d6754]">Planınız devam ediyor</span>
+            <span className="mt-1 block text-base font-semibold text-ink">
               {ongoing.storeName} · {ongoing.menuName}
-            </h2>
-            <p className="mt-1 text-sm text-slate-600">
+            </span>
+            <span className="mt-0.5 block text-sm text-slate-600">
               {ongoing.nextDeliveryDate
-                ? `Sıradaki teslimat: ${new Date(ongoing.nextDeliveryDate).toLocaleDateString("tr-TR")}`
-                : "Teslimat planını görüntüleyin"}
-            </p>
-          </div>
-          <ArrowRight className="h-5 w-5 text-success-700" />
+                ? `Sıradaki teslimat ${new Date(ongoing.nextDeliveryDate).toLocaleDateString("tr-TR")}`
+                : "Teslimat planınızı görüntüleyin"}
+            </span>
+          </span>
+          <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#294438]">
+            Planı gör <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+          </span>
         </Link>
       )}
 
       {completed && (
         <Link
           to={`/subscriptions/${completed.id}`}
-          className="flex flex-wrap items-center gap-4 rounded-2xl border border-primary-100 bg-primary-50 p-5 transition hover:border-primary-300"
+          className="flex flex-wrap items-center gap-4 rounded-xl border border-[#e6e1d8] bg-white px-5 py-4 transition hover:border-primary-300"
         >
-          <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary-600 text-white">
-            <RefreshCw className="h-5 w-5" />
-          </span>
+          <RefreshCw className="h-5 w-5 text-primary-700" />
           <span className="min-w-0 flex-1">
-            <span className="block text-xs font-black uppercase tracking-wide text-primary-700">
-              Yeniden abonelik
-            </span>
-            <span className="mt-1 block font-black text-ink">
-              {completed.storeName} menüsünü yeniden oluşturun
-            </span>
-            <span className="mt-1 block text-sm text-slate-600">
-              Önceki aboneliğiniz tamamlandı; ayrıntılardan güncel menüyü
-              seçebilirsiniz.
-            </span>
+            <span className="block font-semibold text-ink">{completed.storeName} ile yeniden planlayın</span>
+            <span className="mt-0.5 block text-sm text-slate-600">Önceki aboneliğiniz tamamlandı. Güncel menüyü inceleyin.</span>
           </span>
-          <ArrowRight className="h-5 w-5 text-primary-700" />
+          <ArrowRight className="h-4 w-4 text-primary-700" />
         </Link>
+      )}
+
+      {!!metadata?.categories.length && (
+        <section aria-labelledby="category-heading">
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <p className="customer-eyebrow">Canınız ne çekiyor?</p>
+              <h2 id="category-heading" className="customer-display mt-1 text-3xl leading-tight text-ink sm:text-4xl">
+                Damak tadınıza göre keşfedin
+              </h2>
+            </div>
+            <Link to="/stores" className="hidden items-center gap-1 text-sm font-semibold text-primary-700 hover:underline sm:inline-flex">
+              Tüm mutfaklar <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="mt-5 flex gap-2 overflow-x-auto pb-2" aria-label="Mutfak kategorileri">
+            {metadata.categories.slice(0, 8).map((category) => {
+              const Icon = categoryIcon(category);
+              return (
+                <Link
+                  key={category}
+                  to={`/stores?category=${category}`}
+                  className="inline-flex min-h-12 shrink-0 items-center gap-2.5 rounded-lg border border-[#e3ded3] bg-white px-4 text-sm font-medium text-ink transition hover:border-primary-300 hover:bg-primary-50"
+                >
+                  <Icon className="h-4 w-4 text-primary-600" />
+                  {discoveryLabels[category] || category}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       {activeAddressId && (
         <section>
           <div className="mb-5 flex items-end justify-between gap-4">
             <div>
-              <p className="text-sm font-bold text-primary-600">
-                ADRESİNİZE UYGUN
-              </p>
-              <h2 className="mt-1 text-2xl font-black text-slate-900">
+              <p className="customer-eyebrow">Yakınınızda</p>
+              <h2 className="customer-display mt-1 text-3xl leading-tight text-ink sm:text-4xl">
                 Size hizmet veren işletmeler
               </h2>
+              <p className="mt-2 text-sm text-slate-600">İş yerinize teslimat yapan mutfakların haftalık menülerine göz atın.</p>
             </div>
-            <Link
-              to="/stores"
-              className="flex items-center gap-1 text-sm font-bold text-primary-600"
-            >
+            <Link to="/stores" className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary-700 hover:underline">
               Tümünü gör <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
           {storesLoading ? (
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="h-72 animate-pulse rounded-2xl bg-slate-200"
-                />
-              ))}
+              {[1, 2, 3].map((i) => <div key={i} className="h-80 animate-pulse rounded-xl bg-[#eee8dd]" />)}
             </div>
           ) : stores?.content.length ? (
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {stores.content.map((store) => (
-                <StoreCard
-                  key={store.id}
-                  store={store}
-                  addressId={activeAddressId}
-                />
-              ))}
+              {stores.content.map((store) => <StoreCard key={store.id} store={store} addressId={activeAddressId} />)}
             </div>
           ) : (
-            <div className="rounded-2xl bg-white p-10 text-center text-slate-500">
+            <div className="rounded-xl border border-[#e6e1d8] bg-white p-10 text-center text-slate-600">
               Bu adrese hizmet veren aktif işletme bulunamadı.
             </div>
           )}
@@ -260,75 +227,28 @@ export default function HomePage() {
         <section>
           <div className="mb-5 flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-black uppercase tracking-[.14em] text-primary-600">
-                Sizin için
-              </p>
-              <h2 className="mt-1 text-xl font-black text-ink">
-                Son görüntüledikleriniz
-              </h2>
+              <p className="customer-eyebrow">Kaldığınız yerden</p>
+              <h2 className="customer-display mt-1 text-3xl leading-tight text-ink">Son baktığınız mutfaklar</h2>
             </div>
-            <Link
-              to="/favorites"
-              className="flex items-center gap-1 text-sm font-bold text-primary-700"
-            >
+            <Link to="/favorites" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-700">
               Favoriler <Heart className="h-4 w-4" />
             </Link>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {recent.slice(0, 4).map((store) => (
-              <StoreCard
-                key={store.id}
-                store={store}
-                addressId={activeAddressId}
-                compact
-              />
-            ))}
+            {recent.slice(0, 4).map((store) => <StoreCard key={store.id} store={store} addressId={activeAddressId} compact />)}
           </div>
         </section>
       )}
 
-      <section className="rounded-3xl bg-white p-7 shadow-sm sm:p-10">
-        <div className="text-center">
-          <p className="text-sm font-bold text-primary-600">NASIL ÇALIŞIR?</p>
-          <h2 className="mt-2 text-2xl font-black">
-            Üç adımda öğünlerinizi planlayın
-          </h2>
+      <section className="customer-divider grid gap-6 border-t py-8 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] sm:gap-10">
+        <div>
+          <p className="customer-eyebrow">MealFlex nasıl çalışır?</p>
+          <h2 className="customer-display mt-2 text-2xl leading-tight text-ink sm:text-3xl">İyi yemek, kolay bir rutin.</h2>
         </div>
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
-          {[
-            [
-              StoreIcon,
-              "İşletmeni seç",
-              "Adresinize hizmet veren işletmeleri ve gerçek müşteri yorumlarını karşılaştırın.",
-            ],
-            [
-              UtensilsCrossed,
-              "Haftalık menüyü incele",
-              "Gün gün yemek programını görün ve size uygun menüyü seçin.",
-            ],
-            [
-              CheckCircle2,
-              "Talebini gönder",
-              "Kişi ve tarih bilgilerini belirleyin; satıcı onayından sonra aboneliğiniz başlasın.",
-            ],
-          ].map(([Icon, title, text], index) => {
-            const ItemIcon = Icon as typeof StoreIcon;
-            return (
-              <div
-                key={String(title)}
-                className="relative rounded-2xl bg-slate-50 p-6"
-              >
-                <span className="absolute right-5 top-4 text-4xl font-black text-slate-200">
-                  0{index + 1}
-                </span>
-                <ItemIcon className="h-8 w-8 text-primary-600" />
-                <h3 className="mt-5 font-bold">{String(title)}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {String(text)}
-                </p>
-              </div>
-            );
-          })}
+        <div className="grid gap-5 text-sm leading-6 text-slate-600 sm:grid-cols-3">
+          <p><strong className="mb-1 block font-semibold text-ink">01 · Mutfağınızı seçin</strong>Size yakın işletmeleri ve menülerini karşılaştırın.</p>
+          <p><strong className="mb-1 block font-semibold text-ink">02 · Haftayı planlayın</strong>Günleri, kişi sayısını ve teslimat saatini belirleyin.</p>
+          <p><strong className="mb-1 block font-semibold text-ink">03 · Yemeğinizi bekleyin</strong>Satıcı onayından sonra teslimatları hesabınızdan takip edin.</p>
         </div>
       </section>
     </div>

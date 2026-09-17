@@ -741,7 +741,7 @@ export default function StoreSettingsPage() {
                 rows={3}
               />
             </div>
-            <fieldset className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 md:col-span-2">
+            <fieldset className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 md:col-span-2">
               <legend className="px-1 text-sm font-bold text-slate-900">
                 Müşteriye gösterilecek etiketler
               </legend>

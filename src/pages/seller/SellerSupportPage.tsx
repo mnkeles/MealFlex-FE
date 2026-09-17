@@ -141,7 +141,7 @@ export default function SellerSupportPage() {
       <section>
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-black text-ink">Hızlı işlemler</h2>
+            <h2 className="text-lg font-semibold text-ink">Hızlı işlemler</h2>
             <p className="mt-1 text-sm text-slate-500">
               Sık kullanılan satıcı ekranlarına doğrudan ulaşın.
             </p>
@@ -157,16 +157,16 @@ export default function SellerSupportPage() {
             <Link
               key={item.title}
               to={item.path}
-              className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-lg"
+              className="group rounded-xl border border-slate-200 bg-white p-5 shadow-card transition hover:border-primary-200 hover:shadow-lg"
             >
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-600">
                 <Icon className="h-5 w-5" />
               </span>
-              <h3 className="mt-4 font-black text-ink">{item.title}</h3>
+              <h3 className="mt-4 font-semibold text-ink">{item.title}</h3>
               <p className="mt-1 min-h-10 text-sm leading-5 text-slate-500">
                 {item.description}
               </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-xs font-black text-primary-600">
+              <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-primary-600">
                 Ekranı aç
                 <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
               </span>
@@ -176,13 +176,13 @@ export default function SellerSupportPage() {
       </section>
 
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-600">
               <CircleHelp className="h-5 w-5" />
             </span>
             <div>
-              <h2 className="text-lg font-black text-ink">Sık sorulan sorular</h2>
+              <h2 className="text-lg font-semibold text-ink">Sık sorulan sorular</h2>
               <p className="text-sm text-slate-500">
                 {filteredFaqs.length} yardım içeriği gösteriliyor.
               </p>
@@ -210,7 +210,7 @@ export default function SellerSupportPage() {
             <div className="mt-4 divide-y divide-slate-100">
               {filteredFaqs.map((item) => (
                 <details key={item.question} className="group py-4">
-                  <summary className="cursor-pointer list-none pr-8 text-sm font-black text-slate-800 marker:hidden">
+                  <summary className="cursor-pointer list-none pr-8 text-sm font-semibold text-slate-800 marker:hidden">
                     <span className="mr-2 text-primary-600">+</span>
                     {item.question}
                   </summary>
@@ -230,28 +230,28 @@ export default function SellerSupportPage() {
         </div>
 
         <aside className="space-y-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card">
             <Store className="h-5 w-5 text-primary-600" />
-            <h2 className="mt-3 font-black text-ink">Mağaza ayarları</h2>
+            <h2 className="mt-3 font-semibold text-ink">Mağaza ayarları</h2>
             <p className="mt-1 text-sm leading-6 text-slate-500">
               Çalışma saatleri, teslimat bölgesi, personel ve belgeleri mağaza içinden yönetin.
             </p>
             <Link
               to={storePath("settings")}
-              className="mt-4 inline-flex items-center gap-1 text-sm font-black text-primary-600"
+              className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary-600"
             >
               Ayarlara git <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card">
             <Bell className="h-5 w-5 text-primary-600" />
-            <h2 className="mt-3 font-black text-ink">İşlem uyarıları</h2>
+            <h2 className="mt-3 font-semibold text-ink">İşlem uyarıları</h2>
             <p className="mt-1 text-sm leading-6 text-slate-500">
               Talep, teslimat ve hesap uyarılarını Bildirimler ekranından takip edin.
             </p>
             <Link
               to="/seller/notifications"
-              className="mt-4 inline-flex items-center gap-1 text-sm font-black text-primary-600"
+              className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary-600"
             >
               Bildirimleri aç <ArrowRight className="h-4 w-4" />
             </Link>

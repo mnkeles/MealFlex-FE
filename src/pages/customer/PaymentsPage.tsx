@@ -94,7 +94,7 @@ export default function PaymentsPage({
         description="Kart numaranız MealFlex sunucularında saklanmaz."
       />
       <div>
-        <h1 className="text-3xl font-black">
+        <h1 className="text-3xl font-semibold">
           {view === "methods"
             ? "Kayıtlı ödeme yöntemleri"
             : view === "history"
@@ -106,18 +106,18 @@ export default function PaymentsPage({
         </p>
       </div>
       {cardManagementResult === "success" && (
-        <p className="rounded-2xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
+        <p className="rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
           Kartlarınız iyzico üzerinden güvenle güncellendi.
         </p>
       )}
       {cardManagementResult === "failed" && (
-        <p className="rounded-2xl bg-danger-50 p-4 text-sm font-semibold text-danger-700">
+        <p className="rounded-xl bg-danger-50 p-4 text-sm font-semibold text-danger-700">
           Kart güncellemesi tamamlanamadı. Lütfen tekrar deneyin.
         </p>
       )}
       {showMethods && (
-        <section className="rounded-3xl border bg-white p-6">
-          <h2 className="flex items-center gap-2 text-lg font-black">
+        <section className="rounded-xl border bg-white p-6">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
             <CreditCard className="text-primary-600" />
             Kayıtlı kartlar
           </h2>
@@ -128,7 +128,7 @@ export default function PaymentsPage({
               {methods.map((method) => (
                 <div
                   key={method.id}
-                  className="flex items-center justify-between rounded-2xl border p-4"
+                  className="flex items-center justify-between rounded-xl border p-4"
                 >
                   <div>
                     <strong>
@@ -165,7 +165,7 @@ export default function PaymentsPage({
               Ödeme sağlayıcısı doğrulanamadı. Kart ekleme işlemi şu anda kapalı.
             </p>
           ) : paymentConfiguration.data?.provider === "IYZICO" ? (
-            <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
+            <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">
               <p className="text-sm text-slate-700">
                 Kart bilgilerinizi yalnız iyzico&apos;nun güvenli sayfasına girersiniz;
                 MealFlex kart numarası veya CVV almaz.
@@ -207,13 +207,13 @@ export default function PaymentsPage({
       )}
       {showHistory && (
         <>
-          <section className="rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-6">
+          <section className="rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="flex items-center gap-2 text-sm font-bold text-emerald-800">
                   <WalletCards className="h-5 w-5" /> Öğün bakiyesi
                 </p>
-                <p className="mt-2 text-3xl font-black text-emerald-900">
+                <p className="mt-2 text-3xl font-semibold text-emerald-900">
                   {(mealBalance?.availableAmount ?? 0).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} {mealBalance?.currency ?? "TRY"}
                 </p>
                 <p className="mt-2 max-w-xl text-sm text-emerald-800">
@@ -236,9 +236,9 @@ export default function PaymentsPage({
               </div>
             )}
           </section>
-        <section className="rounded-3xl border bg-white p-6">
+        <section className="rounded-xl border bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 text-lg font-black">
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
               <ReceiptText className="text-primary-600" />
               Ödeme ve iade geçmişi
             </h2>

@@ -25,14 +25,18 @@ export default function StoreSubscriptionsPage() {
   ];
 
   return (
-    <div>
-      <h2 className="text-lg font-semibold mb-4">Anlaşmalı Abonelikler</h2>
-      <div className="mb-5 flex flex-wrap gap-2">
+    <div className="space-y-6">
+      <div className="border-b border-[#e6e1d8] pb-5">
+        <p className="customer-eyebrow">Müşteri anlaşmaları</p>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Anlaşmalı abonelikler</h2>
+        <p className="mt-1 text-sm text-slate-500">Ödeme ve başlangıç durumuna göre devam eden anlaşmaları izleyin.</p>
+      </div>
+      <div className="flex flex-wrap gap-1 border-b border-[#e6e1d8]">
         {tabs.map((item) => (
           <button
             key={item.value}
             onClick={() => setTab(item.value)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium ${tab === item.value ? "bg-primary-600 text-white" : "bg-white text-slate-600 hover:bg-slate-50"}`}
+            className={`border-b-2 px-3 py-3 text-sm font-semibold ${tab === item.value ? "border-primary-600 text-primary-700" : "border-transparent text-slate-500 hover:text-ink"}`}
           >
             {item.label}
           </button>
@@ -42,14 +46,14 @@ export default function StoreSubscriptionsPage() {
       {isLoading ? (
         <div className="text-center py-12 text-slate-500">Yükleniyor...</div>
       ) : !data?.content.length ? (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center text-slate-500">
+        <div className="mf-surface p-12 text-center text-slate-500">
           Bu grupta abonelik bulunmuyor.
         </div>
       ) : (
         <div className="space-y-4">
           {data.content.map((sub) => {
             return (
-              <div key={sub.id} className="bg-white rounded-xl shadow-sm p-5">
+              <div key={sub.id} className="mf-surface p-5">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm text-slate-500">#{sub.id}</p>

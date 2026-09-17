@@ -279,12 +279,12 @@ export default function StorePendingPage() {
   return (
     <div
       className={
-        alarm ? "rounded-2xl ring-4 ring-warning-300 ring-offset-4" : ""
+        alarm ? "rounded-xl ring-4 ring-warning-300 ring-offset-4" : ""
       }
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-black">Canlı Abonelik Talepleri</h2>
+          <h2 className="text-xl font-semibold">Canlı Abonelik Talepleri</h2>
           <p className="mt-1 text-sm text-slate-500">
             Yeni talepler bu ekran açıkken anında görünür.
           </p>
@@ -308,7 +308,7 @@ export default function StorePendingPage() {
       <div
         role="tablist"
         aria-label="Onay talebi türleri"
-        className="mb-5 flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm"
+        className="mb-5 flex gap-2 overflow-x-auto rounded-xl border border-slate-200 bg-white p-2 shadow-sm"
       >
         {[
           ["SUBSCRIPTIONS", "Abonelik", allSubscriptions.length],
@@ -321,7 +321,7 @@ export default function StorePendingPage() {
             role="tab"
             aria-selected={activeTab === value}
             onClick={() => setActiveTab(value as typeof activeTab)}
-            className={`min-h-11 shrink-0 rounded-xl px-4 text-sm font-black transition ${
+            className={`min-h-11 shrink-0 rounded-xl px-4 text-sm font-semibold transition ${
               activeTab === value
                 ? "bg-primary-600 text-white"
                 : "text-slate-600 hover:bg-slate-100"
@@ -332,10 +332,10 @@ export default function StorePendingPage() {
         ))}
       </div>
       {activeTab === "DELIVERY_CHANGES" && !!changeRequests.data?.length && (
-        <section className="mb-5 rounded-2xl border border-info-200 bg-info-50 p-5">
+        <section className="mb-5 rounded-xl border border-info-200 bg-info-50 p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h3 className="font-black text-info-950">
+              <h3 className="font-semibold text-info-950">
                 Teslimat işlem talepleri
               </h3>
               <p className="text-sm text-info-700">
@@ -348,7 +348,7 @@ export default function StorePendingPage() {
                 başlanmamış teslimatlarında yapılabilir.
               </p>
             </div>
-            <span className="rounded-full bg-info-600 px-3 py-1 text-xs font-black text-white">
+            <span className="rounded-full bg-info-600 px-3 py-1 text-xs font-semibold text-white">
               {changeRequests.data.length} talep
             </span>
           </div>
@@ -367,7 +367,7 @@ export default function StorePendingPage() {
                       )}
                     </p>
                     {request.requestType === "CANCEL" ? (
-                      <p className="mt-2 inline-flex rounded-full bg-warning-100 px-3 py-1 text-xs font-black text-warning-800">
+                      <p className="mt-2 inline-flex rounded-full bg-warning-100 px-3 py-1 text-xs font-semibold text-warning-800">
                         Yemek servisi iptal talebi
                       </p>
                     ) : (
@@ -471,7 +471,7 @@ export default function StorePendingPage() {
       )}
       {activeTab === "DELIVERY_CHANGES" && !changeRequests.isLoading &&
         !changeRequests.isError && !changeRequests.data?.length && (
-          <p className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+          <p className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
             Onay bekleyen teslimat değişikliği talebi bulunmuyor.
           </p>
         )}
@@ -488,11 +488,11 @@ export default function StorePendingPage() {
           {(requests) => (
             <div className="space-y-4">
               {requests.map((request) => (
-                <article key={request.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <article key={request.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex flex-col justify-between gap-4 lg:flex-row">
                     <div>
                       <span className="text-xs font-bold text-slate-500">TALEP #{request.id}</span>
-                      <h3 className="mt-2 text-lg font-black">{request.customerName} · {request.menuName}</h3>
+                      <h3 className="mt-2 text-lg font-semibold">{request.customerName} · {request.menuName}</h3>
                       <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-600">
                         <span className="flex items-center gap-2"><Users className="h-4 w-4 text-primary-600" />{request.personCount} kişi</span>
                         <span className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-primary-600" />
@@ -507,13 +507,13 @@ export default function StorePendingPage() {
                       <button
                         onClick={() => approveExtension.mutate(request.id)}
                         disabled={approveExtension.isPending}
-                        className="min-h-11 rounded-xl bg-success-600 px-5 text-sm font-black text-white disabled:opacity-50"
+                        className="min-h-11 rounded-xl bg-success-600 px-5 text-sm font-semibold text-white disabled:opacity-50"
                       >
                         Onayla ve uzat
                       </button>
                       <button
                         onClick={() => setExtensionRejectId(request.id)}
-                        className="min-h-11 rounded-xl bg-danger-50 px-5 text-sm font-black text-danger-600"
+                        className="min-h-11 rounded-xl bg-danger-50 px-5 text-sm font-semibold text-danger-600"
                       >
                         Reddet
                       </button>
@@ -570,7 +570,7 @@ export default function StorePendingPage() {
       >
         {() => (
         <>
-        <section className="mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="mb-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex flex-wrap items-center gap-2">
             <select
               aria-label="Onay SLA filtresi"
@@ -624,7 +624,7 @@ export default function StorePendingPage() {
               type="button"
               onClick={() => setBulkConfirmOpen(true)}
               disabled={!selectedIds.size || bulkApprove.isPending}
-              className="ml-auto min-h-11 rounded-xl bg-success-600 px-4 text-sm font-black text-white disabled:opacity-40"
+              className="ml-auto min-h-11 rounded-xl bg-success-600 px-4 text-sm font-semibold text-white disabled:opacity-40"
             >
               Seçilenleri kabul et ({selectedIds.size})
             </button>
@@ -650,7 +650,7 @@ export default function StorePendingPage() {
             return (
               <article
                 key={sub.id}
-                className={`rounded-2xl border bg-white p-5 shadow-sm ${expired ? "border-danger-300" : "border-slate-200"}`}
+                className={`rounded-xl border bg-white p-5 shadow-sm ${expired ? "border-danger-300" : "border-slate-200"}`}
               >
                 <label className="mb-3 inline-flex items-center gap-2 text-sm font-bold text-slate-600">
                   <input
@@ -676,7 +676,7 @@ export default function StorePendingPage() {
                         TALEP #{sub.id}
                       </span>
                       {!sub.sellerViewedAt && (
-                        <span className="rounded-full bg-danger-100 px-2 py-0.5 text-[10px] font-black text-danger-700">
+                        <span className="rounded-full bg-danger-100 px-2 py-0.5 text-[10px] font-semibold text-danger-700">
                           YENİ
                         </span>
                       )}
@@ -687,7 +687,7 @@ export default function StorePendingPage() {
                         {remaining(sub.approvalDeadlineAt, now)}
                       </span>
                     </div>
-                    <h3 className="mt-2 text-lg font-black">
+                    <h3 className="mt-2 text-lg font-semibold">
                       {sub.customerName || "Müşteri"} · {sub.menuName}
                     </h3>
                     <div className="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2 lg:grid-cols-3">
@@ -728,13 +728,13 @@ export default function StorePendingPage() {
                     <button
                       onClick={() => approve.mutate(sub.id)}
                       disabled={approve.isPending}
-                      className="min-h-12 rounded-xl bg-success-600 px-6 text-sm font-black text-white disabled:opacity-50"
+                      className="min-h-12 rounded-xl bg-success-600 px-6 text-sm font-semibold text-white disabled:opacity-50"
                     >
                       Kabul et
                     </button>
                     <button
                       onClick={() => setRejectId(sub.id)}
-                      className="min-h-12 rounded-xl bg-danger-50 px-6 text-sm font-black text-danger-600"
+                      className="min-h-12 rounded-xl bg-danger-50 px-6 text-sm font-semibold text-danger-600"
                     >
                       Reddet
                     </button>
@@ -783,7 +783,7 @@ export default function StorePendingPage() {
           })}
         </div>
         ) : (
-          <p className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+          <p className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
             Seçili SLA filtresine uyan talep bulunmuyor.
           </p>
         )}

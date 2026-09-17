@@ -89,7 +89,7 @@ export default function ForgotPasswordPage({
       {message && (
         <p
           role={isError ? "alert" : "status"}
-          className={`mb-5 rounded-xl border p-3 text-sm leading-6 ${isError ? "border-danger-100 bg-danger-50 text-danger-700" : "border-info-100 bg-info-50 text-info-700"}`}
+          className={`mb-5 rounded-lg border p-3 text-sm leading-6 ${isError ? "border-danger-100 bg-danger-50 text-danger-700" : "border-info-100 bg-info-50 text-info-700"}`}
         >
           {message}
         </p>

@@ -137,7 +137,7 @@ export default function StoreComplaintsPage() {
 
                   <div className="mt-4 grid gap-4 rounded-xl border border-slate-100 bg-slate-50/60 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
                     <div>
-                      <p className="text-xs font-black uppercase tracking-[.08em] text-slate-500">
+                      <p className="text-xs font-semibold uppercase tracking-[.08em] text-slate-500">
                         Durum geçmişi
                       </p>
                       <div className="mt-3 space-y-0">
@@ -175,7 +175,7 @@ export default function StoreComplaintsPage() {
                     </div>
 
                     <div>
-                      <p className="text-xs font-black uppercase tracking-[.08em] text-slate-500">
+                      <p className="text-xs font-semibold uppercase tracking-[.08em] text-slate-500">
                         Yanıt
                       </p>
                       {c.sellerResponse && editingId !== c.id && (

@@ -120,7 +120,7 @@ export default function StoreFinancePage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-black">Finans hareket defteri</h2>
+          <h2 className="text-xl font-semibold">Finans hareket defteri</h2>
           <p className="mt-1 text-sm text-slate-500">
             Gerçekleşen teslimatlara göre oluşan net hakedişinizi takip edin.
           </p>
@@ -142,7 +142,7 @@ export default function StoreFinancePage() {
           </button>
         </div>
       </div>
-      <div className="flex flex-wrap gap-3 rounded-2xl border bg-white p-4">
+      <div className="flex flex-wrap gap-3 rounded-xl border bg-white p-4">
         <label className="text-xs text-slate-500">
           Başlangıç
           <input
@@ -181,18 +181,18 @@ export default function StoreFinancePage() {
       </div>
       <div className="grid gap-4">
         {cards.map(([label, value, color]) => (
-          <div key={String(label)} className="rounded-2xl border bg-white p-5">
+          <div key={String(label)} className="rounded-xl border bg-white p-5">
             <p className="text-sm text-slate-500">{label}</p>
-            <p className={`mt-2 text-2xl font-black ${color}`}>
+            <p className={`mt-2 text-2xl font-semibold ${color}`}>
               {money(Number(value))}
             </p>
           </div>
         ))}
       </div>
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <section className="overflow-hidden rounded-2xl border bg-white">
+        <section className="overflow-hidden rounded-xl border bg-white">
           <div className="border-b p-4">
-            <h3 className="font-black">Abonelik bazlı hareketler</h3>
+            <h3 className="font-semibold">Abonelik bazlı hareketler</h3>
             <p className="mt-1 text-xs text-slate-500">
               Dışa aktarımlar seçili tarih ve durum filtresini aynen kullanır.
             </p>
@@ -236,8 +236,8 @@ export default function StoreFinancePage() {
           )}
         </section>
         <aside className="space-y-4">
-          <div className="rounded-2xl border bg-white p-5">
-            <h3 className="font-black">Hakediş durumu</h3>
+          <div className="rounded-xl border bg-white p-5">
+            <h3 className="font-semibold">Hakediş durumu</h3>
             <p className="mt-1 text-xs text-slate-500">
               Haftanın son geçerli teslimatı tamamlandıktan sonra, o hafta
               teslim edilen öğünler üzerinden hesaplanır.
@@ -261,8 +261,8 @@ export default function StoreFinancePage() {
               </p>
             )}
           </div>
-          <div className="rounded-2xl border bg-white p-5">
-            <h3 className="font-black">Haftalık döküm</h3>
+          <div className="rounded-xl border bg-white p-5">
+            <h3 className="font-semibold">Haftalık döküm</h3>
             <div className="mt-3 divide-y">
               {weeks.map(([week, row]) => (
                 <div key={week} className="py-3 text-xs">

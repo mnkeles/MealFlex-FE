@@ -68,9 +68,10 @@ export default function StoreStaffPage() {
   const selectedRole = roles.find((item) => item.value === role) || roles[1];
 
   return (
-    <div>
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">Personel ve yetkiler</h2>
+    <div className="space-y-6">
+      <div className="border-b border-[#e6e1d8] pb-5">
+        <p className="customer-eyebrow">Ekip erişimi</p>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Personel ve yetkiler</h2>
         <p className="mt-1 text-sm text-slate-500">
           Rol seçimi, verilebilecek temel erişimleri aşağıda açıkça gösterir.
         </p>
@@ -81,7 +82,7 @@ export default function StoreStaffPage() {
             event.preventDefault();
             invite.mutate();
           }}
-          className="rounded-xl bg-white p-4 shadow-sm"
+          className="mf-surface p-4"
         >
           <h3 className="font-medium">Personel davet et</h3>
           <div className="mt-3 flex flex-wrap gap-3">
@@ -154,7 +155,7 @@ export default function StoreStaffPage() {
       {isLoading ? (
         <p>Yükleniyor...</p>
       ) : (
-        <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+        <div className="overflow-hidden mf-surface">
           <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto] gap-4 border-b bg-slate-50 px-4 py-3 text-xs font-bold text-slate-500 md:grid">
             <span>Personel</span>
             <span>Rol ve izinler</span>

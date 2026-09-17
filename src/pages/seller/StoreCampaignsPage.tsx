@@ -48,9 +48,10 @@ export default function StoreCampaignsPage() {
   const canContinue = step !== 0 || Boolean(form.name.trim());
 
   return (
-    <div>
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">Kampanyalar ve kuponlar</h2>
+    <div className="space-y-6">
+      <div className="border-b border-[#e6e1d8] pb-5">
+        <p className="customer-eyebrow">Büyüme araçları</p>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Kampanyalar ve kuponlar</h2>
         <p className="mt-1 text-sm text-slate-500">
           Koşulları sırayla tanımlayın; son adımda yayına alma tarihini kontrol
           edin.
@@ -61,7 +62,7 @@ export default function StoreCampaignsPage() {
           event.preventDefault();
           create.mutate();
         }}
-        className="rounded-xl bg-white p-5 shadow-sm"
+        className="mf-surface p-5"
       >
         <ol className="mb-6 grid gap-2 sm:grid-cols-3">
           {steps.map((label, index) => (
@@ -85,7 +86,7 @@ export default function StoreCampaignsPage() {
                 onChange={(event) =>
                   setForm({ ...form, name: event.target.value })
                 }
-                className="mt-1 w-full rounded-lg border px-3 py-2"
+                className="mf-input mt-1"
               />
             </label>
             <label className="text-sm font-medium">
@@ -97,7 +98,7 @@ export default function StoreCampaignsPage() {
                 onChange={(event) =>
                   setForm({ ...form, code: event.target.value.toUpperCase() })
                 }
-                className="mt-1 w-full rounded-lg border px-3 py-2"
+                className="mf-input mt-1"
               />
             </label>
           </div>
@@ -111,7 +112,7 @@ export default function StoreCampaignsPage() {
                 onChange={(event) =>
                   setForm({ ...form, campaignType: event.target.value })
                 }
-                className="mt-1 w-full rounded-lg border px-3 py-2"
+                className="mf-input mt-1"
               >
                 <option value="PERCENT">Yüzde indirim</option>
                 <option value="FIXED">Sabit indirim</option>
@@ -132,7 +133,7 @@ export default function StoreCampaignsPage() {
                     discountValue: Number(event.target.value),
                   })
                 }
-                className="mt-1 w-full rounded-lg border px-3 py-2"
+                className="mf-input mt-1"
               />
             </label>
             <label className="text-sm font-medium">
@@ -145,7 +146,7 @@ export default function StoreCampaignsPage() {
                 onChange={(event) =>
                   setForm({ ...form, minAmount: event.target.value })
                 }
-                className="mt-1 w-full rounded-lg border px-3 py-2"
+                className="mf-input mt-1"
               />
             </label>
             <label className="text-sm font-medium">
@@ -160,7 +161,7 @@ export default function StoreCampaignsPage() {
                     maxUsesPerCustomer: Number(event.target.value),
                   })
                 }
-                className="mt-1 w-full rounded-lg border px-3 py-2"
+                className="mf-input mt-1"
               />
             </label>
             <label className="flex items-center gap-2 text-sm font-medium md:col-span-2">
@@ -188,7 +189,7 @@ export default function StoreCampaignsPage() {
                 onChange={(event) =>
                   setForm({ ...form, startDate: event.target.value })
                 }
-                className="mt-1 w-full rounded-lg border px-3 py-2"
+                className="mf-input mt-1"
               />
             </label>
             <label className="text-sm font-medium">
@@ -200,7 +201,7 @@ export default function StoreCampaignsPage() {
                 onChange={(event) =>
                   setForm({ ...form, endDate: event.target.value })
                 }
-                className="mt-1 w-full rounded-lg border px-3 py-2"
+                className="mf-input mt-1"
               />
             </label>
             <aside className="rounded-lg bg-primary-50 p-4 text-sm text-primary-900 md:col-span-2">
@@ -242,7 +243,7 @@ export default function StoreCampaignsPage() {
           </p>
         )}
       </form>
-      <div className="mt-6 overflow-hidden rounded-xl bg-white shadow-sm">
+      <div className="mt-6 overflow-hidden mf-surface">
         {isLoading ? (
           <p className="p-4">Yükleniyor...</p>
         ) : campaigns.length === 0 ? (

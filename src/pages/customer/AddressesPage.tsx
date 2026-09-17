@@ -200,7 +200,7 @@ export default function AddressesPage() {
       <div className="hidden">
         <div>
           <p className="text-sm font-bold text-primary-600">TESLİMAT</p>
-          <h1 className="mt-1 text-3xl font-black">Adreslerim</h1>
+          <h1 className="mt-1 text-3xl font-semibold">Adreslerim</h1>
           <p className="mt-2 text-slate-500">
             İşletmeler seçtiğiniz teslimat konumuna göre listelenir.
           </p>
@@ -226,9 +226,9 @@ export default function AddressesPage() {
             event.preventDefault();
             save.mutate();
           }}
-          className="mt-7 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
+          className="mt-7 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
         >
-          <h2 className="text-xl font-black">
+          <h2 className="text-xl font-semibold">
             {editingId ? "Adresi düzenle" : "Yeni adres ekle"}
           </h2>
           <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,.9fr)] lg:items-start">
@@ -312,7 +312,7 @@ export default function AddressesPage() {
                 {addressPreview(form)}
               </div>
             </div>
-            <div className="overflow-hidden rounded-2xl border lg:sticky lg:top-24">
+            <div className="overflow-hidden rounded-xl border lg:sticky lg:top-24">
               <div className="flex items-center justify-between bg-slate-50 px-4 py-3">
                 <div>
                   <p className="text-sm font-bold">
@@ -365,9 +365,9 @@ export default function AddressesPage() {
       )}
 
       {isLoading ? (
-        <div className="mt-7 h-40 animate-pulse rounded-2xl bg-slate-200" />
+        <div className="mt-7 h-40 animate-pulse rounded-xl bg-slate-200" />
       ) : !addresses.length ? (
-        <div className="mt-7 rounded-2xl bg-white p-12 text-center text-slate-500">
+        <div className="mt-7 rounded-xl bg-white p-12 text-center text-slate-500">
           Henüz adres eklenmemiş.
         </div>
       ) : (
@@ -375,7 +375,7 @@ export default function AddressesPage() {
           {addresses.map((address) => (
             <article
               key={address.id}
-              className={`relative rounded-2xl border bg-white p-5 shadow-sm ${activeAddressId === address.id ? "border-primary-400 ring-2 ring-primary-100" : "border-slate-200"}`}
+              className={`relative rounded-xl border bg-white p-5 shadow-sm ${activeAddressId === address.id ? "border-primary-400 ring-2 ring-primary-100" : "border-slate-200"}`}
             >
               <div className="flex items-start gap-3">
                 <div
@@ -385,7 +385,7 @@ export default function AddressesPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <h2 className="font-black">{address.title}</h2>
+                    <h2 className="font-semibold">{address.title}</h2>
                     {activeAddressId === address.id && (
                       <span className="flex items-center gap-1 rounded-full bg-primary-50 px-2 py-1 text-[10px] font-bold text-primary-700">
                         <Check className="h-3 w-3" /> Aktif

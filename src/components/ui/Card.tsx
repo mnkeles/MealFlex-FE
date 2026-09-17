@@ -28,8 +28,8 @@ export function AlertCard({
     danger: "border-danger-100 bg-danger-50 text-danger-700",
   };
   return (
-    <section className={`rounded-2xl border p-4 ${styles[tone]} ${className}`}>
-      <h3 className="text-sm font-black">{title}</h3>
+    <section className={`rounded-xl border p-4 ${styles[tone]} ${className}`}>
+      <h3 className="text-sm font-semibold">{title}</h3>
       <div className="mt-1 text-sm leading-6">{children}</div>
     </section>
   );
@@ -51,7 +51,7 @@ export function ActionCard({
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="font-black">{title}</h3>
+        <h3 className="font-semibold">{title}</h3>
         <p className="mt-1 text-sm text-slate-500">{description}</p>
       </div>
       {action}

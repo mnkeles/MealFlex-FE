@@ -88,7 +88,7 @@ export default function SellerDashboard() {
       {hasDataError && (
         <div
           role="alert"
-          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-warning-200 bg-warning-50 p-4 text-sm font-semibold text-warning-800"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-warning-200 bg-warning-50 p-4 text-sm font-semibold text-warning-800"
         >
           <span>Bazı operasyon verileri yüklenemedi. Gösterilemeyen değerler “—” olarak işaretlendi.</span>
           <Button variant="outline" size="sm" onClick={retryData}>
@@ -132,13 +132,13 @@ export default function SellerDashboard() {
           <Link
             key={delivery.id}
             to={`/seller/stores/${storeId}/operations`}
-            className="flex flex-col gap-3 rounded-2xl border border-danger-100 bg-danger-50 p-4 transition hover:shadow-card sm:flex-row sm:items-center"
+            className="flex flex-col gap-3 rounded-xl border border-danger-100 bg-danger-50 p-4 transition hover:border-danger-200 sm:flex-row sm:items-center"
           >
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-danger-600 text-white">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-danger-600 text-white">
               <AlertTriangle className="h-5 w-5" />
             </span>
             <div className="flex-1">
-              <p className="text-sm font-black text-danger-700">
+              <p className="text-sm font-semibold text-danger-700">
                 Öncelikli teslimat: {delivery.customerName}
               </p>
               <p className="mt-1 text-sm text-danger-700/80">
@@ -148,7 +148,7 @@ export default function SellerDashboard() {
                 · {delivery.deliveryTime}
               </p>
             </div>
-            <span className="text-sm font-black text-danger-700">
+            <span className="text-sm font-semibold text-danger-700">
               Operasyonu aç →
             </span>
           </Link>
@@ -156,13 +156,13 @@ export default function SellerDashboard() {
         {!pendingSubsQuery.isError && pendingSubs?.totalElements ? (
           <Link
             to={`/seller/stores/${storeId}/pending`}
-            className="flex flex-col gap-3 rounded-2xl border border-warning-100 bg-warning-50 p-4 transition hover:shadow-card sm:flex-row sm:items-center"
+            className="flex flex-col gap-3 rounded-xl border border-warning-100 bg-warning-50 p-4 transition hover:border-warning-200 sm:flex-row sm:items-center"
           >
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-warning-600 text-white">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-warning-600 text-white">
               <BellRing className="h-5 w-5" />
             </span>
             <div className="flex-1">
-              <p className="text-sm font-black text-warning-700">
+              <p className="text-sm font-semibold text-warning-700">
                 Onay bekleyen abonelik talepleri var
               </p>
               <p className="mt-1 text-sm text-warning-700/80">
@@ -170,7 +170,7 @@ export default function SellerDashboard() {
                 operasyon sayfasına gidin.
               </p>
             </div>
-            <span className="text-sm font-black text-warning-700">
+            <span className="text-sm font-semibold text-warning-700">
               Talepleri aç →
             </span>
           </Link>
@@ -186,7 +186,7 @@ export default function SellerDashboard() {
                 Yaklaşan teslimatları ve anlık durumlarını takip edin.
               </p>
             </div>
-            <span className="rounded-lg bg-primary-50 px-2.5 py-1.5 text-xs font-black text-primary-700">
+            <span className="text-xs font-semibold text-primary-700">
               {deliveriesQuery.isError ? "Veri alınamadı" : `${deliveries.length} kayıt`}
             </span>
           </div>
@@ -208,11 +208,11 @@ export default function SellerDashboard() {
                   className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-slate-100 text-slate-600">
+                    <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#f3efe8] text-slate-600">
                       <CookingPot className="h-5 w-5" />
                     </span>
                     <div className="min-w-0">
-                      <p className="truncate font-black text-ink">
+                      <p className="truncate font-semibold text-ink">
                         {delivery.customerName}
                       </p>
                       <p className="mt-1 truncate text-sm text-slate-500">
@@ -221,7 +221,7 @@ export default function SellerDashboard() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-3 sm:justify-end">
-                    <span className="text-sm font-black text-slate-700">
+                    <span className="text-sm font-semibold text-slate-700">
                       {delivery.deliveryTime}
                     </span>
                     <StatusBadge domain="delivery" status={delivery.status} />

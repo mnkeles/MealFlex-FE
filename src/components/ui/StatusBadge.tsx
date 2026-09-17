@@ -63,7 +63,7 @@ export default function StatusBadge({
   return (
     <span
       title={definition?.description}
-      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-black ${tones[definition?.tone || tone]} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-md border border-current/10 px-2 py-1 text-[11px] font-semibold ${tones[definition?.tone || tone]} ${className}`}
     >
       {Icon && <Icon className="h-3 w-3" aria-hidden="true" />}
       {definition?.label || children}

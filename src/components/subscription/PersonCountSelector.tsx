@@ -35,7 +35,7 @@ export default function PersonCountSelector({
         max={maximum}
         value={value}
         onChange={(event) => update(Number(event.target.value) || minimum)}
-        className="w-28 border-0 text-center text-5xl font-black outline-none"
+        className="w-28 border-0 text-center text-5xl font-semibold outline-none"
       />
       <button
         type="button"

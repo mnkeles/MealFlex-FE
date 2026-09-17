@@ -37,7 +37,7 @@ export default function AccountSecurityPage() {
     );
   if (isError || !profile)
     return (
-      <div className="rounded-2xl border border-danger-100 bg-danger-50 p-5 text-sm font-semibold text-danger-700">
+      <div className="rounded-xl border border-danger-100 bg-danger-50 p-5 text-sm font-semibold text-danger-700">
         Hesap ve güvenlik bilgileri yüklenemedi. Lütfen tekrar deneyin.
       </div>
     );

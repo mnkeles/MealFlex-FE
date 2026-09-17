@@ -218,7 +218,7 @@ export default function AdminFinancePage() {
                   event.preventDefault();
                   setAppliedSearch(search);
                 }}
-                className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-card sm:flex-row sm:max-w-2xl"
+                className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-card sm:flex-row sm:max-w-2xl"
               >
                 <label className="relative flex-1">
                   <Search
@@ -385,7 +385,7 @@ export default function AdminFinancePage() {
                     </td>
                     <td className="px-4 py-3">{money(item.refundAmount)}</td>
                     <td className="px-4 py-3">{money(item.adjustmentAmount)}</td>
-                    <td className="px-4 py-3 font-black">
+                    <td className="px-4 py-3 font-semibold">
                       {money(item.netAmount)}
                     </td>
                     <td className="px-4 py-3">
@@ -454,7 +454,7 @@ export default function AdminFinancePage() {
       {tab === "configuration" && (
         <div className="grid gap-6 xl:grid-cols-2">
           <section className="mf-surface p-6">
-            <h2 className="text-lg font-black">Platform kuralları</h2>
+            <h2 className="text-lg font-semibold">Platform kuralları</h2>
             <p className="mt-1 text-sm text-slate-500">
               Değişiklikler yalnız yeni abonelik taleplerine uygulanır.
             </p>
@@ -508,7 +508,7 @@ export default function AdminFinancePage() {
             </Button>
           </section>
           <section className="mf-surface p-6">
-            <h2 className="text-lg font-black">Yeni komisyon kuralı</h2>
+            <h2 className="text-lg font-semibold">Yeni komisyon kuralı</h2>
             <p className="mt-1 text-sm text-slate-500">
               Mağaza boş bırakılırsa oran tüm mağazalar için geçerlidir.
             </p>
@@ -585,7 +585,7 @@ export default function AdminFinancePage() {
             )}
           </section>
           <section className="mf-surface overflow-x-auto p-6 xl:col-span-2">
-            <h2 className="text-lg font-black">Komisyon geçmişi</h2>
+            <h2 className="text-lg font-semibold">Komisyon geçmişi</h2>
             <table className="mt-4 w-full min-w-[700px] text-left text-sm">
               <thead className="border-b text-xs uppercase text-slate-500">
                 <tr>
@@ -610,8 +610,8 @@ export default function AdminFinancePage() {
       )}
       {payment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
-          <section className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h2 className="text-lg font-black">Ödeme iadesi</h2>
+          <section className="w-full max-w-md rounded-xl bg-white p-6 shadow-floating">
+            <h2 className="text-lg font-semibold">Ödeme iadesi</h2>
             <p className="mt-1 text-sm text-slate-500">
               İade edilebilir tutar: {money(availableRefund)}
             </p>
@@ -681,8 +681,8 @@ export default function AdminFinancePage() {
       )}
       {payoutToPay && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
-          <section className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h2 className="text-lg font-black">Hakedişi öde</h2>
+          <section className="w-full max-w-md rounded-xl bg-white p-6 shadow-floating">
+            <h2 className="text-lg font-semibold">Hakedişi öde</h2>
             <p className="mt-1 text-sm text-slate-500">
               {payoutToPay.storeName} için {money(payoutToPay.netAmount)} banka
               aktarımına gönderilecek. Bu işlem ikinci kez çalıştırılamaz.

@@ -85,7 +85,7 @@ export default function AdminUsersPage() {
   return (
     <div className="mf-page">
       <PageHeader
-        eyebrow="Platform"
+        eyebrow="Erişim yönetimi"
         title="Kullanıcılar"
         description="Müşteri, satıcı ve yönetici hesaplarını rol ve durum bilgileriyle yönetin."
       />

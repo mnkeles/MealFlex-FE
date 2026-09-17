@@ -70,7 +70,7 @@ export default function Drawer({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-950/40"
+      className="fixed inset-0 z-50 bg-[#252a24]/45 backdrop-blur-[2px]"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -78,18 +78,18 @@ export default function Drawer({
       <section
         ref={panelRef}
         onKeyDown={trapFocus}
-        className={`absolute inset-y-0 flex w-full max-w-md flex-col bg-white shadow-2xl ${side === "right" ? "right-0" : "left-0"}`}
+        className={`absolute inset-y-0 flex w-full max-w-md flex-col border-[#e6e1d8] bg-[#fffefa] shadow-floating ${side === "right" ? "right-0 border-l" : "left-0 border-r"}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="drawer-title"
       >
-        <header className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h2 id="drawer-title" className="font-black text-ink">
+        <header className="flex items-center justify-between border-b border-[#e6e1d8] px-5 py-4">
+          <h2 id="drawer-title" className="font-semibold text-ink">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+            className="rounded-lg p-2 text-slate-500 hover:bg-[#f3efe8]"
             aria-label="Paneli kapat"
           >
             <X size={20} />

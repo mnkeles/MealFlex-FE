@@ -26,7 +26,7 @@ export default function CriticalActionPanel({
           aria-hidden="true"
         />
         <div>
-          <h2 className="font-black text-danger-700">{title}</h2>
+          <h2 className="font-semibold text-danger-700">{title}</h2>
           <p className="mt-1 text-sm leading-6 text-slate-700">{description}</p>
         </div>
       </div>

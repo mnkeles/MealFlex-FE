@@ -54,18 +54,22 @@ export default function SellerSubscriptionsPage() {
   ];
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-6">Abonelikler</h1>
+    <div className="mf-page">
+      <div className="border-b border-[#e6e1d8] pb-5">
+        <p className="customer-eyebrow">Talep yönetimi</p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink">Abonelikler</h1>
+        <p className="mt-1 text-sm text-slate-500">Yeni talepleri değerlendirin ve aktif anlaşmaları durumlarına göre izleyin.</p>
+      </div>
 
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-1 overflow-x-auto border-b border-[#e6e1d8]">
         {tabs.map((t) => (
           <button
             key={t.label}
             onClick={() => setTab(t.value)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`shrink-0 border-b-2 px-3 py-3 text-sm font-semibold transition-colors ${
               tab === t.value
-                ? "bg-primary-600 text-white"
-                : "bg-white text-slate-600 hover:bg-slate-50"
+                ? "border-primary-600 text-primary-700"
+                : "border-transparent text-slate-500 hover:text-ink"
             }`}
           >
             {t.label}
@@ -76,14 +80,14 @@ export default function SellerSubscriptionsPage() {
       {isLoading ? (
         <div className="text-center py-12 text-slate-500">Yükleniyor...</div>
       ) : data?.content.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center text-slate-500">
+        <div className="mf-surface p-12 text-center text-slate-500">
           Abonelik bulunamadı.
         </div>
       ) : (
         <div className="space-y-4">
           {data?.content.map((sub) => {
             return (
-              <div key={sub.id} className="bg-white rounded-xl shadow-sm p-5">
+              <div key={sub.id} className="mf-surface p-5">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm text-slate-500">#{sub.id}</p>
@@ -126,7 +130,7 @@ export default function SellerSubscriptionsPage() {
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       aria-label="Abonelik ret nedeni"
-                      className="flex-1 rounded-lg border bg-white px-3 py-2 text-sm"
+                      className="mf-input flex-1"
                     >
                       <option value="">Ret nedeni seçin</option>
                       {rejectionReasons.map((reason) => (

@@ -17,10 +17,10 @@ export default function FileUpload({
 }: Props) {
   return (
     <label
-      className={`flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary-200 bg-primary-50/40 p-5 text-center transition hover:bg-primary-50 ${disabled ? "pointer-events-none opacity-50" : ""}`}
+      className={`flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-[#cfc6b9] bg-[#faf8f4] p-5 text-center transition hover:border-primary-300 hover:bg-primary-50/40 ${disabled ? "pointer-events-none opacity-50" : ""}`}
     >
       <ImagePlus className="text-primary-600" size={26} />
-      <span className="mt-2 text-sm font-black text-primary-700">{label}</span>
+      <span className="mt-2 text-sm font-semibold text-primary-700">{label}</span>
       <span className="mt-1 text-xs text-slate-500">
         {hint || `En fazla ${maxFiles} dosya seçebilirsiniz.`}
       </span>

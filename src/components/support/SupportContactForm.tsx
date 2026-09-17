@@ -43,13 +43,13 @@ export default function SupportContactForm() {
   };
 
   return (
-    <section className="rounded-2xl bg-slate-950 p-5 text-white shadow-card sm:p-7">
+    <section className="rounded-xl bg-slate-950 p-5 text-white shadow-card sm:p-7">
       <div className="flex items-start gap-4">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/10 text-primary-300">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white/10 text-primary-300">
           <LifeBuoy className="h-6 w-6" />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 className="text-xl font-black">Bize ulaşın</h2>
+          <h2 className="text-xl font-semibold">Bize ulaşın</h2>
           <p className="mt-1 text-sm leading-6 text-slate-300">
             İletişim bilgilerinizi ve yaşadığınız sorunu yazın. Talebiniz MealFlex
             destek ekibinin yönetim ekranına iletilir.
@@ -58,7 +58,7 @@ export default function SupportContactForm() {
       </div>
 
       {request.isSuccess ? (
-        <div role="status" className="mt-5 rounded-2xl bg-success-50 p-5 text-success-900">
+        <div role="status" className="mt-5 rounded-xl bg-success-50 p-5 text-success-900">
           <strong>Destek talebiniz alındı.</strong>
           <p className="mt-1 text-sm">
             Talep numaranız #{request.data.id}. Ekibimiz talebinizi yanıtladığında
@@ -67,7 +67,7 @@ export default function SupportContactForm() {
           <button
             type="button"
             onClick={() => request.reset()}
-            className="mt-3 text-sm font-black underline"
+            className="mt-3 text-sm font-semibold underline"
           >
             Yeni talep oluştur
           </button>
@@ -159,7 +159,7 @@ export default function SupportContactForm() {
             <button
               type="submit"
               disabled={request.isPending}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-black text-white disabled:opacity-50"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
               {request.isPending ? "Gönderiliyor…" : "Destek talebi gönder"}

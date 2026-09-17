@@ -47,11 +47,11 @@ function MenuCard({
   onSelect: () => void;
 }) {
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <article className={`overflow-hidden rounded-xl border bg-white transition ${selected ? "border-primary-400" : "border-[#e6e1d8] hover:border-[#cec6b9]"}`}>
       <div className="p-5 sm:p-6">
         <div className="flex items-start gap-4">
           {menuPhotos(menu).length > 0 && (
-            <div className="grid w-28 shrink-0 grid-cols-2 gap-1">
+            <div className="grid w-28 shrink-0 grid-cols-2 gap-1 overflow-hidden rounded-lg sm:w-32">
               {menuPhotos(menu)
                 .slice(0, 4)
                 .map((image, index) => (
@@ -60,16 +60,16 @@ function MenuCard({
                     src={image.imageUrl}
                     alt={`${menu.name} fotoğraf ${index + 1}`}
                     kind="menu"
-                    className="rounded-lg"
+                    className="overflow-hidden"
                   />
                 ))}
             </div>
           )}
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-black text-slate-900">{menu.name}</h3>
-              <span className="rounded-full bg-success-50 px-2 py-1 text-[11px] font-bold text-success-700">
-                Aktif
+              <h3 className="text-lg font-semibold tracking-tight text-ink">{menu.name}</h3>
+              <span className="rounded-md bg-[#edf2ea] px-2 py-1 text-[11px] font-semibold text-[#47614d]">
+                Haftalık
               </span>
             </div>
             {menu.description && (
@@ -82,7 +82,7 @@ function MenuCard({
                 {menu.dietTags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full bg-success-50 px-2 py-1 text-[11px] font-bold text-success-700"
+                    className="rounded-md bg-[#edf2ea] px-2 py-1 text-[11px] font-semibold text-[#47614d]"
                   >
                     {discoveryLabels[tag] || tag}
                   </span>
@@ -104,7 +104,7 @@ function MenuCard({
             )}
           </div>
           <div className="shrink-0 text-right">
-            <p className="text-xl font-black text-primary-600">
+            <p className="text-xl font-semibold text-ink">
               {menu.pricePerPerson.toLocaleString("tr-TR")} ₺
             </p>
             <p className="text-xs text-slate-500">kişi / gün</p>
@@ -118,8 +118,8 @@ function MenuCard({
             )}
           </div>
         </div>
-        <section className="mt-5 border-t border-slate-100 pt-4">
-          <p className="text-sm font-bold text-slate-800">Menüde yer alabilecek yemek çeşitleri</p>
+        <section className="customer-divider mt-5 border-t pt-4">
+          <p className="text-sm font-semibold text-ink">Menüde yer alabilecek yemek çeşitleri</p>
           <p className="mt-1 text-xs leading-5 text-slate-500">
             Günlük menü üretim planına göre değişebilir.
           </p>
@@ -128,7 +128,7 @@ function MenuCard({
               {menu.items.map((item) => (
                 <span
                   key={item.id}
-                  className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700"
+                  className="rounded-md bg-[#f4f1eb] px-3 py-1 text-xs font-medium text-slate-700"
                   title={item.description || undefined}
                 >
                   {item.name}
@@ -137,15 +137,15 @@ function MenuCard({
               ))}
             </div>
           ) : (
-            <p className="mt-3 rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-500">
+            <p className="mt-3 rounded-lg bg-[#f7f4ee] px-3 py-2 text-xs text-slate-500">
               Yemek çeşitleri henüz paylaşılmadı.
             </p>
           )}
         </section>
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+        <div className="customer-divider mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
           <span className="text-xs font-semibold text-slate-500">Haftalık planınız için uygundur</span>
           {disabled ? (
-            <span className="rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-bold text-slate-500">
+            <span className="rounded-lg bg-[#f4f1eb] px-5 py-2.5 text-sm font-semibold text-slate-500">
               Şu anda talep alınmıyor
             </span>
           ) : (
@@ -206,7 +206,7 @@ export default function StoreDetailPage() {
   }, [storeId]);
 
   if (isLoading)
-    return <div className="h-96 animate-pulse rounded-3xl bg-slate-200" />;
+    return <div className="h-96 animate-pulse rounded-xl bg-[#eee8dd]" />;
   if (isError || !store)
     return (
       <div className="mf-page">
@@ -219,12 +219,12 @@ export default function StoreDetailPage() {
 
   return (
     <div className="mf-page">
-      <Link to="/stores" className="text-sm font-bold text-primary-600">
+      <Link to="/stores" className="text-sm font-semibold text-primary-700">
         ← İşletmelere dön
       </Link>
-      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-card">
-        <div className="relative h-56 bg-gradient-to-br from-warning-100 to-danger-100 sm:h-72">
-          <MediaPlaceholder src={store.coverImageUrl} alt="" kind="menu" fit="contain" />
+      <section className="overflow-hidden rounded-xl border border-[#e6e1d8] bg-white">
+        <div className="relative h-64 bg-[#eee7db] sm:h-80">
+          <MediaPlaceholder src={store.coverImageUrl} alt="" kind="menu" fit="cover" />
           <div className="absolute right-4 top-4">
             <FavoriteButton storeId={store.id} />
           </div>
@@ -236,7 +236,7 @@ export default function StoreDetailPage() {
         </div>
         <div className="p-6 sm:p-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-            <div className="mt-2 grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-2xl border-4 border-white bg-white text-3xl shadow-lg">
+            <div className="-mt-14 grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-xl border-4 border-white bg-white text-3xl shadow-card sm:-mt-16">
               <MediaPlaceholder
                 src={store.logoUrl}
                 alt=""
@@ -246,7 +246,7 @@ export default function StoreDetailPage() {
               />
             </div>
             <div className="min-w-0 flex-1">
-              <h1 className="text-3xl font-black text-slate-900">
+              <h1 className="customer-display text-3xl text-ink sm:text-4xl">
                 {store.name}
               </h1>
               {store.description && (
@@ -255,18 +255,12 @@ export default function StoreDetailPage() {
                 </p>
               )}
               {!!store.categories?.length && (
-                <div className="mt-4 rounded-2xl bg-primary-50/70 p-3.5">
-                  <p className="text-xs font-bold text-primary-900">
-                    Mutfak tarzı ve menü özellikleri
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-slate-600">
-                    Bu işletmenin müşterileriyle paylaştığı öne çıkan bilgiler.
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-4">
+                  <div className="flex flex-wrap gap-2">
                     {store.categories.slice(0, 5).map((value) => (
                       <span
                         key={value}
-                        className="rounded-full bg-white px-3 py-1 text-xs font-bold text-primary-700 shadow-sm"
+                        className="rounded-md border border-[#e5ded2] bg-[#faf8f4] px-3 py-1 text-xs font-medium text-[#705849]"
                       >
                         {discoveryLabels[value] || value}
                       </span>
@@ -275,16 +269,16 @@ export default function StoreDetailPage() {
                 </div>
               )}
               <div className="mt-4 flex flex-wrap gap-3 text-sm">
-                <span className="flex items-center gap-1 rounded-lg bg-success-50 px-3 py-1.5 font-bold text-success-700">
-                  <Star className="h-4 w-4 fill-success-600" /> {store.rating} (
+                <span className="flex items-center gap-1 font-semibold text-ink">
+                  <Star className="h-4 w-4 fill-[#dfaa5d] text-[#dfaa5d]" /> {store.rating} (
                   {store.reviewCount} değerlendirme)
                 </span>
                 {store.distanceKm != null && (
-                  <span className="flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-1.5 text-slate-700">
+                  <span className="flex items-center gap-1 text-slate-600">
                     <MapPin className="h-4 w-4" /> {store.distanceKm} km
                   </span>
                 )}
-                <span className="flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-1.5 text-slate-700">
+                <span className="flex items-center gap-1 text-slate-600">
                   <Users className="h-4 w-4" /> Bu adres için min.{" "}
                   {store.effectiveMinPersonCount ?? store.minPersonCount} kişi
                 </span>
@@ -298,7 +292,8 @@ export default function StoreDetailPage() {
         <main>
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-2xl font-black">Abonelik menüleri</h2>
+              <p className="customer-eyebrow">Bu hafta</p>
+              <h2 className="customer-display mt-1 text-3xl text-ink">Abonelik menüleri</h2>
               <p className="mt-1 text-sm text-slate-500">
                 Sunulan yemek çeşitlerini inceleyerek size uygun menüyü seçin.
               </p>
@@ -309,7 +304,7 @@ export default function StoreDetailPage() {
                 value={menuSearch}
                 onChange={(event) => setMenuSearch(event.target.value)}
                 placeholder="Menüde ara"
-                className="h-10 rounded-xl border border-slate-200 pl-9 pr-3 text-sm outline-none focus:border-primary-400"
+                className="h-10 rounded-lg border border-[#dedbd3] bg-white pl-9 pr-3 text-sm outline-none focus:border-primary-400"
               />
             </label>
           </div>
@@ -325,7 +320,7 @@ export default function StoreDetailPage() {
                 />
               ))
             ) : (
-              <div className="rounded-2xl bg-white p-10 text-center text-slate-500">
+              <div className="rounded-xl border border-[#e6e1d8] bg-white p-10 text-center text-slate-500">
                 Aramanıza uygun menü bulunamadı.
               </div>
             )}
@@ -333,11 +328,11 @@ export default function StoreDetailPage() {
         </main>
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
           {selectedMenu && (
-            <div className="hidden rounded-2xl border border-primary-200 bg-primary-50 p-5 lg:block">
-              <p className="text-xs font-black uppercase tracking-wide text-primary-700">
+            <div className="hidden rounded-xl border border-[#d7d1c6] bg-[#f7f4ed] p-5 lg:block">
+              <p className="customer-eyebrow text-primary-700">
                 Abonelik özeti
               </p>
-              <h3 className="mt-2 font-black text-ink">{selectedMenu.name}</h3>
+              <h3 className="mt-2 font-semibold text-ink">{selectedMenu.name}</h3>
               <p className="mt-1 text-sm text-slate-600">
                 {selectedMenu.pricePerPerson.toLocaleString("tr-TR")} ₺ kişi /
                 gün
@@ -350,8 +345,8 @@ export default function StoreDetailPage() {
               </Link>
             </div>
           )}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <h3 className="flex items-center gap-2 font-black">
+          <div className="rounded-xl border border-[#e6e1d8] bg-white p-5">
+            <h3 className="flex items-center gap-2 font-semibold">
               <Clock3 className="h-5 w-5 text-primary-600" /> Çalışma saatleri
             </h3>
             <div className="mt-4 space-y-2">
@@ -376,8 +371,8 @@ export default function StoreDetailPage() {
               })}
             </div>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <h3 className="font-black">Teslimat bilgisi</h3>
+          <div className="rounded-xl border border-[#e6e1d8] bg-white p-5">
+            <h3 className="font-semibold">Teslimat bilgisi</h3>
             <p className="mt-3 flex items-start gap-2 text-sm text-slate-600">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />{" "}
               {activeAddress
@@ -389,7 +384,7 @@ export default function StoreDetailPage() {
               {store.effectiveMinPersonCount ?? store.minPersonCount} kişi
             </p>
             {store.nextAvailableDeliveryDate && (
-              <p className="mt-3 rounded-xl bg-success-50 p-3 text-sm font-bold text-success-700">
+              <p className="mt-3 rounded-lg bg-[#edf2ea] p-3 text-sm font-semibold text-[#47614d]">
                 İlk uygun teslimat:{" "}
                 {new Date(store.nextAvailableDeliveryDate).toLocaleDateString(
                   "tr-TR",
@@ -401,7 +396,7 @@ export default function StoreDetailPage() {
                 {store.availableDeliveryTimes.slice(0, 8).map((time) => (
                   <span
                     key={time}
-                    className="rounded-lg bg-slate-100 px-2 py-1 text-xs font-semibold"
+                    className="rounded-md bg-[#f4f1eb] px-2 py-1 text-xs font-semibold"
                   >
                     {time.slice(0, 5)}
                   </span>
@@ -429,7 +424,8 @@ export default function StoreDetailPage() {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-black">Müşteri değerlendirmeleri</h2>
+            <p className="customer-eyebrow">Deneyimler</p>
+            <h2 className="customer-display mt-1 text-3xl text-ink">Müşteri değerlendirmeleri</h2>
             <p className="mt-1 text-sm text-slate-500">
               Bu işletmeden hizmet alan müşterilerin yorumları
             </p>
@@ -440,7 +436,7 @@ export default function StoreDetailPage() {
             {reviews.content.map((review) => (
               <article
                 key={review.id}
-                className="rounded-2xl border border-slate-200 bg-white p-5"
+                className="rounded-xl border border-[#e6e1d8] bg-white p-5"
               >
                 <div className="flex justify-between">
                   <span className="font-bold">{review.customerName}</span>
@@ -468,7 +464,7 @@ export default function StoreDetailPage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl bg-white p-8 text-center text-sm text-slate-500">
+            <div className="rounded-xl border border-[#e6e1d8] bg-white p-8 text-center text-sm text-slate-500">
             Henüz değerlendirme yapılmamış.
           </div>
         )}

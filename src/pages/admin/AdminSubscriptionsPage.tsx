@@ -91,7 +91,7 @@ export default function AdminSubscriptionsPage() {
 
       <form
         onSubmit={submitSearch}
-        className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-card md:grid-cols-[1fr_220px_auto]"
+        className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-card md:grid-cols-[1fr_220px_auto]"
       >
         <label className="relative block">
           <Search
@@ -245,13 +245,13 @@ export default function AdminSubscriptionsPage() {
           aria-modal="true"
           aria-label="Abonelik operasyon detayı"
         >
-          <section className="h-full w-full max-w-2xl overflow-y-auto bg-white shadow-2xl">
+          <section className="h-full w-full max-w-2xl overflow-y-auto bg-white shadow-floating">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white p-5">
               <div>
-                <p className="text-xs font-black uppercase tracking-wide text-primary-600">
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">
                   Operasyon kaydı
                 </p>
-                <h2 className="text-lg font-black">Abonelik #{selectedId}</h2>
+                <h2 className="text-lg font-semibold">Abonelik #{selectedId}</h2>
                 <p className="text-sm text-slate-500">Detay ve işlem geçmişi</p>
               </div>
               <button
@@ -274,7 +274,7 @@ export default function AdminSubscriptionsPage() {
             )}
             {detailQuery.data && (
               <div className="space-y-6 p-5">
-                <div className="grid gap-3 rounded-2xl bg-slate-50 p-4 sm:grid-cols-2">
+                <div className="grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-2">
                   <div>
                     <p className="text-xs text-slate-500">Müşteri</p>
                     <p className="font-bold">
@@ -309,7 +309,7 @@ export default function AdminSubscriptionsPage() {
                 <div>
                   <div className="mb-2 flex items-center gap-2">
                     <CalendarClock size={18} className="text-primary-600" />
-                    <h3 className="font-black">Teslimatlar</h3>
+                    <h3 className="font-semibold">Teslimatlar</h3>
                   </div>
                   <div className="space-y-2">
                     {detailQuery.data.deliveries.map((delivery) => (
@@ -347,7 +347,7 @@ export default function AdminSubscriptionsPage() {
                 <div>
                   <div className="mb-2 flex items-center gap-2">
                     <FileText size={18} className="text-primary-600" />
-                    <h3 className="font-black">Yönetici notu ve işlem</h3>
+                    <h3 className="font-semibold">Yönetici notu ve işlem</h3>
                   </div>
                   <textarea
                     value={reason}
@@ -384,7 +384,7 @@ export default function AdminSubscriptionsPage() {
                   ) : null}
                 </div>
                 <div>
-                  <h3 className="mb-2 font-black">İşlem geçmişi</h3>
+                  <h3 className="mb-2 font-semibold">İşlem geçmişi</h3>
                   <ol className="space-y-2 border-l-2 border-slate-200 pl-4">
                     {detailQuery.data.events.length === 0 && (
                       <li className="text-sm text-slate-500">

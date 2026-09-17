@@ -330,13 +330,13 @@ export default function SellerStoresListPage() {
             {stores.map((store) => (
               <article
                 key={store.id}
-                className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-floating"
+                className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-floating"
               >
                 <div className="relative h-28 bg-gradient-to-br from-warning-100 via-cream to-success-100">
                   {store.coverImageUrl && (
                     <img src={store.coverImageUrl} alt="" className="h-full w-full object-contain" />
                   )}
-                  <div className="absolute -bottom-8 left-5 grid h-16 w-16 place-items-center overflow-hidden rounded-2xl border-4 border-white bg-white shadow-sm">
+                  <div className="absolute -bottom-8 left-5 grid h-16 w-16 place-items-center overflow-hidden rounded-xl border-4 border-white bg-white shadow-sm">
                     {store.logoUrl ? (
                       <img src={store.logoUrl} alt={`${store.name} logosu`} className="h-full w-full object-contain" />
                     ) : (
@@ -346,7 +346,7 @@ export default function SellerStoresListPage() {
                 </div>
                 <div className="p-5 pt-11">
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="min-w-0 truncate font-black text-slate-900">{store.name}</h3>
+                    <h3 className="min-w-0 truncate font-semibold text-slate-900">{store.name}</h3>
                     <StatusBadge domain="store" status={store.status} />
                   </div>
                   <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-slate-500">

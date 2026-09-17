@@ -75,7 +75,7 @@ export default function AdminAuditSearchPage() {
       />
 
       <section className="mf-surface p-4">
-        <h2 className="font-black text-ink">Kayıt bul</h2>
+        <h2 className="font-semibold text-ink">Kayıt bul</h2>
         <form onSubmit={(event) => { event.preventDefault(); setTerm(input.trim()); }} className="mt-3 flex flex-col gap-3 sm:flex-row">
           <label className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
@@ -91,7 +91,7 @@ export default function AdminAuditSearchPage() {
           <section className="grid gap-4 md:grid-cols-2">
             {results.map(([type, value]) => (
               <article key={type} className="mf-surface p-5">
-                <div className="flex items-center justify-between gap-3"><h2 className="font-black text-ink">{readableType[type] || type}</h2><StatusBadge tone="info">Eşleşen kayıt</StatusBadge></div>
+                <div className="flex items-center justify-between gap-3"><h2 className="font-semibold text-ink">{readableType[type] || type}</h2><StatusBadge tone="info">Eşleşen kayıt</StatusBadge></div>
                 <dl className="mt-4 space-y-2 text-sm">
                   {Object.entries(value as Record<string, unknown>).map(([key, item]) => (
                     <div key={key} className="grid grid-cols-[minmax(100px,.35fr)_1fr] gap-3 border-b border-slate-100 pb-2 last:border-0"><dt className="font-semibold text-slate-500">{key}</dt><dd className="break-all font-medium text-slate-700">{safeValue(key, item)}</dd></div>
@@ -107,7 +107,7 @@ export default function AdminAuditSearchPage() {
 
       <section className="mf-surface p-4" aria-label="Audit filtreleri">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2"><SlidersHorizontal className="h-4 w-4 text-primary-600" /><h2 className="font-black text-ink">Audit hareketleri</h2></div>
+          <div className="flex items-center gap-2"><SlidersHorizontal className="h-4 w-4 text-primary-600" /><h2 className="font-semibold text-ink">Audit hareketleri</h2></div>
           {hasAuditFilters && <Button variant="ghost" size="sm" onClick={resetAuditFilters}>Filtreleri temizle</Button>}
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">

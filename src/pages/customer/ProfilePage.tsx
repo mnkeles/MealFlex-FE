@@ -66,7 +66,7 @@ export default function ProfilePage() {
   if (profileQuery.isLoading)
     return (
       <div className="mf-page">
-        <div className="h-80 animate-pulse rounded-2xl bg-slate-200" />
+        <div className="h-80 animate-pulse rounded-xl bg-slate-200" />
       </div>
     );
   if (profileQuery.isError || !profileQuery.data)

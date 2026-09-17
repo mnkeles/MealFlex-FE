@@ -259,8 +259,8 @@ export default function StoreSubscriptionDetailPage() {
           aria-modal="true"
           aria-labelledby="seller-cancel-title"
         >
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
-            <h3 id="seller-cancel-title" className="text-xl font-black">
+          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-floating">
+            <h3 id="seller-cancel-title" className="text-xl font-semibold">
               Aboneliği iptal et
             </h3>
             <p className="mt-2 text-sm text-slate-600">

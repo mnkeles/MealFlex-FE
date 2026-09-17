@@ -71,7 +71,7 @@ export default function AuditTimeline({
       <div className="flex items-center gap-2 border-b border-slate-200 p-5">
         <ShieldCheck className="text-primary-600" size={18} />
         <div>
-          <h2 className="font-black text-ink">{title}</h2>
+          <h2 className="font-semibold text-ink">{title}</h2>
           <p className="text-sm text-slate-500">{description}</p>
         </div>
       </div>

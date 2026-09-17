@@ -31,10 +31,11 @@ export default function StoreAnalyticsPage() {
   );
 
   return (
-    <div>
-      <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e6e1d8] pb-5">
         <div>
-          <h2 className="text-lg font-semibold">Analitik</h2>
+          <p className="customer-eyebrow">Performans</p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Analitik</h2>
           <p className="text-sm text-slate-500">
             Teslim edilen siparişler ve müşteri değerlendirmeleri
           </p>
@@ -47,7 +48,7 @@ export default function StoreAnalyticsPage() {
               value={startDate}
               max={endDate}
               onChange={(event) => setStartDate(event.target.value)}
-              className="block mt-1 px-3 py-1.5 border rounded-lg text-sm text-slate-700"
+              className="mf-input mt-1 h-10"
             />
           </label>
           <label className="text-xs text-slate-500">
@@ -57,7 +58,7 @@ export default function StoreAnalyticsPage() {
               value={endDate}
               min={startDate}
               onChange={(event) => setEndDate(event.target.value)}
-              className="block mt-1 px-3 py-1.5 border rounded-lg text-sm text-slate-700"
+              className="mf-input mt-1 h-10"
             />
           </label>
         </div>
@@ -69,13 +70,13 @@ export default function StoreAnalyticsPage() {
         data && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-xl shadow-sm p-5">
+              <div className="mf-surface p-5">
                 <p className="text-sm text-slate-500">Ortalama Puan</p>
                 <p className="text-3xl font-bold text-warning-500 mt-1">
                   {Number(data.rating).toFixed(1)} / 5
                 </p>
               </div>
-              <div className="bg-white rounded-xl shadow-sm p-5">
+              <div className="mf-surface p-5">
                 <p className="text-sm text-slate-500">Toplam Yorum</p>
                 <p className="text-3xl font-bold text-slate-900 mt-1">
                   {data.reviewCount}
@@ -83,7 +84,7 @@ export default function StoreAnalyticsPage() {
               </div>
             </div>
 
-            <section className="bg-white rounded-xl shadow-sm p-5">
+            <section className="mf-surface p-5">
               <h3 className="font-semibold mb-4">Günlük Teslimat Porsiyonu</h3>
               {!data.deliveryTrend.length ? (
                 <p className="text-sm text-slate-500">
@@ -119,7 +120,7 @@ export default function StoreAnalyticsPage() {
             </section>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <section className="bg-white rounded-xl shadow-sm p-5">
+              <section className="mf-surface p-5">
                 <h3 className="font-semibold mb-4">Popüler Menüler</h3>
                 {!data.popularMenus.length ? (
                   <p className="text-sm text-slate-500">Veri bulunmuyor.</p>
@@ -146,7 +147,7 @@ export default function StoreAnalyticsPage() {
                 )}
               </section>
 
-              <section className="bg-white rounded-xl shadow-sm p-5">
+              <section className="mf-surface p-5">
                 <h3 className="font-semibold mb-4">Puan Dağılımı</h3>
                 <div className="space-y-3">
                   {[5, 4, 3, 2, 1].map((rating) => {

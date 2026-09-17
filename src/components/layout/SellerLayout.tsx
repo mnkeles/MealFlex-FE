@@ -195,7 +195,7 @@ export default function SellerLayout() {
         </div>
       )}
       <aside
-        className={`fixed z-40 hidden min-h-screen overflow-visible border-r border-slate-200 bg-white transition-[width] duration-300 ease-in-out md:block ${isSidebarCollapsed ? "w-20" : "w-72"}`}
+        className={`fixed z-40 hidden min-h-screen overflow-visible border-r border-[#e6e1d8] bg-[#fdfcf9] transition-[width] duration-300 ease-in-out md:block ${isSidebarCollapsed ? "w-20" : "w-72"}`}
       >
         <div
           className={`relative flex h-[89px] items-center border-b border-slate-100 ${isSidebarCollapsed ? "justify-center px-3" : "justify-between px-6"}`}
@@ -205,7 +205,7 @@ export default function SellerLayout() {
               <MealFlexLogo
                 showWordmark={!isSidebarCollapsed}
                 iconClassName="h-9 w-9"
-                wordmarkClassName="text-xl font-black tracking-tight text-primary-600"
+                wordmarkClassName="text-xl font-semibold tracking-tight text-primary-600"
               />
             </Link>
             {!isSidebarCollapsed && (
@@ -238,8 +238,8 @@ export default function SellerLayout() {
               onClick={guardNavigation}
               className={`flex items-center rounded-lg py-2.5 text-sm font-medium transition-colors ${isSidebarCollapsed ? "justify-center px-2" : "gap-3 px-4"} ${
                 location.pathname.startsWith(item.path)
-                  ? "bg-primary-50 text-primary-700 shadow-sm"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "border-l-2 border-primary-600 bg-white text-primary-700"
+                  : "border-l-2 border-transparent text-slate-600 hover:bg-white hover:text-slate-900"
               }`}
               title={isSidebarCollapsed ? item.label : undefined}
             >
@@ -270,10 +270,10 @@ export default function SellerLayout() {
             <div
               role="menu"
               aria-label="Hesap işlemleri"
-              className={`absolute bottom-full mb-2 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 text-left shadow-xl ${isSidebarCollapsed ? "left-2 w-64" : "left-4 right-4"}`}
+              className={`absolute bottom-full mb-2 overflow-hidden rounded-xl border border-[#e6e1d8] bg-white p-2 text-left shadow-floating ${isSidebarCollapsed ? "left-2 w-64" : "left-4 right-4"}`}
             >
               <div className="border-b border-slate-100 px-3 py-2">
-                <p className="truncate text-sm font-black text-ink">
+              <p className="truncate text-sm font-semibold text-ink">
                   {user?.firstName} {user?.lastName}
                 </p>
                 <p className="truncate text-xs text-slate-500">{user?.email}</p>
@@ -337,14 +337,14 @@ export default function SellerLayout() {
             title={isSidebarCollapsed ? "Hesap menüsü" : undefined}
             className={`flex w-full items-center rounded-xl text-left transition hover:bg-slate-50 ${isSidebarCollapsed ? "h-11 justify-center" : "gap-3 px-2 py-2"}`}
           >
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-900 text-xs font-black text-white">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-900 text-xs font-semibold text-white">
               {user?.firstName?.[0]}
               {user?.lastName?.[0]}
             </span>
             {!isSidebarCollapsed && (
               <>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-black text-slate-700">
+                  <span className="block truncate text-sm font-semibold text-slate-700">
                     {user?.firstName} {user?.lastName}
                   </span>
                   <span className="block text-xs text-slate-500">Hesap işlemleri</span>
@@ -364,7 +364,7 @@ export default function SellerLayout() {
           <Link to="/seller/stores" onClick={guardNavigation}>
             <MealFlexLogo
               iconClassName="h-8 w-8"
-              wordmarkClassName="text-lg font-black tracking-tight text-primary-600"
+              wordmarkClassName="text-lg font-semibold tracking-tight text-primary-600"
             />
           </Link>
           <Link
@@ -387,7 +387,7 @@ export default function SellerLayout() {
                 if (id && confirmSellerStoreNavigation())
                   navigate(`/seller/stores/${id}/${activeStoreSection}`);
               }}
-              className="h-10 min-w-48 max-w-sm rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-ink outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100"
+              className="h-10 min-w-48 max-w-sm rounded-lg border border-[#ddd7cc] bg-white px-3 text-sm font-semibold text-ink outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
             >
               <option value="">Mağaza seçin</option>
               {stores.map((store) => (
@@ -402,7 +402,7 @@ export default function SellerLayout() {
               to="/seller/notifications"
               onClick={guardNavigation}
               aria-label="Bildirimler"
-              className="relative grid h-10 w-10 place-items-center rounded-xl text-slate-600 hover:bg-slate-100"
+              className="relative grid h-10 w-10 place-items-center rounded-lg text-slate-600 hover:bg-[#f3efe8]"
             >
               <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
@@ -414,7 +414,7 @@ export default function SellerLayout() {
             <Link
               to="/seller/profile"
               onClick={guardNavigation}
-              className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm font-bold text-slate-700 hover:bg-slate-100"
+              className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-semibold text-slate-700 hover:bg-[#f3efe8]"
             >
               <span className="grid h-8 w-8 place-items-center rounded-full bg-slate-900 text-xs text-white">
                 {user?.firstName?.[0]}

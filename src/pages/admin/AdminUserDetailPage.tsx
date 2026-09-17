@@ -162,7 +162,7 @@ export default function AdminUserDetailPage() {
         <article className="mf-surface p-6">
           <div className="mb-4 flex items-center gap-2">
             <UserRound size={18} className="text-primary-600" />
-            <h2 className="font-black">Kullanıcı bilgileri</h2>
+            <h2 className="font-semibold">Kullanıcı bilgileri</h2>
           </div>
           {editing ? (
             <div className="space-y-4">
@@ -241,7 +241,7 @@ export default function AdminUserDetailPage() {
         </article>
         {(customerProfile || sellerProfile) && (
           <article className="mf-surface p-6">
-            <h2 className="font-black">
+            <h2 className="font-semibold">
               {customerProfile ? "Müşteri profili" : "Satıcı profili"}
             </h2>
             <dl className="mt-4">
@@ -274,7 +274,7 @@ export default function AdminUserDetailPage() {
       <section className="mf-surface p-6">
         <div className="mb-4 flex items-center gap-2">
           <MapPin size={18} className="text-primary-600" />
-          <h2 className="font-black">Adresler ({addresses.length})</h2>
+          <h2 className="font-semibold">Adresler ({addresses.length})</h2>
         </div>
         {addresses.length ? (
           <div className="grid gap-3 md:grid-cols-2">
@@ -301,7 +301,7 @@ export default function AdminUserDetailPage() {
       </section>
       <section className="mf-surface overflow-hidden">
         <div className="border-b border-slate-200 p-5">
-          <h2 className="font-black">
+          <h2 className="font-semibold">
             İlişkili abonelikler ({subscriptions.length})
           </h2>
         </div>
@@ -343,7 +343,7 @@ export default function AdminUserDetailPage() {
       <section className="mf-surface p-6">
         <div className="mb-4 flex items-center gap-2">
           <ShieldAlert size={18} className="text-warning-600" />
-          <h2 className="font-black">Şikâyetler ({complaints.length})</h2>
+          <h2 className="font-semibold">Şikâyetler ({complaints.length})</h2>
         </div>
         {complaints.length ? (
           <div className="space-y-3">

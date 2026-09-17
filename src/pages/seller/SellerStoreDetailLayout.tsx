@@ -145,7 +145,7 @@ export default function SellerStoreDetailLayout() {
 
   return (
     <div className="min-w-0 space-y-5">
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
         <Link
           to="/seller/stores"
           onClick={(event) => {
@@ -157,11 +157,11 @@ export default function SellerStoreDetailLayout() {
         </Link>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary-50 text-primary-600">
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary-50 text-primary-600">
               <Store size={21} />
             </span>
             <div>
-              <h1 className="text-2xl font-black tracking-tight text-ink">
+              <h1 className="text-2xl font-semibold tracking-tight text-ink">
                 {store?.name || "Mağaza"}
               </h1>
               <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -170,7 +170,7 @@ export default function SellerStoreDetailLayout() {
                   <StatusBadge tone="danger">Yeni siparişler duraklatıldı</StatusBadge>
                 )}
                 {pendingCount > 0 && (
-                  <span className="rounded-full bg-warning-50 px-2.5 py-1 text-[11px] font-black text-warning-700">
+                  <span className="rounded-full bg-warning-50 px-2.5 py-1 text-[11px] font-semibold text-warning-700">
                     {pendingCount} yeni talep
                   </span>
                 )}
@@ -209,7 +209,7 @@ export default function SellerStoreDetailLayout() {
       </section>
 
       <nav
-        className="rounded-2xl border border-slate-200 bg-white p-3 shadow-card"
+        className="rounded-xl border border-slate-200 bg-white p-3 shadow-card"
         aria-label="Mağaza bölümleri"
       >
         <button
@@ -231,7 +231,7 @@ export default function SellerStoreDetailLayout() {
               onClick={(event) => {
                 if (!confirmSellerStoreNavigation()) event.preventDefault();
               }}
-              className={`rounded-xl px-3 py-2 text-xs font-black transition ${group.label === activeGroup.label ? "bg-primary-600 text-white shadow-sm" : "bg-slate-50 text-slate-600 hover:bg-primary-50 hover:text-primary-700"}`}
+              className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${group.label === activeGroup.label ? "bg-primary-600 text-white shadow-sm" : "bg-slate-50 text-slate-600 hover:bg-primary-50 hover:text-primary-700"}`}
             >
               {group.label}
             </Link>
@@ -264,7 +264,7 @@ export default function SellerStoreDetailLayout() {
       >
         {tabGroups.map((group) => (
           <section key={group.label} className="mb-6">
-            <h2 className="text-xs font-black uppercase tracking-[.14em] text-slate-500">
+            <h2 className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">
               {group.label}
             </h2>
             <div className="mt-2 grid gap-1">

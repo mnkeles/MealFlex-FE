@@ -29,7 +29,7 @@ function FavoriteCard({
   return (
     <Link
       to={`/stores/${item.storeId}${addressId ? `?addressId=${addressId}` : ""}`}
-      className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+      className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
     >
       <div className="relative h-36 bg-slate-100">
         {item.coverImageUrl ? (
@@ -76,7 +76,7 @@ function FavoriteCard({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="truncate font-black group-hover:text-primary-600">
+            <h2 className="truncate font-semibold group-hover:text-primary-600">
               {item.storeName}
             </h2>
             <div className="mt-1 flex gap-3 text-xs text-slate-500">
@@ -120,7 +120,7 @@ export default function FavoritesPage() {
   return (
     <div>
       <p className="text-sm font-bold text-primary-600">KAYDETTİKLERİNİZ</p>
-      <h1 className="mt-1 text-3xl font-black">Favori işletmelerim</h1>
+      <h1 className="mt-1 text-3xl font-semibold">Favori işletmelerim</h1>
       <p className="mt-2 text-slate-500">
         Beğendiğiniz işletmelere hızlıca ulaşın.
       </p>
@@ -132,7 +132,7 @@ export default function FavoritesPage() {
               {[1, 2, 3].map((index) => (
                 <div
                   key={index}
-                  className="h-64 animate-pulse rounded-2xl bg-slate-200"
+                  className="h-64 animate-pulse rounded-xl bg-slate-200"
                 />
               ))}
             </div>

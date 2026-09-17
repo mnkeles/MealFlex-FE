@@ -17,7 +17,7 @@ export default class AppErrorBoundary extends Component<Props, State> {
     if (this.state.failed)
       return (
         <main
-          className="mx-auto mt-20 max-w-lg rounded-2xl border border-danger-100 bg-white p-8 text-center shadow-sm"
+          className="mx-auto mt-20 max-w-lg rounded-xl border border-danger-100 bg-white p-8 text-center shadow-sm"
           role="alert"
         >
           <h1 className="text-xl font-bold text-slate-900">

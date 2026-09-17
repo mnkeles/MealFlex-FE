@@ -6,12 +6,12 @@
    değerler gelecekte koyu tema için tek bir katmandan değiştirilebilir. */
 :root {
   color-scheme: light;
-  --mf-color-canvas: #f7f8fc;
+  --mf-color-canvas: #faf8f4;
   --mf-color-surface: #ffffff;
-  --mf-color-ink: #172033;
-  --mf-color-muted: #667085;
-  --mf-color-border: #dfe3eb;
-  --mf-color-primary: #dc3626;
+  --mf-color-ink: #252a24;
+  --mf-color-muted: #6c7168;
+  --mf-color-border: #e6e1d8;
+  --mf-color-primary: #ad482d;
   --mf-color-success: #027a48;
   --mf-color-warning: #b54708;
   --mf-color-danger: #d92d20;
@@ -27,33 +27,37 @@
   --mf-radius-card: 1rem;
   --mf-radius-surface: 1.25rem;
   --mf-shadow-xs: 0 1px 2px rgba(16, 24, 40, .04);
-  --mf-shadow-card: 0 1px 2px rgba(16, 24, 40, .04), 0 6px 16px rgba(16, 24, 40, .06);
-  --mf-shadow-floating: 0 12px 30px rgba(16, 24, 40, .12);
+  --mf-shadow-card: 0 1px 2px rgba(44, 42, 35, .035), 0 7px 20px rgba(44, 42, 35, .045);
+  --mf-shadow-floating: 0 12px 30px rgba(44, 42, 35, .12);
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   @apply bg-canvas text-ink antialiased;
 }
 
 @layer components {
   .mf-page { @apply mx-auto w-full max-w-7xl space-y-6; }
-  .mf-surface { @apply rounded-2xl border border-slate-200/80 bg-white shadow-card; }
+  .mf-surface { @apply rounded-xl border border-[#e6e1d8] bg-white shadow-mf-xs; }
   .mf-display { @apply text-mf-display text-ink; }
   .mf-page-title { @apply text-mf-title text-ink; }
   .mf-heading { @apply text-mf-heading text-ink; }
   .mf-body { @apply text-mf-body text-ink; }
   .mf-caption { @apply text-mf-caption text-slate-500; }
-  .mf-section-title { @apply text-lg font-black tracking-tight text-ink sm:text-xl; }
+  .mf-section-title { @apply text-lg font-bold tracking-tight text-ink sm:text-xl; }
   .mf-muted { @apply text-sm leading-6 text-slate-500; }
-  .mf-label { @apply mb-1.5 block text-sm font-bold text-slate-700; }
-  .mf-input { @apply h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-4 focus:ring-primary-100; }
-  .mf-textarea { @apply w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-4 focus:ring-primary-100; }
+  .mf-label { @apply mb-1.5 block text-sm font-semibold text-slate-700; }
+  .mf-input { @apply h-11 w-full rounded-lg border border-[#dedbd3] bg-white px-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100; }
+  .mf-textarea { @apply w-full rounded-lg border border-[#dedbd3] bg-white px-3 py-2.5 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100; }
 }
+
+.customer-display { font-family: Georgia, 'Times New Roman', serif; font-weight: 600; letter-spacing: -.035em; }
+.customer-eyebrow { color: #85654d; font-size: .68rem; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; }
+.customer-divider { border-color: #e8e1d5; }
 
 /* Klavye ile gezinmede odak her zaman görünür olmalıdır. */
 :focus-visible {
-  outline: 3px solid #e23b2e;
+  outline: 3px solid #ad482d;
   outline-offset: 3px;
 }
 

@@ -12,11 +12,11 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-primary-600 text-white shadow-sm hover:bg-primary-700 focus:ring-primary-200",
+    "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-200",
   secondary:
-    "bg-slate-900 text-white shadow-sm hover:bg-slate-800 focus:ring-slate-200",
+    "bg-[#263b32] text-white hover:bg-[#1b3028] focus:ring-success-200",
   outline:
-    "border border-slate-200 bg-white text-slate-700 hover:border-primary-200 hover:bg-primary-50 hover:text-primary-700 focus:ring-primary-100",
+    "border border-[#dedbd3] bg-white text-slate-700 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus:ring-primary-100",
   ghost:
     "text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:ring-slate-100",
   danger:
@@ -40,7 +40,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center rounded-xl font-bold transition focus:outline-none focus:ring-4 disabled:pointer-events-none disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center rounded-lg font-semibold transition focus:outline-none focus:ring-4 disabled:pointer-events-none disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {leftIcon}

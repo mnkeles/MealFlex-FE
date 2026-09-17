@@ -110,7 +110,7 @@ export default function StoreCouriersPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl font-black">Kurye çalışma alanı</h2>
+        <h2 className="text-xl font-semibold">Kurye çalışma alanı</h2>
         <p className="mt-1 text-sm text-slate-500">
           Kurye atamalarını ve mobil rota görünümünü yönetin. Telefon numaraları
           operasyon için maskeli gösterilir.
@@ -133,7 +133,7 @@ export default function StoreCouriersPage() {
           event.preventDefault();
           create.mutate();
         }}
-        className="flex flex-wrap gap-2 rounded-2xl border bg-white p-4"
+        className="flex flex-wrap gap-2 rounded-xl border bg-white p-4"
       >
         <input
           aria-label="Kurye adı"
@@ -172,8 +172,8 @@ export default function StoreCouriersPage() {
         </p>
       </form>
       <div className="grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <section className="rounded-2xl border bg-white p-5">
-          <h3 className="font-black">Kuryeler</h3>
+        <section className="rounded-xl border bg-white p-5">
+          <h3 className="font-semibold">Kuryeler</h3>
           <div className="mt-3 space-y-2">
             {couriers.data?.map((courier) => (
               <button
@@ -195,8 +195,8 @@ export default function StoreCouriersPage() {
             )) || <p className="py-3 text-sm text-slate-500">Kurye yok.</p>}
           </div>
         </section>
-        <section className="rounded-2xl border bg-white p-5">
-          <h3 className="font-black">
+        <section className="rounded-xl border bg-white p-5">
+          <h3 className="font-semibold">
             {activeCourier
               ? `${activeCourier.fullName} için mobil rota`
               : "Bugünkü rota ve atamalar"}

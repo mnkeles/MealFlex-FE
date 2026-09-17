@@ -27,18 +27,18 @@ export default function PageHeader({
         {backTo && (
           <Link
             to={backTo}
-            className="mb-2 inline-flex items-center gap-1 text-sm font-semibold text-slate-500 transition hover:text-primary-700"
+            className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-slate-500 transition hover:text-primary-700"
           >
             <ChevronLeft className="h-4 w-4" />
             {backLabel}
           </Link>
         )}
         {eyebrow && (
-          <p className="mb-1 text-xs font-black uppercase tracking-[.14em] text-primary-600">
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[.16em] text-[#85654d]">
             {eyebrow}
           </p>
         )}
-        <h1 className="text-2xl font-black tracking-tight text-ink sm:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-[-.025em] text-ink sm:text-3xl">
           {title}
         </h1>
         {description && (

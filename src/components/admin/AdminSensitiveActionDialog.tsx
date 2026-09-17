@@ -80,7 +80,7 @@ export default function AdminSensitiveActionDialog({
     >
       <form
         onSubmit={submit}
-        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-white p-6 shadow-floating"
         role="dialog"
         aria-modal="true"
         aria-labelledby="sensitive-action-title"
@@ -94,7 +94,7 @@ export default function AdminSensitiveActionDialog({
         <p className="mt-2 text-sm text-slate-600">{description}</p>
         {impactItems.length > 0 && (
           <div className="mt-4 rounded-xl border border-warning-200 bg-warning-50 p-4">
-            <p className="text-sm font-black text-warning-900">İşlem etkisi</p>
+            <p className="text-sm font-semibold text-warning-900">İşlem etkisi</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-warning-800">
               {impactItems.map((item) => <li key={item}>{item}</li>)}
             </ul>

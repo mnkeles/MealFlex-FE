@@ -104,7 +104,7 @@ export default function AdminLayout() {
       {menuGroups.map((group) => (
         <div key={group.label}>
           <p
-            className={`mb-2 px-3 text-[10px] font-black uppercase tracking-[.14em] text-slate-500 ${collapsed ? "hidden" : ""}`}
+            className={`mb-2 px-3 text-[10px] font-semibold uppercase tracking-[.16em] text-[#85654d] ${collapsed ? "hidden" : ""}`}
           >
             {group.label}
           </p>
@@ -121,7 +121,7 @@ export default function AdminLayout() {
                   aria-current={active ? "page" : undefined}
                   onClick={() => setMobileMenuOpen(false)}
                   title={collapsed ? item.label : undefined}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition ${collapsed ? "justify-center" : ""} ${active ? "bg-primary-50 text-primary-700 shadow-sm" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}
+                  className={`flex items-center gap-3 rounded-lg border-l-2 px-3 py-2.5 text-sm font-semibold transition ${collapsed ? "justify-center" : ""} ${active ? "border-primary-600 bg-white text-primary-700" : "border-transparent text-slate-600 hover:bg-white hover:text-slate-900"}`}
                 >
                   <Icon className="h-[18px] w-[18px] shrink-0" />
                   <span className={collapsed ? "hidden" : ""}>
@@ -142,7 +142,7 @@ export default function AdminLayout() {
         <Link to="/admin/dashboard">
           <MealFlexLogo
             iconClassName="h-9 w-9"
-            wordmarkClassName="text-xl font-black tracking-tight text-primary-600"
+            wordmarkClassName="text-xl font-semibold tracking-tight text-primary-600"
           />
         </Link>
         <div className="flex items-center gap-2">
@@ -153,7 +153,7 @@ export default function AdminLayout() {
           >
             <Bell className="h-5 w-5" />
             {taskCount > 0 && (
-              <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-danger-600 px-1 text-center text-[10px] font-black leading-5 text-white">
+              <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-danger-600 px-1 text-center text-[10px] font-semibold leading-5 text-white">
                 {taskCount > 99 ? "99+" : taskCount}
               </span>
             )}
@@ -179,7 +179,7 @@ export default function AdminLayout() {
             <div className="flex h-16 items-center justify-between border-b px-4">
               <MealFlexLogo
                 iconClassName="h-9 w-9"
-                wordmarkClassName="text-xl font-black tracking-tight text-primary-600"
+                wordmarkClassName="text-xl font-semibold tracking-tight text-primary-600"
               />
               <button
                 onClick={() => setMobileMenuOpen(false)}
@@ -192,12 +192,12 @@ export default function AdminLayout() {
             <div className="min-h-0 flex-1 overflow-y-auto">{nav()}</div>
             <div className="border-t border-slate-100 p-4">
               <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900 text-xs font-black text-white">
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900 text-xs font-semibold text-white">
                   {user?.firstName?.[0]}
                   {user?.lastName?.[0]}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-black text-slate-800">
+                  <p className="truncate text-sm font-semibold text-slate-800">
                     {user?.firstName} {user?.lastName}
                   </p>
                   <p className="text-xs text-primary-600">Platform yöneticisi</p>
@@ -215,7 +215,7 @@ export default function AdminLayout() {
         </div>
       )}
       <aside
-        className={`fixed hidden h-screen flex-col border-r border-slate-200 bg-white transition-[width] duration-200 md:flex ${collapsed ? "w-20" : "w-72"}`}
+        className={`fixed hidden h-screen flex-col border-r border-[#e6e1d8] bg-[#fdfcf9] transition-[width] duration-200 md:flex ${collapsed ? "w-20" : "w-72"}`}
       >
         <div
           className={`flex items-center border-b border-slate-100 py-5 ${collapsed ? "justify-center px-2" : "justify-between px-6"}`}
@@ -225,7 +225,7 @@ export default function AdminLayout() {
               <MealFlexLogo
                 showWordmark={!collapsed}
                 iconClassName="h-10 w-10"
-                wordmarkClassName="text-xl font-black tracking-tight text-primary-600"
+                wordmarkClassName="text-xl font-semibold tracking-tight text-primary-600"
               />
             </Link>
             <p
@@ -250,14 +250,14 @@ export default function AdminLayout() {
         <div className="min-h-0 flex-1 overflow-y-auto">{nav()}</div>
         <div className="border-t border-slate-100 p-4">
           <div
-            className={`flex items-center gap-3 rounded-xl bg-slate-50 p-3 ${collapsed ? "justify-center" : ""}`}
+            className={`flex items-center gap-3 border-t border-[#eeeae2] p-3 ${collapsed ? "justify-center" : ""}`}
           >
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900 text-xs font-black text-white">
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900 text-xs font-semibold text-white">
               {user?.firstName?.[0]}
               {user?.lastName?.[0]}
             </span>
             <div className={`min-w-0 flex-1 ${collapsed ? "hidden" : ""}`}>
-              <p className="truncate text-sm font-black text-slate-800">
+              <p className="truncate text-sm font-semibold text-slate-800">
                 {user?.firstName} {user?.lastName}
               </p>
               <p className="text-xs text-primary-600">Platform yöneticisi</p>
@@ -283,7 +283,7 @@ export default function AdminLayout() {
           <div className="flex items-center gap-3">
             <Link
               to="/admin/audit-search"
-              className="flex h-10 w-72 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-500 transition hover:border-primary-200 hover:bg-white"
+              className="flex h-10 w-72 items-center gap-2 rounded-lg border border-[#ddd7cc] bg-[#faf8f4] px-3 text-sm text-slate-500 transition hover:border-primary-300 hover:bg-white"
             >
               <Search className="h-4 w-4" />
               Kullanıcı, mağaza veya işlem ara
@@ -295,12 +295,12 @@ export default function AdminLayout() {
             >
               <Bell className="h-5 w-5" />
               {taskCount > 0 && (
-                <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-danger-600 px-1 text-center text-[10px] font-black leading-5 text-white">
+                <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-danger-600 px-1 text-center text-[10px] font-semibold leading-5 text-white">
                   {taskCount > 99 ? "99+" : taskCount}
                 </span>
               )}
             </Link>
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900 text-xs font-black text-white">
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900 text-xs font-semibold text-white">
               {user?.firstName?.[0]}
               {user?.lastName?.[0]}
             </span>

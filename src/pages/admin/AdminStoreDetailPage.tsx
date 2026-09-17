@@ -169,7 +169,7 @@ export default function AdminStoreDetailPage() {
         <article className="mf-surface p-6">
           <div className="mb-4 flex items-center gap-2">
             <Building2 size={18} className="text-primary-600" />
-            <h2 className="font-black">Mağaza bilgileri</h2>
+            <h2 className="font-semibold">Mağaza bilgileri</h2>
           </div>
           {editing ? (
             <div className="space-y-4">
@@ -259,7 +259,7 @@ export default function AdminStoreDetailPage() {
         <article className="mf-surface p-6">
           <div className="mb-4 flex items-center gap-2">
             <MapPinned size={18} className="text-primary-600" />
-            <h2 className="font-black">
+            <h2 className="font-semibold">
               Hizmet bölgeleri ({serviceAreas.length})
             </h2>
           </div>
@@ -280,7 +280,7 @@ export default function AdminStoreDetailPage() {
       </section>
       <section className="mf-surface overflow-hidden">
         <div className="border-b border-slate-200 p-5">
-          <h2 className="font-black">Abonelikler ({subscriptions.length})</h2>
+          <h2 className="font-semibold">Abonelikler ({subscriptions.length})</h2>
         </div>
         {subscriptions.length ? (
           <div className="overflow-x-auto">
@@ -320,7 +320,7 @@ export default function AdminStoreDetailPage() {
       <section className="mf-surface p-6">
         <div className="mb-4 flex items-center gap-2">
           <ShieldAlert size={18} className="text-warning-600" />
-          <h2 className="font-black">Şikâyetler ({complaints.length})</h2>
+          <h2 className="font-semibold">Şikâyetler ({complaints.length})</h2>
         </div>
         {complaints.length ? (
           <div className="space-y-3">

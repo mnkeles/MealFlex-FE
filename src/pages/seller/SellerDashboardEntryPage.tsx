@@ -31,7 +31,7 @@ export default function SellerDashboardEntryPage() {
     return (
       <div className="mf-page">
         <PageHeader
-          eyebrow="Satıcı hesabı"
+          eyebrow="Kurulum adımı"
           title="Operasyona başlamaya hazırsınız"
           description="Mağaza açabilmek için önce satıcı profilinizi tamamlayın."
         />
@@ -64,7 +64,7 @@ export default function SellerDashboardEntryPage() {
   return (
     <div className="mf-page">
       <PageHeader
-        eyebrow="Mağaza operasyonu"
+        eyebrow="Operasyon başlangıcı"
         title="Dashboard için bir mağaza oluşturun"
         description="Dashboard verileri mağaza bazında gösterilir."
       />

@@ -83,7 +83,7 @@ export default function MockCardTokenizationForm({
   return (
     <form
       onSubmit={submit}
-      className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+      className="rounded-xl border border-slate-200 bg-slate-50 p-4"
     >
       <div className="mb-3 flex items-center gap-2 text-sm font-bold">
         <CreditCard className="h-4 w-4 text-primary-600" aria-hidden="true" />{" "}

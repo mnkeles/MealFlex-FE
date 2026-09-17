@@ -41,7 +41,7 @@ export default function AuthLayout({
             <MealFlexLogo
               surface="dark"
               iconClassName="h-11 w-11"
-              wordmarkClassName="text-2xl font-black tracking-tight text-white"
+              wordmarkClassName="text-2xl font-semibold tracking-tight text-white"
             />
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-slate-950/30 px-3.5 py-2 text-xs font-bold text-white backdrop-blur-md">
               <Store className="h-4 w-4 text-primary-300" />
@@ -50,10 +50,10 @@ export default function AuthLayout({
           </header>
 
           <div className="relative z-10 px-8 pb-8 xl:px-12 xl:pb-10">
-            <p className="text-xs font-black uppercase tracking-[.18em] text-primary-300">
+            <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary-300">
               Günlük operasyon
             </p>
-            <h2 className="mt-4 max-w-2xl text-4xl font-black leading-[1.05] tracking-tight xl:text-5xl">
+            <h2 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-tight xl:text-5xl">
               Mutfaktan teslimata, bütün gün tek ekranda.
             </h2>
             <p className="mt-5 max-w-xl text-base leading-7 text-white/80 xl:text-lg">
@@ -65,7 +65,7 @@ export default function AuthLayout({
               <div className="flex gap-3 py-5 sm:pr-6">
                 <BellRing className="mt-0.5 h-5 w-5 shrink-0 text-primary-300" />
                 <div>
-                  <p className="text-sm font-black">Talepler zamanında önünüzde</p>
+                  <p className="text-sm font-semibold">Talepler zamanında önünüzde</p>
                   <p className="mt-1 text-xs leading-5 text-white/65">
                     Abonelik ve değişiklik kararlarını tek kuyruktan yönetin.
                   </p>
@@ -74,7 +74,7 @@ export default function AuthLayout({
               <div className="flex gap-3 border-t border-white/20 py-5 sm:border-l sm:border-t-0 sm:pl-6">
                 <PackageCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary-300" />
                 <div>
-                  <p className="text-sm font-black">Üretim ve teslimat birlikte</p>
+                  <p className="text-sm font-semibold">Üretim ve teslimat birlikte</p>
                   <p className="mt-1 text-xs leading-5 text-white/65">
                     Günün porsiyonunu ve teslimat durumlarını aynı yerde izleyin.
                   </p>
@@ -97,27 +97,27 @@ export default function AuthLayout({
             <div className="mb-6 flex items-center justify-between lg:hidden">
               <MealFlexLogo
                 iconClassName="h-10 w-10"
-                wordmarkClassName="text-2xl font-black tracking-tight text-primary-600"
+                wordmarkClassName="text-2xl font-semibold tracking-tight text-primary-600"
               />
               <span className="rounded-full bg-[#0d1d2c] px-3 py-1.5 text-xs font-bold text-white shadow-sm">
                 Satıcı Merkezi
               </span>
             </div>
 
-            <div className="relative mb-7 h-40 overflow-hidden rounded-3xl shadow-card lg:hidden">
+            <div className="relative mb-7 h-40 overflow-hidden rounded-xl shadow-card lg:hidden">
               <img
                 src="/images/customer-access-modal-v2.jpg"
                 alt="Catering mutfağında hazırlanmış kurumsal öğün"
                 className="h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#091827]/90 via-[#091827]/25 to-transparent" />
-              <p className="absolute bottom-4 left-5 right-5 text-lg font-black leading-tight text-white">
+              <p className="absolute bottom-4 left-5 right-5 text-lg font-semibold leading-tight text-white">
                 Mutfaktan teslimata, bütün gün tek ekranda.
               </p>
             </div>
 
             <header>
-              <h1 className="text-3xl font-black tracking-tight text-ink sm:text-4xl">
+              <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                 {title}
               </h1>
               <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -125,7 +125,7 @@ export default function AuthLayout({
               </p>
             </header>
 
-            <div className="mt-7 rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_24px_70px_rgba(15,23,42,.09)] sm:p-7">
+            <div className="mt-7 rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_24px_70px_rgba(15,23,42,.09)] sm:p-7">
               {children}
             </div>
             <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs leading-5 text-slate-500">
@@ -151,21 +151,21 @@ export default function AuthLayout({
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/15 to-transparent" />
 
           <div className="relative z-10 p-8 xl:p-10">
-            <div className="inline-flex rounded-2xl border border-white/20 bg-slate-950/25 px-4 py-3 shadow-lg backdrop-blur-md">
+            <div className="inline-flex rounded-xl border border-white/20 bg-slate-950/25 px-4 py-3 shadow-lg backdrop-blur-md">
               <MealFlexLogo
                 surface="dark"
                 iconClassName="h-10 w-10"
-                wordmarkClassName="text-2xl font-black tracking-tight text-white"
+                wordmarkClassName="text-2xl font-semibold tracking-tight text-white"
               />
             </div>
           </div>
 
-          <div className="relative z-10 m-6 max-w-2xl rounded-3xl bg-slate-950/90 p-8 text-white shadow-2xl xl:m-8 xl:p-10">
+          <div className="relative z-10 m-6 max-w-2xl rounded-xl bg-slate-950/90 p-8 text-white shadow-floating xl:m-8 xl:p-10">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-800 px-3.5 py-2 text-xs font-bold">
               <Sparkles className="h-4 w-4 text-amber-300" />
               Her gün taze, her hafta planlı
             </div>
-            <h2 className="max-w-xl text-4xl font-black leading-[1.08] tracking-tight xl:text-5xl">
+            <h2 className="max-w-xl text-4xl font-semibold leading-[1.08] tracking-tight xl:text-5xl">
               İş yerinde iyi yemek, iyi bir günün başlangıcı.
             </h2>
             <p className="mt-4 max-w-xl text-base leading-7 text-white/85 xl:text-lg">
@@ -191,27 +191,27 @@ export default function AuthLayout({
             <div className="mb-6 flex items-center justify-between lg:hidden">
               <MealFlexLogo
                 iconClassName="h-10 w-10"
-                wordmarkClassName="text-2xl font-black tracking-tight text-primary-600"
+                wordmarkClassName="text-2xl font-semibold tracking-tight text-primary-600"
               />
               <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm ring-1 ring-slate-200">
                 Güvenli giriş
               </span>
             </div>
 
-            <div className="relative mb-7 h-40 overflow-hidden rounded-3xl shadow-card lg:hidden">
+            <div className="relative mb-7 h-40 overflow-hidden rounded-xl shadow-card lg:hidden">
               <img
                 src="/images/login-meal-hero.jpg"
                 alt="Dengeli bir öğle yemeği sofrası"
                 className="h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 to-transparent" />
-              <p className="absolute bottom-4 left-5 right-5 text-lg font-black leading-tight text-white">
+              <p className="absolute bottom-4 left-5 right-5 text-lg font-semibold leading-tight text-white">
                 Her gün taze, her hafta planlı.
               </p>
             </div>
 
             <header>
-              <h1 className="text-3xl font-black tracking-tight text-ink sm:text-4xl">
+              <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                 {title}
               </h1>
               <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -219,7 +219,7 @@ export default function AuthLayout({
               </p>
             </header>
 
-            <div className="mt-7 rounded-3xl border border-white/80 bg-white/90 p-5 shadow-[0_24px_70px_rgba(31,41,55,0.10)] backdrop-blur sm:p-7">
+            <div className="mt-7 rounded-xl border border-white/80 bg-white/90 p-5 shadow-[0_24px_70px_rgba(31,41,55,0.10)] backdrop-blur sm:p-7">
               {children}
             </div>
             <p className="mt-6 text-center text-xs leading-5 text-slate-600">
@@ -238,13 +238,13 @@ export default function AuthLayout({
         <MealFlexLogo
           surface="dark"
           iconClassName="h-11 w-11"
-          wordmarkClassName="text-2xl font-black tracking-tight text-white"
+          wordmarkClassName="text-2xl font-semibold tracking-tight text-white"
         />
         <div>
-          <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/15">
+          <div className="grid h-14 w-14 place-items-center rounded-xl bg-white/15">
             <UtensilsCrossed className="h-7 w-7" />
           </div>
-          <h1 className="mt-6 max-w-md text-4xl font-black tracking-tight">
+          <h1 className="mt-6 max-w-md text-4xl font-semibold tracking-tight">
             İş yeriniz için dengeli yemek, düzenli teslimat.
           </h1>
           <p className="mt-4 max-w-md text-base leading-7 text-white/80">
@@ -273,14 +273,14 @@ export default function AuthLayout({
           <div className="mb-7 lg:hidden">
             <MealFlexLogo
               iconClassName="h-11 w-11"
-              wordmarkClassName="text-2xl font-black tracking-tight text-primary-600"
+              wordmarkClassName="text-2xl font-semibold tracking-tight text-primary-600"
             />
           </div>
           <header>
-            <p className="text-xs font-black uppercase tracking-[.14em] text-primary-700">
+            <p className="text-xs font-semibold uppercase tracking-[.14em] text-primary-700">
               MealFlex hesabı
             </p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight text-ink">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink">
               {title}
             </h1>
             <p className="mt-2 text-sm leading-6 text-slate-600">

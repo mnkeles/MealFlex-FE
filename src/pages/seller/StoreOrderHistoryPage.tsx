@@ -79,9 +79,13 @@ export default function StoreOrderHistoryPage() {
   };
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Sipariş Geçmişi</h2>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e6e1d8] pb-5">
+        <div>
+          <p className="customer-eyebrow">Operasyon arşivi</p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Sipariş geçmişi</h2>
+          <p className="mt-1 text-sm text-slate-500">Geçmiş teslimatları filtreleyin, inceleyin ve dışa aktarın.</p>
+        </div>
         <button
           onClick={exportCsv}
           disabled={
@@ -95,25 +99,25 @@ export default function StoreOrderHistoryPage() {
 
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow-sm p-4 text-center">
+          <div className="mf-surface p-4 text-center">
             <p className="text-sm text-slate-500">Teslim Edilen</p>
             <p className="text-2xl font-bold text-success-600">
               {stats.delivered}
             </p>
           </div>
-          <div className="bg-white rounded-xl shadow-sm p-4 text-center">
+          <div className="mf-surface p-4 text-center">
             <p className="text-sm text-slate-500">İptal</p>
             <p className="text-2xl font-bold text-danger-600">
               {stats.cancelled}
             </p>
           </div>
-          <div className="bg-white rounded-xl shadow-sm p-4 text-center">
+          <div className="mf-surface p-4 text-center">
             <p className="text-sm text-slate-500">Bekleyen</p>
             <p className="text-2xl font-bold text-warning-600">
               {stats.scheduled}
             </p>
           </div>
-          <div className="bg-white rounded-xl shadow-sm p-4 text-center">
+          <div className="mf-surface p-4 text-center">
             <p className="text-sm text-slate-500">Toplam Porsiyon</p>
             <p className="text-2xl font-bold text-slate-900">
               {stats.totalPersons}
@@ -122,7 +126,7 @@ export default function StoreOrderHistoryPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
+      <div className="mf-surface p-4 mb-4">
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <label className="block text-xs text-slate-500 mb-1">
@@ -173,12 +177,12 @@ export default function StoreOrderHistoryPage() {
       {isLoading ? (
         <div className="text-center py-12 text-slate-500">Yükleniyor...</div>
       ) : !data?.content.length ? (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center text-slate-500">
+        <div className="mf-surface p-12 text-center text-slate-500">
           Seçilen tarih aralığında sipariş bulunamadı.
         </div>
       ) : (
         <>
-          <div className="bg-white rounded-xl shadow-sm divide-y">
+          <div className="mf-surface divide-y">
             {data.content.map((d) => {
               return (
                 <div

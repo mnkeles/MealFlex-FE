@@ -96,7 +96,7 @@ export default function LoginPage({
 
   const content = (
     <>
-      <p className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-primary-600">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-primary-600">
         {contentByAudience[audience].eyebrow}
       </p>
       <form
@@ -196,7 +196,7 @@ export default function LoginPage({
           </p>
           <Link
             to="/seller/login"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary-200 bg-primary-50 px-4 py-3 text-sm font-black text-primary-700 transition hover:border-primary-300 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary-200 bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:border-primary-300 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
           >
             <Store className="h-4 w-4" aria-hidden="true" />
             Satıcı girişi
@@ -211,7 +211,7 @@ export default function LoginPage({
           </p>
           <Link
             to="/login"
-            className="inline-flex items-center justify-center gap-2 text-sm font-black text-slate-700 transition hover:text-primary-700 hover:underline focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-slate-700 transition hover:text-primary-700 hover:underline focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
           >
             Müşteri girişine dön
             <ArrowRight className="h-4 w-4" aria-hidden="true" />

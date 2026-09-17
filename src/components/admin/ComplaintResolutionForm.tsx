@@ -42,7 +42,7 @@ export default function ComplaintResolutionForm({
     <div className="mt-6 border-t border-slate-200 pt-5">
       <div className="flex items-center gap-2">
         <ReceiptText size={18} className="text-primary-600" />
-        <h3 className="font-black">Nihai karar ve telafi</h3>
+        <h3 className="font-semibold">Nihai karar ve telafi</h3>
       </div>
 
       <div className="mt-4 grid gap-2 sm:grid-cols-2">

@@ -34,7 +34,7 @@ export default function FormPageLayout({
         ))}
       </div>
       {saveBar && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 p-3 shadow-floating backdrop-blur sm:left-auto sm:right-6 sm:bottom-6 sm:w-auto sm:rounded-2xl sm:border">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e6e1d8] bg-[#fffefa]/95 p-3 shadow-floating backdrop-blur sm:left-auto sm:right-6 sm:bottom-6 sm:w-auto sm:rounded-xl sm:border">
           {saveBar}
         </div>
       )}

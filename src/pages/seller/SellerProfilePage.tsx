@@ -102,11 +102,15 @@ export default function SellerProfilePage() {
   );
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-6">Satıcı Profili</h1>
+    <div className="mf-page">
+      <div className="border-b border-[#e6e1d8] pb-5">
+        <p className="customer-eyebrow">Kurumsal bilgiler</p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink">Satıcı profili</h1>
+        <p className="mt-1 text-sm text-slate-500">Firma, yetkili ve ödeme aktarım bilgilerinizi güncel tutun.</p>
+      </div>
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-xl shadow-sm p-6 max-w-2xl"
+        className="mf-surface p-6 max-w-2xl"
       >
         {formError && (
           <p
@@ -127,7 +131,7 @@ export default function SellerProfilePage() {
               onChange={(e) =>
                 setForm({ ...form, companyTitle: e.target.value })
               }
-              className="w-full px-3 py-2 border rounded-lg text-sm"
+              className="mf-input"
               required
             />
           </div>
@@ -141,7 +145,7 @@ export default function SellerProfilePage() {
               onChange={(e) =>
                 setForm({ ...form, authorizedPerson: e.target.value })
               }
-              className="w-full px-3 py-2 border rounded-lg text-sm"
+              className="mf-input"
               required
             />
           </div>
@@ -197,7 +201,7 @@ export default function SellerProfilePage() {
               type="text"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg text-sm"
+              className="mf-input"
             />
           </div>
           <div>
@@ -256,7 +260,7 @@ export default function SellerProfilePage() {
               maxLength={26}
               pattern="TR[0-9]{24}"
               required={Boolean(form.bankName)}
-              className="w-full px-3 py-2 border rounded-lg text-sm"
+              className="mf-input"
             />
             <p className="mt-1 text-xs text-slate-500">
               Türkiye IBAN'ı, boşluksuz 26 karakter olarak kaydedilir.

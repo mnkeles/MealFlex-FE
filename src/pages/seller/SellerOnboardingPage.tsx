@@ -37,7 +37,7 @@ export default function SellerOnboardingPage() {
           stores.map((store) => (
             <article
               key={store.id}
-              className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-white p-5"
+              className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-5"
             >
               <div>
                 <h2 className="font-bold">{store.name}</h2>
@@ -57,7 +57,7 @@ export default function SellerOnboardingPage() {
             </article>
           ))
         ) : (
-          <div className="rounded-2xl border bg-white p-8 text-center text-slate-500">
+          <div className="rounded-xl border bg-white p-8 text-center text-slate-500">
             Henüz mağaza şubeniz bulunmuyor.
           </div>
         )}

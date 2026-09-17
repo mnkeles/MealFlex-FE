@@ -119,7 +119,7 @@ export default function AdminSellerOnboardingPage() {
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="font-black text-ink">
+                          <h2 className="font-semibold text-ink">
                             {document.storeName}
                           </h2>
                           <StatusBadge
@@ -294,10 +294,10 @@ export default function AdminSellerOnboardingPage() {
             <div className="flex items-start gap-3">
               <ShieldCheck className="mt-0.5 text-primary-600" />
               <div>
-                <p className="text-xs font-black uppercase tracking-wide text-primary-600">
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">
                   Belge inceleme
                 </p>
-                <h2 className="font-black text-ink">{selected.storeName}</h2>
+                <h2 className="font-semibold text-ink">{selected.storeName}</h2>
                 <p className="text-sm text-slate-500">
                   {typeLabels[selected.documentType] || selected.documentType}
                 </p>

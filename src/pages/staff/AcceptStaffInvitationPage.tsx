@@ -15,18 +15,18 @@ export default function AcceptStaffInvitationPage() {
 
   return (
     <main className="grid min-h-screen place-items-center bg-slate-50 p-4">
-      <section className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <section className="w-full max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <MealFlexLogo />
-        <div className="mt-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
+        <div className="mt-8 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
           <UserRoundCheck aria-hidden="true" />
         </div>
-        <h1 className="mt-4 text-2xl font-black text-slate-950">Personel davetini kabul et</h1>
+        <h1 className="mt-4 text-2xl font-semibold text-slate-950">Personel davetini kabul et</h1>
         <p className="mt-2 text-sm text-slate-600">
           Davetin gönderildiği e-posta adresiyle giriş yapmış olmalısınız. Kabulden sonra yalnız size verilen mağaza yetkileri açılır.
         </p>
 
         {accept.isSuccess ? (
-          <div className="mt-6 rounded-2xl bg-success-50 p-4 text-success-900" role="status">
+          <div className="mt-6 rounded-xl bg-success-50 p-4 text-success-900" role="status">
             <p className="flex items-center gap-2 font-bold"><CheckCircle2 className="h-5 w-5" />Davet kabul edildi</p>
             <p className="mt-1 text-sm">Rolünüz: {accept.data.role}</p>
             {accept.data.role === "COURIER" && (

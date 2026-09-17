@@ -194,7 +194,7 @@ export default function CourierWorkspacePage() {
   return (
     <main className="mx-auto min-h-screen max-w-xl bg-slate-50 p-4 pb-24">
       <header className="mb-4">
-        <h1 className="text-2xl font-black">Bugünkü rotam</h1>
+        <h1 className="text-2xl font-semibold">Bugünkü rotam</h1>
         <p className="mt-1 text-sm text-slate-500">
           Yalnız size atanmış teslimatlar gösterilir.
         </p>
@@ -230,7 +230,7 @@ export default function CourierWorkspacePage() {
             {deliveries.map((delivery, index) => (
             <article
               key={delivery.id}
-              className="rounded-2xl border bg-white p-4 shadow-sm"
+              className="rounded-xl border bg-white p-4 shadow-sm"
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -238,7 +238,7 @@ export default function CourierWorkspacePage() {
                     {delivery.routeSequence || index + 1}. DURAK ·{" "}
                     {delivery.deliveryTime.slice(0, 5)}
                   </p>
-                  <h2 className="mt-1 font-black">{delivery.menuName}</h2>
+                  <h2 className="mt-1 font-semibold">{delivery.menuName}</h2>
                   <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <span>{delivery.personCount} kişilik teslimat</span>
                     <StatusBadge domain="delivery" status={delivery.status} />

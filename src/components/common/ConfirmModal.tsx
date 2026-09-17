@@ -72,12 +72,12 @@ export default function ConfirmModal({
       <div
         ref={dialogRef}
         onKeyDown={onKeyDown}
-        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-white p-6 shadow-floating"
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-title"
       >
-        <h2 id="confirm-title" className="text-xl font-black">
+        <h2 id="confirm-title" className="text-xl font-semibold">
           {title}
         </h2>
         <p className="mt-3 text-sm leading-6 text-slate-600">{message}</p>

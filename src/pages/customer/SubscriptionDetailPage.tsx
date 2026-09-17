@@ -138,13 +138,13 @@ function DeliveryLiveTracking({ deliveries }: { deliveries: Delivery[] }) {
   );
   if (!tracked.length) return null;
   return (
-    <section className="rounded-3xl border border-info-200 bg-gradient-to-br from-info-50 to-white p-6 shadow-sm">
+    <section className="rounded-xl border border-info-200 bg-gradient-to-br from-info-50 to-white p-6 shadow-sm">
       <div className="flex items-center gap-3">
-        <span className="grid h-11 w-11 place-items-center rounded-2xl bg-info-600 text-white">
+        <span className="grid h-11 w-11 place-items-center rounded-xl bg-info-600 text-white">
           <Truck className="h-6 w-6" />
         </span>
         <div>
-          <h2 className="text-xl font-black">Teslimat takibi</h2>
+          <h2 className="text-xl font-semibold">Teslimat takibi</h2>
           <p className="text-sm text-slate-500">
             Operasyon durumu ve tahmini teslim zamanı
           </p>
@@ -155,7 +155,7 @@ function DeliveryLiveTracking({ deliveries }: { deliveries: Delivery[] }) {
           return (
             <div
               key={delivery.id}
-              className="rounded-2xl border border-info-100 bg-white p-4"
+              className="rounded-xl border border-info-100 bg-white p-4"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <strong>
@@ -577,7 +577,7 @@ export default function SubscriptionDetailPage() {
   }, [location.search]);
 
   if (isLoading)
-    return <div className="h-96 animate-pulse rounded-3xl bg-slate-200" />;
+    return <div className="h-96 animate-pulse rounded-xl bg-slate-200" />;
   if (isError || !data)
     return (
       <div className="mf-page">
@@ -737,7 +737,7 @@ export default function SubscriptionDetailPage() {
           >
             ← Aboneliklerime dön
           </Link>
-          <p className="mt-3 text-xs font-black uppercase tracking-[.14em] text-primary-600">
+          <p className="mt-3 text-xs font-semibold uppercase tracking-[.14em] text-primary-600">
             Abonelik yönetimi
           </p>
           <div className="mt-2 flex items-center gap-3">
@@ -754,7 +754,7 @@ export default function SubscriptionDetailPage() {
             </div>
             <div>
               <p className="text-xs font-bold text-slate-500">Catering firması</p>
-              <h1 className="text-3xl font-black tracking-tight text-ink">
+              <h1 className="text-3xl font-semibold tracking-tight text-ink">
                 {sub.storeName}
               </h1>
               <p className="text-sm text-slate-500">Abonelik detayı</p>
@@ -819,7 +819,7 @@ export default function SubscriptionDetailPage() {
       <div
         role="tablist"
         aria-label="Abonelik ayrıntıları"
-        className="flex snap-x gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-card"
+        className="flex snap-x gap-2 overflow-x-auto rounded-xl border border-slate-200 bg-white p-2 shadow-card"
       >
         {(
           [
@@ -846,8 +846,8 @@ export default function SubscriptionDetailPage() {
           <DeliveryLiveTracking deliveries={data.deliveries} />
           <div id="deliveries" className="scroll-mt-24" />
           {!!deliveryChangeRequests.length && (
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-black">Değişiklik taleplerim</h2>
+            <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-semibold">Değişiklik taleplerim</h2>
               <p className="mt-1 text-sm text-slate-500">
                 Teslimat değişikliği ve yemek servisi iptal taleplerinizin satıcı
                 kararlarını buradan takip edebilirsiniz.
@@ -877,7 +877,7 @@ export default function SubscriptionDetailPage() {
                   return (
                     <article
                       key={request.id}
-                      className="rounded-2xl border border-slate-100 p-4"
+                      className="rounded-xl border border-slate-100 p-4"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <strong>
@@ -933,10 +933,10 @@ export default function SubscriptionDetailPage() {
             </section>
           )}
           {["APPROVED", "ACTIVE"].includes(sub.status) && (
-            <details className="group rounded-3xl border border-info-200 bg-white shadow-sm">
+            <details className="group rounded-xl border border-info-200 bg-white shadow-sm">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-6 [&::-webkit-details-marker]:hidden">
                 <div>
-                  <h2 className="text-xl font-black">
+                  <h2 className="text-xl font-semibold">
                     Teslimat işlemleri
                   </h2>
                   <p className="mt-1 text-sm text-slate-500">
@@ -1019,10 +1019,10 @@ export default function SubscriptionDetailPage() {
             </details>
           )}
           {paymentSummary && (
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="flex items-center gap-2 text-xl font-black">
+                  <h2 className="flex items-center gap-2 text-xl font-semibold">
                     <CreditCard className="h-5 w-5 text-primary-600" />
                     Ödemeler
                   </h2>
@@ -1044,10 +1044,10 @@ export default function SubscriptionDetailPage() {
               {subscriptionPayments.length ? (
                 <div className="mt-5 space-y-3">
                   {subscriptionPayments.map((payment) => (
-                    <article key={payment.id} className="rounded-2xl border border-slate-200 p-4">
+                    <article key={payment.id} className="rounded-xl border border-slate-200 p-4">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <p className="font-black text-slate-900">
+                          <p className="font-semibold text-slate-900">
                             {payment.storeName ?? sub.storeName}
                           </p>
                           <p className="mt-1 text-xs text-slate-500">
@@ -1099,7 +1099,7 @@ export default function SubscriptionDetailPage() {
               {["PENDING_APPROVAL", "APPROVED", "ACTIVE", "PAYMENT_SUSPENDED"].includes(
                 sub.status,
               ) && (
-                <div className="mt-4 rounded-2xl border border-slate-200 p-4">
+                <div className="mt-4 rounded-xl border border-slate-200 p-4">
                   <label
                     htmlFor="subscription-payment-method"
                     className="text-sm font-bold text-slate-700"
@@ -1161,9 +1161,9 @@ export default function SubscriptionDetailPage() {
               ))}
             </section>
           )}
-          <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-start gap-4">
-              <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl bg-slate-100 text-2xl">
+              <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-slate-100 text-2xl">
                 {sub.storeLogoUrl ? (
                   <img
                     src={sub.storeLogoUrl}
@@ -1175,7 +1175,7 @@ export default function SubscriptionDetailPage() {
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-xl font-black">{sub.storeName}</h2>
+                <h2 className="text-xl font-semibold">{sub.storeName}</h2>
                 <p className="mt-1 text-slate-500">{sub.menuName}</p>
               </div>
               <Link
@@ -1208,7 +1208,7 @@ export default function SubscriptionDetailPage() {
                 <strong>{sub.deliveryTime}</strong>
               </div>
               <div>
-                <span className="mb-2 block text-lg font-black text-primary-600">
+                <span className="mb-2 block text-lg font-semibold text-primary-600">
                   ₺
                 </span>
                 <span className="block text-xs text-slate-500">Toplam</span>
@@ -1236,10 +1236,10 @@ export default function SubscriptionDetailPage() {
             )}
           </section>
 
-          <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-black">Teslimat takvimi</h2>
+                <h2 className="text-xl font-semibold">Teslimat takvimi</h2>
                 <p className="mt-1 text-sm text-slate-500">
                   {new Date(sub.startDate).toLocaleDateString("tr-TR")} –{" "}
                   {new Date(sub.endDate).toLocaleDateString("tr-TR")}
@@ -1322,8 +1322,8 @@ export default function SubscriptionDetailPage() {
         </main>
 
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
-          <section className="rounded-2xl border border-slate-200 bg-white p-5">
-            <h2 className="font-black">Durum geçmişi</h2>
+          <section className="rounded-xl border border-slate-200 bg-white p-5">
+            <h2 className="font-semibold">Durum geçmişi</h2>
             <div className="mt-5 space-y-0">
               {timeline.map((item, index) => {
                 const tone = {
@@ -1388,8 +1388,8 @@ export default function SubscriptionDetailPage() {
               })}
             </div>
           </section>
-          <section className="rounded-2xl border border-slate-200 bg-white p-5">
-            <h2 className="font-black">İşlemler</h2>
+          <section className="rounded-xl border border-slate-200 bg-white p-5">
+            <h2 className="font-semibold">İşlemler</h2>
             <div className="mt-4 space-y-2">
               {canReview && (
                 <button
@@ -1441,8 +1441,8 @@ export default function SubscriptionDetailPage() {
 
       {actionDelivery && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6">
-            <h2 className="text-xl font-black">Teslimat işlemi seçin</h2>
+          <div className="w-full max-w-md rounded-xl bg-white p-6">
+            <h2 className="text-xl font-semibold">Teslimat işlemi seçin</h2>
             <p className="mt-2 text-sm text-slate-500">
               {new Date(`${actionDelivery.deliveryDate}T12:00:00`).toLocaleDateString(
                 "tr-TR",
@@ -1455,9 +1455,9 @@ export default function SubscriptionDetailPage() {
               <button
                 type="button"
                 onClick={() => openModify(actionDelivery)}
-                className="rounded-2xl border border-info-200 p-4 text-left hover:bg-info-50"
+                className="rounded-xl border border-info-200 p-4 text-left hover:bg-info-50"
               >
-                <span className="flex items-center gap-2 font-black text-info-800">
+                <span className="flex items-center gap-2 font-semibold text-info-800">
                   <Clock3 className="h-5 w-5" /> Saat veya kişi sayısını değiştir
                 </span>
                 <span className="mt-1 block text-sm text-slate-500">
@@ -1470,9 +1470,9 @@ export default function SubscriptionDetailPage() {
                   setActionDeliveryId(undefined);
                   setCancelDeliveryId(actionDelivery.id);
                 }}
-                className="rounded-2xl border border-warning-200 p-4 text-left hover:bg-warning-50"
+                className="rounded-xl border border-warning-200 p-4 text-left hover:bg-warning-50"
               >
-                <span className="flex items-center gap-2 font-black text-warning-800">
+                <span className="flex items-center gap-2 font-semibold text-warning-800">
                   <CalendarDays className="h-5 w-5" /> Yemek servisini iptal et
                 </span>
                 <span className="mt-1 block text-sm text-slate-500">
@@ -1494,8 +1494,8 @@ export default function SubscriptionDetailPage() {
       )}
       {modifyDeliveryId && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6">
-            <h2 className="text-xl font-black">Teslimat değişikliği talebi</h2>
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6">
+            <h2 className="text-xl font-semibold">Teslimat değişikliği talebi</h2>
             <p className="mt-2 text-sm text-slate-500">
               Yalnız bu teslimat günü için saat ve kişi sayısını
               değiştirebilirsiniz. Teslimat adresi abonelik boyunca sabittir.
@@ -1663,8 +1663,8 @@ export default function SubscriptionDetailPage() {
       />
       {showFreeze && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6">
-            <h2 className="text-xl font-black">Aboneliği dondur</h2>
+          <div className="w-full max-w-md rounded-xl bg-white p-6">
+            <h2 className="text-xl font-semibold">Aboneliği dondur</h2>
             <p className="mt-2 text-sm text-slate-500">
               Aralıktaki planlanmış teslimatlar atlanır ve ücret düzeltmesi
               yapılır.
@@ -1739,8 +1739,8 @@ export default function SubscriptionDetailPage() {
           aria-modal="true"
           aria-labelledby="extend-subscription-title"
         >
-          <div className="w-full max-w-md rounded-2xl bg-white p-6">
-            <h2 id="extend-subscription-title" className="text-xl font-black">
+          <div className="w-full max-w-md rounded-xl bg-white p-6">
+            <h2 id="extend-subscription-title" className="text-xl font-semibold">
               Abonelik dönemini uzat
             </h2>
             <p className="mt-2 text-sm text-slate-500">
@@ -1784,8 +1784,8 @@ export default function SubscriptionDetailPage() {
 
       {showCancel && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6">
-            <h2 className="text-xl font-black">Aboneliği iptal et</h2>
+          <div className="w-full max-w-md rounded-xl bg-white p-6">
+            <h2 className="text-xl font-semibold">Aboneliği iptal et</h2>
             <p className="mt-2 text-sm text-slate-500">
               İptal nedeninizi belirtmeniz satıcıya yardımcı olur.
             </p>
@@ -1816,8 +1816,8 @@ export default function SubscriptionDetailPage() {
       )}
       {showReview && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6">
-            <h2 className="text-xl font-black">Deneyiminizi değerlendirin</h2>
+          <div className="w-full max-w-md rounded-xl bg-white p-6">
+            <h2 className="text-xl font-semibold">Deneyiminizi değerlendirin</h2>
             <div className="mt-5 flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((value) => (
                 <button
@@ -1855,8 +1855,8 @@ export default function SubscriptionDetailPage() {
       )}
       {showComplaint && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6">
-            <h2 className="text-xl font-black">Sorun bildir</h2>
+          <div className="w-full max-w-md rounded-xl bg-white p-6">
+            <h2 className="text-xl font-semibold">Sorun bildir</h2>
             <select
               aria-label="Sorunun ilgili olduğu teslimat"
               value={complaint.deliveryId}

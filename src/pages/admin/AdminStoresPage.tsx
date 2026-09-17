@@ -169,26 +169,26 @@ export default function AdminStoresPage() {
                 <table className="w-full min-w-[760px] text-left">
                   <thead className="border-b bg-slate-50">
                     <tr>
-                      <th className="px-6 py-3 text-xs font-black uppercase tracking-wide text-slate-500">
+                      <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
                         ID
                       </th>
-                      <th className="px-6 py-3 text-xs font-black uppercase tracking-wide text-slate-500">
+                      <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
                         Mağaza adı
                       </th>
                       {showMinPerson && (
-                        <th className="px-6 py-3 text-xs font-black uppercase tracking-wide text-slate-500">
+                        <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
                           Minimum kişi
                         </th>
                       )}
                       {showRating && (
-                        <th className="px-6 py-3 text-xs font-black uppercase tracking-wide text-slate-500">
+                        <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
                           Puan
                         </th>
                       )}
-                      <th className="px-6 py-3 text-xs font-black uppercase tracking-wide text-slate-500">
+                      <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
                         Durum
                       </th>
-                      <th className="px-6 py-3 text-xs font-black uppercase tracking-wide text-slate-500">
+                      <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
                         İşlem
                       </th>
                     </tr>

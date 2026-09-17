@@ -170,17 +170,17 @@ export default function AdminComplaintsPage() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
           <section
-            className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"
+            className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-floating"
             role="dialog"
             aria-modal="true"
             aria-label="Şikâyet kararı"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-black uppercase tracking-wide text-primary-600">
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">
                   Şikâyet #{selected.id}
                 </p>
-                <h2 className="text-xl font-black text-ink">Karar ve telafi</h2>
+                <h2 className="text-xl font-semibold text-ink">Karar ve telafi</h2>
               </div>
               <StatusBadge
                 tone={uiStatus(complaintStatuses, selected.status).tone}
@@ -200,7 +200,7 @@ export default function AdminComplaintsPage() {
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {context.data.delivery && (
                   <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                       Teslimat
                     </p>
                     <p className="mt-2 text-sm font-semibold text-ink">
@@ -222,7 +222,7 @@ export default function AdminComplaintsPage() {
                 )}
                 {context.data.payment && (
                   <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                       Ödeme
                     </p>
                     <p className="mt-2 text-sm font-semibold text-ink">
