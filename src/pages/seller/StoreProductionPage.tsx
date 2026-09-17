@@ -150,9 +150,9 @@ export default function StoreProductionPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-[#e7e7e7] pb-5">
         <div>
-          <h2 className="text-xl font-semibold">Operasyon ve Üretim Takvimi</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Operasyon ve üretim takvimi</h2>
           <p className="mt-1 text-sm text-slate-500">
             Porsiyonları menü ve teslimat saatine göre mutfak için hazırlayın.
           </p>
@@ -161,7 +161,7 @@ export default function StoreProductionPage() {
           <button
             onClick={exportCsv}
             disabled={!rows.length}
-            className="flex items-center gap-1 rounded-xl border bg-white px-3 py-2 text-sm font-bold disabled:opacity-40"
+            className="flex items-center gap-1 rounded-2xl border border-[#e7e7e7] bg-white px-3 py-2 text-sm font-bold disabled:opacity-40"
           >
             <Download className="h-4 w-4" />
             CSV
@@ -169,7 +169,7 @@ export default function StoreProductionPage() {
           <button
             onClick={exportExcel}
             disabled={!rows.length}
-            className="flex items-center gap-1 rounded-xl border bg-white px-3 py-2 text-sm font-bold disabled:opacity-40"
+            className="flex items-center gap-1 rounded-2xl border border-[#e7e7e7] bg-white px-3 py-2 text-sm font-bold disabled:opacity-40"
           >
             <FileSpreadsheet className="h-4 w-4" />
             Excel
@@ -184,7 +184,7 @@ export default function StoreProductionPage() {
           </button>
         </div>
       </div>
-      <div className="flex flex-wrap items-end gap-3 rounded-xl border bg-white p-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-[#e7e7e7] bg-white p-4">
         <div className="flex rounded-xl bg-slate-100 p-1">
           <button
             onClick={() => setMode("day")}
@@ -221,15 +221,15 @@ export default function StoreProductionPage() {
         {(data) => (
           <>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border bg-white p-5">
+              <div className="rounded-2xl border border-[#e7e7e7] bg-white p-5">
                 <UtensilsCrossed className="h-5 w-5 text-primary-600" />
                 <p className="mt-3 text-sm text-slate-500">Toplam porsiyon</p>
-                <p className="text-3xl font-semibold">{data.totalPortions}</p>
+                <p className="text-3xl font-bold">{data.totalPortions}</p>
               </div>
-              <div className="rounded-xl border bg-white p-5">
+              <div className="rounded-2xl border border-[#e7e7e7] bg-white p-5">
                 <Users className="h-5 w-5 text-info-600" />
                 <p className="mt-3 text-sm text-slate-500">Teslimat</p>
-                <p className="text-3xl font-semibold">{data.totalDeliveries}</p>
+                <p className="text-3xl font-bold">{data.totalDeliveries}</p>
               </div>
             </div>
             <section>
@@ -247,7 +247,7 @@ export default function StoreProductionPage() {
                     <p className="text-xs font-bold uppercase text-slate-500">
                       {trDate(day.date)}
                     </p>
-                    <p className="mt-2 text-2xl font-semibold">{day.portions}</p>
+                    <p className="mt-2 text-2xl font-bold">{day.portions}</p>
                     <p className="text-xs text-slate-500">
                       porsiyon · {day.deliveryCount} teslimat
                     </p>
@@ -278,7 +278,7 @@ export default function StoreProductionPage() {
               </div>
             </section>
             <div className="grid gap-5 lg:grid-cols-2">
-              <section className="rounded-xl border bg-white p-5">
+              <section className="rounded-2xl border border-[#e7e7e7] bg-white p-5">
                 <h3 className="font-semibold">Menü bazlı porsiyon</h3>
                 <div className="mt-4 space-y-4">
                   {data.menus.map((menu) => (
@@ -304,7 +304,7 @@ export default function StoreProductionPage() {
                   )}
                 </div>
               </section>
-              <section className="rounded-xl border bg-white p-5">
+              <section className="rounded-2xl border border-[#e7e7e7] bg-white p-5">
                 <h3 className="font-semibold">Teslimat saati yoğunluğu</h3>
                 <div className="mt-3 divide-y">
                   {data.timeSlots.map((slot) => (
@@ -329,7 +329,7 @@ export default function StoreProductionPage() {
                 </div>
               </section>
             </div>
-            <section className="overflow-hidden rounded-xl border bg-white">
+            <section className="overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white">
               <div className="border-b p-4">
                 <h3 className="font-semibold">Toplu hazırlık listesi</h3>
               </div>

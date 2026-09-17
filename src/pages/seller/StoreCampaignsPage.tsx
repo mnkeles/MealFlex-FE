@@ -49,9 +49,9 @@ export default function StoreCampaignsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-[#e6e1d8] pb-5">
+      <div className="border-b border-[#e7e7e7] pb-5">
         <p className="customer-eyebrow">Büyüme araçları</p>
-        <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Kampanyalar ve kuponlar</h2>
+        <h2 className="mt-1 text-xl font-bold tracking-tight text-ink">Kampanyalar ve kuponlar</h2>
         <p className="mt-1 text-sm text-slate-500">
           Koşulları sırayla tanımlayın; son adımda yayına alma tarihini kontrol
           edin.

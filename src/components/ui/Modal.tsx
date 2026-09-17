@@ -81,7 +81,7 @@ export default function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-[#252a24]/45 p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-50 grid place-items-center bg-[#191919]/45 p-4 backdrop-blur-[2px]"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -89,19 +89,19 @@ export default function Modal({
       <section
         ref={dialogRef}
         onKeyDown={trapFocus}
-        className="max-h-[90vh] w-full max-w-lg overflow-hidden rounded-xl border border-[#e6e1d8] bg-[#fffefa] shadow-floating"
+        className="max-h-[90vh] w-full max-w-lg overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white shadow-floating"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        <header className="flex items-center justify-between border-b border-[#e6e1d8] px-5 py-4">
-          <h2 id="modal-title" className="font-semibold text-ink">
+        <header className="flex items-center justify-between border-b border-[#e7e7e7] px-5 py-4">
+          <h2 id="modal-title" className="font-bold text-ink">
             {title}
           </h2>
           <button
             onClick={onClose}
             aria-label="Pencereyi kapat"
-            className="rounded-lg p-2 text-slate-500 hover:bg-[#f3efe8]"
+            className="rounded-lg p-2 text-slate-500 hover:bg-[#f2f2f2]"
           >
             <X size={20} />
           </button>
@@ -110,7 +110,7 @@ export default function Modal({
           {children}
         </div>
         {footer && (
-          <footer className="flex flex-wrap justify-end gap-2 border-t border-[#e6e1d8] bg-[#faf8f4] p-4">
+          <footer className="flex flex-wrap justify-end gap-2 border-t border-[#e7e7e7] bg-[#f7f7f7] p-4">
             {footer}
           </footer>
         )}

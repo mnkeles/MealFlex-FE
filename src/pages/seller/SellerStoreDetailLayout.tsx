@@ -145,7 +145,7 @@ export default function SellerStoreDetailLayout() {
 
   return (
     <div className="min-w-0 space-y-5">
-      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+      <section className="rounded-2xl border border-[#e7e7e7] bg-white p-5 sm:p-6">
         <Link
           to="/seller/stores"
           onClick={(event) => {
@@ -161,7 +161,7 @@ export default function SellerStoreDetailLayout() {
               <Store size={21} />
             </span>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-ink">
+              <h1 className="text-2xl font-bold tracking-tight text-ink">
                 {store?.name || "Mağaza"}
               </h1>
               <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -209,13 +209,13 @@ export default function SellerStoreDetailLayout() {
       </section>
 
       <nav
-        className="rounded-xl border border-slate-200 bg-white p-3 shadow-card"
+        className="rounded-2xl border border-[#e7e7e7] bg-white p-3"
         aria-label="Mağaza bölümleri"
       >
         <button
           type="button"
           onClick={() => setMobileNavigationOpen(true)}
-          className="flex min-h-11 w-full items-center justify-between rounded-xl bg-slate-50 px-3 text-left text-sm font-bold text-slate-700 md:hidden"
+          className="flex min-h-11 w-full items-center justify-between rounded-2xl bg-[#f7f7f7] px-3 text-left text-sm font-bold text-slate-700 md:hidden"
         >
           <span>
             {activeGroup.label} ·{" "}
@@ -223,7 +223,7 @@ export default function SellerStoreDetailLayout() {
           </span>
           <Menu className="h-5 w-5 text-primary-600" />
         </button>
-        <div className="hidden flex-wrap gap-2 border-b border-slate-100 pb-3 md:flex">
+        <div className="hidden flex-wrap gap-1 border-b border-[#eeeeee] pb-3 md:flex">
           {tabGroups.map((group) => (
             <Link
               key={group.label}
@@ -231,7 +231,7 @@ export default function SellerStoreDetailLayout() {
               onClick={(event) => {
                 if (!confirmSellerStoreNavigation()) event.preventDefault();
               }}
-              className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${group.label === activeGroup.label ? "bg-primary-600 text-white shadow-sm" : "bg-slate-50 text-slate-600 hover:bg-primary-50 hover:text-primary-700"}`}
+              className={`rounded-full px-3.5 py-2 text-xs font-bold transition ${group.label === activeGroup.label ? "bg-[#191919] text-white" : "bg-[#f2f2f2] text-slate-600 hover:bg-primary-50 hover:text-primary-700"}`}
             >
               {group.label}
             </Link>

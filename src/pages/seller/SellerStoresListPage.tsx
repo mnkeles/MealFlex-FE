@@ -152,7 +152,7 @@ export default function SellerStoresListPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Mağazalarım</h1>
+        <h1 className="text-2xl font-bold">Mağazalarım</h1>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700"
@@ -330,7 +330,7 @@ export default function SellerStoresListPage() {
             {stores.map((store) => (
               <article
                 key={store.id}
-                className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card transition-shadow hover:shadow-floating"
+                className="overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white shadow-card transition-shadow hover:shadow-floating"
               >
                 <div className="relative h-28 bg-gradient-to-br from-warning-100 via-cream to-success-100">
                   {store.coverImageUrl && (

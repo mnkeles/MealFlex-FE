@@ -208,7 +208,7 @@ export default function SellerDashboard() {
                   className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#f3efe8] text-slate-600">
+                    <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#f2f2f2] text-slate-600">
                       <CookingPot className="h-5 w-5" />
                     </span>
                     <div className="min-w-0">

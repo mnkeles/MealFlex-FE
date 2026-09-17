@@ -17,7 +17,7 @@ export default function FileUpload({
 }: Props) {
   return (
     <label
-      className={`flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-[#cfc6b9] bg-[#faf8f4] p-5 text-center transition hover:border-primary-300 hover:bg-primary-50/40 ${disabled ? "pointer-events-none opacity-50" : ""}`}
+      className={`flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#bdbdbd] bg-[#f7f7f7] p-5 text-center transition hover:border-primary-400 hover:bg-primary-50/40 ${disabled ? "pointer-events-none opacity-50" : ""}`}
     >
       <ImagePlus className="text-primary-600" size={26} />
       <span className="mt-2 text-sm font-semibold text-primary-700">{label}</span>

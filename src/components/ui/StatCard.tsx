@@ -13,9 +13,9 @@ type StatCardProps = {
 };
 const toneClasses = {
   primary: "bg-primary-50 text-primary-600",
-  success: "bg-success-50 text-success-600",
-  warning: "bg-warning-50 text-warning-600",
-  danger: "bg-danger-50 text-danger-600",
+  success: "bg-[#f2f2f2] text-[#191919]",
+  warning: "bg-[#fff5db] text-warning-700",
+  danger: "bg-[#fff1ef] text-primary-600",
 };
 
 export default function StatCard({
@@ -31,13 +31,13 @@ export default function StatCard({
     <>
       <div className="flex items-start justify-between gap-3">
         <div
-          className={`grid h-10 w-10 place-items-center rounded-lg ${toneClasses[tone]}`}
+          className={`grid h-10 w-10 place-items-center rounded-xl ${toneClasses[tone]}`}
         >
           {icon}
         </div>
         {to && <ArrowUpRight className="h-5 w-5 text-slate-300" />}
       </div>
-      <p className="mt-5 text-3xl font-semibold tracking-tight text-ink">
+      <p className="mt-5 text-3xl font-bold tracking-tight text-ink">
         {value}
       </p>
       <p className="mt-1 text-sm font-semibold text-slate-600">{label}</p>
@@ -58,7 +58,7 @@ export default function StatCard({
   return to ? (
     <Link
       to={to}
-      className="mf-surface block p-5 transition hover:border-[#cec6b9] hover:shadow-card"
+      className="mf-surface block p-5 transition hover:border-[#c9c9c9] hover:shadow-card"
     >
       {content}
     </Link>

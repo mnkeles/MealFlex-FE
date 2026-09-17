@@ -144,7 +144,7 @@ function DeliveryLiveTracking({ deliveries }: { deliveries: Delivery[] }) {
           <Truck className="h-6 w-6" />
         </span>
         <div>
-          <h2 className="text-xl font-semibold">Teslimat takibi</h2>
+          <h2 className="text-xl font-bold">Teslimat takibi</h2>
           <p className="text-sm text-slate-500">
             Operasyon durumu ve tahmini teslim zamanı
           </p>
@@ -754,7 +754,7 @@ export default function SubscriptionDetailPage() {
             </div>
             <div>
               <p className="text-xs font-bold text-slate-500">Catering firması</p>
-              <h1 className="text-3xl font-semibold tracking-tight text-ink">
+              <h1 className="text-3xl font-bold tracking-tight text-ink">
                 {sub.storeName}
               </h1>
               <p className="text-sm text-slate-500">Abonelik detayı</p>
@@ -819,7 +819,7 @@ export default function SubscriptionDetailPage() {
       <div
         role="tablist"
         aria-label="Abonelik ayrıntıları"
-        className="flex snap-x gap-2 overflow-x-auto rounded-xl border border-slate-200 bg-white p-2 shadow-card"
+        className="flex snap-x gap-2 overflow-x-auto rounded-2xl border border-[#e7e7e7] bg-white p-2 shadow-card"
       >
         {(
           [
@@ -846,8 +846,8 @@ export default function SubscriptionDetailPage() {
           <DeliveryLiveTracking deliveries={data.deliveries} />
           <div id="deliveries" className="scroll-mt-24" />
           {!!deliveryChangeRequests.length && (
-            <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold">Değişiklik taleplerim</h2>
+            <section className="rounded-2xl border border-[#e7e7e7] bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-bold">Değişiklik taleplerim</h2>
               <p className="mt-1 text-sm text-slate-500">
                 Teslimat değişikliği ve yemek servisi iptal taleplerinizin satıcı
                 kararlarını buradan takip edebilirsiniz.
@@ -917,7 +917,7 @@ export default function SubscriptionDetailPage() {
                         </p>
                       )}
                       {request.customerNote && (
-                        <p className="mt-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-700">
+                        <p className="mt-2 rounded-2xl bg-[#f7f7f7] p-3 text-sm text-slate-700">
                           <strong>
                             {request.requestType === "CANCEL"
                               ? "Talep nedeni:"
@@ -936,7 +936,7 @@ export default function SubscriptionDetailPage() {
             <details className="group rounded-xl border border-info-200 bg-white shadow-sm">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-6 [&::-webkit-details-marker]:hidden">
                 <div>
-                  <h2 className="text-xl font-semibold">
+                  <h2 className="text-xl font-bold">
                     Teslimat işlemleri
                   </h2>
                   <p className="mt-1 text-sm text-slate-500">
@@ -1019,10 +1019,10 @@ export default function SubscriptionDetailPage() {
             </details>
           )}
           {paymentSummary && (
-            <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="rounded-2xl border border-[#e7e7e7] bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="flex items-center gap-2 text-xl font-semibold">
+                  <h2 className="flex items-center gap-2 text-xl font-bold">
                     <CreditCard className="h-5 w-5 text-primary-600" />
                     Ödemeler
                   </h2>
@@ -1062,7 +1062,7 @@ export default function SubscriptionDetailPage() {
                           <StatusBadge domain="payment" status={payment.status} />
                         </div>
                       </div>
-                      <dl className="mt-4 grid gap-3 rounded-xl bg-slate-50 p-3 text-sm sm:grid-cols-2">
+                      <dl className="mt-4 grid gap-3 rounded-2xl bg-[#f7f7f7] p-3 text-sm sm:grid-cols-2">
                         <div>
                           <dt className="text-xs text-slate-500">Hizmet tarihleri</dt>
                           <dd className="mt-1 font-semibold text-slate-800">
@@ -1092,7 +1092,7 @@ export default function SubscriptionDetailPage() {
                   ))}
                 </div>
               ) : (
-                <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+                <p className="mt-5 rounded-2xl bg-[#f7f7f7] p-4 text-sm text-slate-500">
                   Bu abonelik için henüz ödeme hareketi yok.
                 </p>
               )}
@@ -1117,7 +1117,7 @@ export default function SubscriptionDetailPage() {
                             : undefined,
                         )
                       }
-                      className="min-h-11 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-sm"
+                      className="min-h-11 flex-1 rounded-2xl border border-[#e7e7e7] bg-white px-3 text-sm"
                     >
                       <option value="">Yeni kartı seçin</option>
                       {paymentMethods.map((method) => (
@@ -1161,7 +1161,7 @@ export default function SubscriptionDetailPage() {
               ))}
             </section>
           )}
-          <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <section className="rounded-2xl border border-[#e7e7e7] bg-white p-6 shadow-sm">
             <div className="flex items-start gap-4">
               <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-slate-100 text-2xl">
                 {sub.storeLogoUrl ? (
@@ -1175,7 +1175,7 @@ export default function SubscriptionDetailPage() {
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-xl font-semibold">{sub.storeName}</h2>
+                <h2 className="text-xl font-bold">{sub.storeName}</h2>
                 <p className="mt-1 text-slate-500">{sub.menuName}</p>
               </div>
               <Link
@@ -1215,7 +1215,7 @@ export default function SubscriptionDetailPage() {
                 <strong>{sub.totalAmount.toLocaleString("tr-TR")} ₺</strong>
               </div>
             </div>
-            <div className="mt-5 flex items-start gap-2 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+            <div className="mt-5 flex items-start gap-2 rounded-2xl bg-[#f7f7f7] p-4 text-sm text-slate-600">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
               <span>
                 <strong className="block text-slate-800">
@@ -1236,10 +1236,10 @@ export default function SubscriptionDetailPage() {
             )}
           </section>
 
-          <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <section className="rounded-2xl border border-[#e7e7e7] bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold">Teslimat takvimi</h2>
+                <h2 className="text-xl font-bold">Teslimat takvimi</h2>
                 <p className="mt-1 text-sm text-slate-500">
                   {new Date(sub.startDate).toLocaleDateString("tr-TR")} –{" "}
                   {new Date(sub.endDate).toLocaleDateString("tr-TR")}
@@ -1322,7 +1322,7 @@ export default function SubscriptionDetailPage() {
         </main>
 
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
-          <section className="rounded-xl border border-slate-200 bg-white p-5">
+          <section className="rounded-2xl border border-[#e7e7e7] bg-white p-5">
             <h2 className="font-semibold">Durum geçmişi</h2>
             <div className="mt-5 space-y-0">
               {timeline.map((item, index) => {
@@ -1388,7 +1388,7 @@ export default function SubscriptionDetailPage() {
               })}
             </div>
           </section>
-          <section className="rounded-xl border border-slate-200 bg-white p-5">
+          <section className="rounded-2xl border border-[#e7e7e7] bg-white p-5">
             <h2 className="font-semibold">İşlemler</h2>
             <div className="mt-4 space-y-2">
               {canReview && (
@@ -1441,8 +1441,8 @@ export default function SubscriptionDetailPage() {
 
       {actionDelivery && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6">
-            <h2 className="text-xl font-semibold">Teslimat işlemi seçin</h2>
+          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            <h2 className="text-xl font-bold">Teslimat işlemi seçin</h2>
             <p className="mt-2 text-sm text-slate-500">
               {new Date(`${actionDelivery.deliveryDate}T12:00:00`).toLocaleDateString(
                 "tr-TR",
@@ -1494,8 +1494,8 @@ export default function SubscriptionDetailPage() {
       )}
       {modifyDeliveryId && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6">
-            <h2 className="text-xl font-semibold">Teslimat değişikliği talebi</h2>
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6">
+            <h2 className="text-xl font-bold">Teslimat değişikliği talebi</h2>
             <p className="mt-2 text-sm text-slate-500">
               Yalnız bu teslimat günü için saat ve kişi sayısını
               değiştirebilirsiniz. Teslimat adresi abonelik boyunca sabittir.
@@ -1663,8 +1663,8 @@ export default function SubscriptionDetailPage() {
       />
       {showFreeze && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6">
-            <h2 className="text-xl font-semibold">Aboneliği dondur</h2>
+          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            <h2 className="text-xl font-bold">Aboneliği dondur</h2>
             <p className="mt-2 text-sm text-slate-500">
               Aralıktaki planlanmış teslimatlar atlanır ve ücret düzeltmesi
               yapılır.
@@ -1739,8 +1739,8 @@ export default function SubscriptionDetailPage() {
           aria-modal="true"
           aria-labelledby="extend-subscription-title"
         >
-          <div className="w-full max-w-md rounded-xl bg-white p-6">
-            <h2 id="extend-subscription-title" className="text-xl font-semibold">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            <h2 id="extend-subscription-title" className="text-xl font-bold">
               Abonelik dönemini uzat
             </h2>
             <p className="mt-2 text-sm text-slate-500">
@@ -1784,8 +1784,8 @@ export default function SubscriptionDetailPage() {
 
       {showCancel && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6">
-            <h2 className="text-xl font-semibold">Aboneliği iptal et</h2>
+          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            <h2 className="text-xl font-bold">Aboneliği iptal et</h2>
             <p className="mt-2 text-sm text-slate-500">
               İptal nedeninizi belirtmeniz satıcıya yardımcı olur.
             </p>
@@ -1816,8 +1816,8 @@ export default function SubscriptionDetailPage() {
       )}
       {showReview && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6">
-            <h2 className="text-xl font-semibold">Deneyiminizi değerlendirin</h2>
+          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            <h2 className="text-xl font-bold">Deneyiminizi değerlendirin</h2>
             <div className="mt-5 flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((value) => (
                 <button
@@ -1855,8 +1855,8 @@ export default function SubscriptionDetailPage() {
       )}
       {showComplaint && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-950/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6">
-            <h2 className="text-xl font-semibold">Sorun bildir</h2>
+          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            <h2 className="text-xl font-bold">Sorun bildir</h2>
             <select
               aria-label="Sorunun ilgili olduğu teslimat"
               value={complaint.deliveryId}

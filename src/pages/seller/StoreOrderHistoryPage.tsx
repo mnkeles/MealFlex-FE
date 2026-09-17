@@ -80,10 +80,10 @@ export default function StoreOrderHistoryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e6e1d8] pb-5">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e7e7e7] pb-5">
         <div>
           <p className="customer-eyebrow">Operasyon arşivi</p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Sipariş geçmişi</h2>
+          <h2 className="mt-1 text-xl font-bold tracking-tight text-ink">Sipariş geçmişi</h2>
           <p className="mt-1 text-sm text-slate-500">Geçmiş teslimatları filtreleyin, inceleyin ve dışa aktarın.</p>
         </div>
         <button
@@ -91,7 +91,7 @@ export default function StoreOrderHistoryPage() {
           disabled={
             isExporting || !startDate || !endDate || startDate > endDate
           }
-          className="rounded-lg border bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          className="rounded-xl border border-[#e7e7e7] bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
         >
           {isExporting ? "Hazırlanıyor..." : "CSV İndir"}
         </button>

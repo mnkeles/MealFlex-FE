@@ -26,12 +26,12 @@ export default function StoreSubscriptionsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-[#e6e1d8] pb-5">
+      <div className="border-b border-[#e7e7e7] pb-5">
         <p className="customer-eyebrow">Müşteri anlaşmaları</p>
-        <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Anlaşmalı abonelikler</h2>
+        <h2 className="mt-1 text-xl font-bold tracking-tight text-ink">Anlaşmalı abonelikler</h2>
         <p className="mt-1 text-sm text-slate-500">Ödeme ve başlangıç durumuna göre devam eden anlaşmaları izleyin.</p>
       </div>
-      <div className="flex flex-wrap gap-1 border-b border-[#e6e1d8]">
+      <div className="flex flex-wrap gap-1 border-b border-[#e7e7e7]">
         {tabs.map((item) => (
           <button
             key={item.value}

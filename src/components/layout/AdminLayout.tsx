@@ -104,7 +104,7 @@ export default function AdminLayout() {
       {menuGroups.map((group) => (
         <div key={group.label}>
           <p
-            className={`mb-2 px-3 text-[10px] font-semibold uppercase tracking-[.16em] text-[#85654d] ${collapsed ? "hidden" : ""}`}
+            className={`mb-2 px-3 text-[10px] font-semibold uppercase tracking-[.16em] text-[#eb1700] ${collapsed ? "hidden" : ""}`}
           >
             {group.label}
           </p>
@@ -215,7 +215,7 @@ export default function AdminLayout() {
         </div>
       )}
       <aside
-        className={`fixed hidden h-screen flex-col border-r border-[#e6e1d8] bg-[#fdfcf9] transition-[width] duration-200 md:flex ${collapsed ? "w-20" : "w-72"}`}
+        className={`fixed hidden h-screen flex-col border-r border-[#e7e7e7] bg-[#fdfcf9] transition-[width] duration-200 md:flex ${collapsed ? "w-20" : "w-72"}`}
       >
         <div
           className={`flex items-center border-b border-slate-100 py-5 ${collapsed ? "justify-center px-2" : "justify-between px-6"}`}
@@ -250,7 +250,7 @@ export default function AdminLayout() {
         <div className="min-h-0 flex-1 overflow-y-auto">{nav()}</div>
         <div className="border-t border-slate-100 p-4">
           <div
-            className={`flex items-center gap-3 border-t border-[#eeeae2] p-3 ${collapsed ? "justify-center" : ""}`}
+            className={`flex items-center gap-3 border-t border-[#eeeeee] p-3 ${collapsed ? "justify-center" : ""}`}
           >
             <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-900 text-xs font-semibold text-white">
               {user?.firstName?.[0]}
@@ -283,7 +283,7 @@ export default function AdminLayout() {
           <div className="flex items-center gap-3">
             <Link
               to="/admin/audit-search"
-              className="flex h-10 w-72 items-center gap-2 rounded-lg border border-[#ddd7cc] bg-[#faf8f4] px-3 text-sm text-slate-500 transition hover:border-primary-300 hover:bg-white"
+              className="flex h-10 w-72 items-center gap-2 rounded-lg border border-[#d6d6d6] bg-[#f7f7f7] px-3 text-sm text-slate-500 transition hover:border-primary-300 hover:bg-white"
             >
               <Search className="h-4 w-4" />
               Kullanıcı, mağaza veya işlem ara

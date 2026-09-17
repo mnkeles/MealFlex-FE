@@ -284,7 +284,7 @@ export default function StorePendingPage() {
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold">Canlı Abonelik Talepleri</h2>
+          <h2 className="text-xl font-bold">Canlı Abonelik Talepleri</h2>
           <p className="mt-1 text-sm text-slate-500">
             Yeni talepler bu ekran açıkken anında görünür.
           </p>
@@ -308,7 +308,7 @@ export default function StorePendingPage() {
       <div
         role="tablist"
         aria-label="Onay talebi türleri"
-        className="mb-5 flex gap-2 overflow-x-auto rounded-xl border border-slate-200 bg-white p-2 shadow-sm"
+        className="mb-5 flex gap-2 overflow-x-auto rounded-2xl border border-[#e7e7e7] bg-white p-2 shadow-sm"
       >
         {[
           ["SUBSCRIPTIONS", "Abonelik", allSubscriptions.length],
@@ -356,7 +356,7 @@ export default function StorePendingPage() {
             {changeRequests.data.map((request) => (
               <div
                 key={request.id}
-                className="rounded-xl bg-white p-4 shadow-sm"
+                className="rounded-2xl bg-white p-4 shadow-sm"
               >
                 <div className="flex flex-col justify-between gap-3 lg:flex-row">
                   <div>
@@ -471,7 +471,7 @@ export default function StorePendingPage() {
       )}
       {activeTab === "DELIVERY_CHANGES" && !changeRequests.isLoading &&
         !changeRequests.isError && !changeRequests.data?.length && (
-          <p className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+          <p className="rounded-2xl border border-[#e7e7e7] bg-white p-8 text-center text-sm text-slate-500">
             Onay bekleyen teslimat değişikliği talebi bulunmuyor.
           </p>
         )}
@@ -488,7 +488,7 @@ export default function StorePendingPage() {
           {(requests) => (
             <div className="space-y-4">
               {requests.map((request) => (
-                <article key={request.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                <article key={request.id} className="rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-sm">
                   <div className="flex flex-col justify-between gap-4 lg:flex-row">
                     <div>
                       <span className="text-xs font-bold text-slate-500">TALEP #{request.id}</span>
@@ -570,7 +570,7 @@ export default function StorePendingPage() {
       >
         {() => (
         <>
-        <section className="mb-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="mb-4 rounded-2xl border border-[#e7e7e7] bg-white p-4 shadow-sm">
           <div className="flex flex-wrap items-center gap-2">
             <select
               aria-label="Onay SLA filtresi"
@@ -578,7 +578,7 @@ export default function StorePendingPage() {
               onChange={(event) =>
                 setSlaFilter(event.target.value as typeof slaFilter)
               }
-              className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold"
+              className="h-11 rounded-2xl border border-[#e7e7e7] bg-white px-3 text-sm font-bold"
             >
               <option value="ALL">Tüm talepler</option>
               <option value="URGENT">24 saatten az kalanlar</option>
@@ -590,7 +590,7 @@ export default function StorePendingPage() {
               onChange={(event) =>
                 setSortMode(event.target.value as typeof sortMode)
               }
-              className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold"
+              className="h-11 rounded-2xl border border-[#e7e7e7] bg-white px-3 text-sm font-bold"
             >
               <option value="SLA">SLA süresi en az</option>
               <option value="NEWEST">En yeni talep</option>
@@ -650,7 +650,7 @@ export default function StorePendingPage() {
             return (
               <article
                 key={sub.id}
-                className={`rounded-xl border bg-white p-5 shadow-sm ${expired ? "border-danger-300" : "border-slate-200"}`}
+                className={`rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-sm ${expired ? "border-danger-300" : "border-slate-200"}`}
               >
                 <label className="mb-3 inline-flex items-center gap-2 text-sm font-bold text-slate-600">
                   <input
@@ -783,7 +783,7 @@ export default function StorePendingPage() {
           })}
         </div>
         ) : (
-          <p className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+          <p className="rounded-2xl border border-[#e7e7e7] bg-white p-8 text-center text-sm text-slate-500">
             Seçili SLA filtresine uyan talep bulunmuyor.
           </p>
         )}

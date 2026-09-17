@@ -35,9 +35,9 @@ export default function SellerNotificationsPage() {
 
   return (
     <div className="mf-page">
-      <div className="border-b border-[#e6e1d8] pb-5">
+      <div className="border-b border-[#e7e7e7] pb-5">
         <p className="customer-eyebrow">Hesap akışı</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink">Bildirimler</h1>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-ink">Bildirimler</h1>
         <p className="mt-1 text-sm text-slate-500">Talepler, ödemeler ve operasyon gelişmeleri burada toplanır.</p>
       </div>
 

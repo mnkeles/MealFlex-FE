@@ -57,10 +57,10 @@ export default function SellerMenusPage() {
 
   return (
     <div className="mf-page">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e6e1d8] pb-5">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e7e7e7] pb-5">
         <div>
           <p className="customer-eyebrow">Ürün yönetimi</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink">Menüler</h1>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-ink">Menüler</h1>
           <p className="mt-1 text-sm text-slate-500">Fiyatları, içerikleri ve alerjen bilgilerini tek yerde yönetin.</p>
         </div>
         <button

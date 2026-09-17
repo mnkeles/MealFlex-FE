@@ -29,7 +29,7 @@ function FavoriteCard({
   return (
     <Link
       to={`/stores/${item.storeId}${addressId ? `?addressId=${addressId}` : ""}`}
-      className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+      className="group overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
     >
       <div className="relative h-36 bg-slate-100">
         {item.coverImageUrl ? (
@@ -120,7 +120,7 @@ export default function FavoritesPage() {
   return (
     <div>
       <p className="text-sm font-bold text-primary-600">KAYDETTİKLERİNİZ</p>
-      <h1 className="mt-1 text-3xl font-semibold">Favori işletmelerim</h1>
+      <h1 className="mt-1 text-3xl font-bold">Favori işletmelerim</h1>
       <p className="mt-2 text-slate-500">
         Beğendiğiniz işletmelere hızlıca ulaşın.
       </p>

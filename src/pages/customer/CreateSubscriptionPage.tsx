@@ -606,7 +606,7 @@ export default function CreateSubscriptionPage() {
           <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-success-100">
             <CheckCircle2 className="h-10 w-10 text-success-600" />
           </div>
-          <h1 className="mt-6 text-2xl font-semibold text-ink">
+          <h1 className="mt-6 text-2xl font-bold text-ink">
             Talebiniz satıcıya gönderildi
           </h1>
           <p className="mt-3 leading-7 text-slate-600">
@@ -703,7 +703,7 @@ export default function CreateSubscriptionPage() {
         description="Menü, teslimat ve ödeme bilgilerinizi adım adım tamamlayın. Talebiniz satıcı onayından sonra başlar."
       />
       <div className="mt-5 grid gap-7 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <main className="rounded-xl border border-slate-200 bg-white p-5 shadow-card sm:p-8">
+        <main className="rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card sm:p-8">
           <ol
             className="mt-7 grid grid-cols-5 gap-2"
             aria-label="Abonelik oluşturma adımları"
@@ -760,7 +760,7 @@ export default function CreateSubscriptionPage() {
                     <CreditCard />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">Ödeme yöntemi</h2>
+                    <h2 className="text-xl font-bold">Ödeme yöntemi</h2>
                     <p className="text-sm text-slate-500">
                       Tahsilat, satıcı onayından sonra ilk teslimat haftasında başlar.
                     </p>
@@ -793,7 +793,7 @@ export default function CreateSubscriptionPage() {
                         Kayıtlı kartınızı seçin
                       </h3>
                       {paymentMethodsLoading ? (
-                        <p className="mt-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+                        <p className="mt-3 rounded-2xl bg-[#f7f7f7] p-4 text-sm text-slate-500">
                           Kayıtlı kartlar yükleniyor…
                         </p>
                       ) : paymentMethods.length ? (
@@ -884,7 +884,7 @@ export default function CreateSubscriptionPage() {
                     <Users />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-xl font-bold">
                       Kaç kişilik yemek istiyorsunuz?
                     </h2>
                     <p className="text-sm text-slate-500">
@@ -914,7 +914,7 @@ export default function CreateSubscriptionPage() {
                     <CalendarDays />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-xl font-bold">
                       Abonelik tarihlerini belirleyin
                     </h2>
                     <p className="text-sm text-slate-500">
@@ -985,7 +985,7 @@ export default function CreateSubscriptionPage() {
                     <MapPin />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">Teslimat bilgileri</h2>
+                    <h2 className="text-xl font-bold">Teslimat bilgileri</h2>
                     <p className="text-sm text-slate-500">
                       Yemeğin nereye ve saat kaçta geleceğini seçin.
                     </p>
@@ -1037,7 +1037,7 @@ export default function CreateSubscriptionPage() {
                           onChange={(event) =>
                             setDeliveryTime(event.target.value)
                           }
-                          className="h-12 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 font-normal"
+                          className="h-12 w-full rounded-2xl border border-[#e7e7e7] bg-white pl-10 pr-3 font-normal"
                         >
                           {availableDeliveryTimes.map((time) => (
                             <option key={time} value={time.slice(0, 5)}>
@@ -1058,7 +1058,7 @@ export default function CreateSubscriptionPage() {
             )}
             {step === 3 && preview && (
               <section>
-                <h2 className="text-xl font-semibold">Abonelik özetiniz</h2>
+                <h2 className="text-xl font-bold">Abonelik özetiniz</h2>
                 {!previewIsCurrent && (
                   <div role="status" className="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
                     Güncel tutar henüz doğrulanmadı.
@@ -1135,7 +1135,7 @@ export default function CreateSubscriptionPage() {
                   </div>
                   <div className="mt-3 flex items-end justify-between border-t border-white/15 pt-3">
                     <span className="font-semibold">Toplam tutar</span>
-                    <span className="text-3xl font-semibold text-warning-300">
+                    <span className="text-3xl font-bold text-warning-300">
                       {preview.totalAmount.toLocaleString("tr-TR")} ₺
                     </span>
                   </div>
@@ -1145,7 +1145,7 @@ export default function CreateSubscriptionPage() {
                   edilecektir.
                 </div>
                 {weeklyCharges.length > 0 && (
-                  <details className="group mt-3 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <details className="group mt-3 overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white">
                     <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 text-sm font-bold text-slate-800">
                       <span className="flex items-center gap-2">
                         <CalendarDays className="h-5 w-5 text-primary-600" />
@@ -1163,7 +1163,7 @@ export default function CreateSubscriptionPage() {
                         {weeklyCharges.map((charge) => (
                           <article
                             key={charge.weekStart}
-                            className="rounded-xl border border-slate-200 bg-white p-4"
+                            className="rounded-2xl border border-[#e7e7e7] bg-white p-4"
                           >
                             <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
                               {new Date(
@@ -1255,7 +1255,7 @@ export default function CreateSubscriptionPage() {
           </div>
         </main>
 
-        <aside className="hidden h-fit rounded-xl border border-slate-200 bg-white p-5 shadow-card lg:sticky lg:top-24 lg:block">
+        <aside className="hidden h-fit rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card lg:sticky lg:top-24 lg:block">
           <p className="text-xs font-semibold uppercase tracking-[.12em] text-primary-600">
             Seçtiğiniz menü
           </p>
@@ -1270,7 +1270,7 @@ export default function CreateSubscriptionPage() {
           >
             Menüyü değiştir
           </button>
-          <p className="mt-3 text-2xl font-semibold text-primary-600">
+          <p className="mt-3 text-2xl font-bold text-primary-600">
             {menu.pricePerPerson.toLocaleString("tr-TR")} ₺{" "}
             <span className="text-xs font-normal text-slate-500">
               / kişi / gün
@@ -1348,7 +1348,7 @@ export default function CreateSubscriptionPage() {
         >
           Menüyü değiştir
         </button>
-        <p className="mt-4 text-2xl font-semibold text-primary-600">
+        <p className="mt-4 text-2xl font-bold text-primary-600">
           {menu.pricePerPerson.toLocaleString("tr-TR")} ₺{" "}
           <span className="text-xs font-normal text-slate-500">
             / kişi / gün

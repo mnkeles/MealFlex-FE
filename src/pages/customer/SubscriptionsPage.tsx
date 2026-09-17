@@ -140,7 +140,7 @@ export default function SubscriptionsPage() {
           </Link>
         }
       />
-      <div className="flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-card">
+      <div className="flex flex-wrap gap-2 rounded-2xl border border-[#e7e7e7] bg-white p-2 shadow-card">
         {tabs.map((item) => (
           <button
             key={item.value}

@@ -157,7 +157,7 @@ export default function SellerSupportPage() {
             <Link
               key={item.title}
               to={item.path}
-              className="group rounded-xl border border-slate-200 bg-white p-5 shadow-card transition hover:border-primary-200 hover:shadow-lg"
+              className="group rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card transition hover:border-primary-200 hover:shadow-lg"
             >
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-600">
                 <Icon className="h-5 w-5" />
@@ -176,7 +176,7 @@ export default function SellerSupportPage() {
       </section>
 
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+        <div className="rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card sm:p-6">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-600">
               <CircleHelp className="h-5 w-5" />
@@ -200,7 +200,7 @@ export default function SellerSupportPage() {
               </button>
             ))}
           </div>
-          <label className="mt-4 flex h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 text-slate-600">
+          <label className="mt-4 flex h-11 items-center gap-3 rounded-2xl border border-[#e7e7e7] bg-white px-4 text-slate-600">
             <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
             <span className="sr-only">Destek içeriğinde ara</span>
             <input type="search" value={search} onChange={(event) => setSearch(event.target.value)}
@@ -230,7 +230,7 @@ export default function SellerSupportPage() {
         </div>
 
         <aside className="space-y-4">
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card">
+          <div className="rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card">
             <Store className="h-5 w-5 text-primary-600" />
             <h2 className="mt-3 font-semibold text-ink">Mağaza ayarları</h2>
             <p className="mt-1 text-sm leading-6 text-slate-500">
@@ -243,7 +243,7 @@ export default function SellerSupportPage() {
               Ayarlara git <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card">
+          <div className="rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card">
             <Bell className="h-5 w-5 text-primary-600" />
             <h2 className="mt-3 font-semibold text-ink">İşlem uyarıları</h2>
             <p className="mt-1 text-sm leading-6 text-slate-500">

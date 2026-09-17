@@ -200,7 +200,7 @@ export default function AddressesPage() {
       <div className="hidden">
         <div>
           <p className="text-sm font-bold text-primary-600">TESLİMAT</p>
-          <h1 className="mt-1 text-3xl font-semibold">Adreslerim</h1>
+          <h1 className="mt-1 text-3xl font-bold">Adreslerim</h1>
           <p className="mt-2 text-slate-500">
             İşletmeler seçtiğiniz teslimat konumuna göre listelenir.
           </p>
@@ -226,9 +226,9 @@ export default function AddressesPage() {
             event.preventDefault();
             save.mutate();
           }}
-          className="mt-7 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
+          className="mt-7 rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-sm sm:p-7"
         >
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-xl font-bold">
             {editingId ? "Adresi düzenle" : "Yeni adres ekle"}
           </h2>
           <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,.9fr)] lg:items-start">
@@ -307,7 +307,7 @@ export default function AddressesPage() {
                   />
                 </label>
               </div>
-              <div className="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-700">
+              <div className="mt-4 rounded-2xl bg-[#f7f7f7] p-4 text-sm text-slate-700">
                 <span className="font-bold">Adres önizlemesi:</span>{" "}
                 {addressPreview(form)}
               </div>
@@ -367,7 +367,7 @@ export default function AddressesPage() {
       {isLoading ? (
         <div className="mt-7 h-40 animate-pulse rounded-xl bg-slate-200" />
       ) : !addresses.length ? (
-        <div className="mt-7 rounded-xl bg-white p-12 text-center text-slate-500">
+        <div className="mt-7 rounded-2xl bg-white p-12 text-center text-slate-500">
           Henüz adres eklenmemiş.
         </div>
       ) : (
@@ -375,7 +375,7 @@ export default function AddressesPage() {
           {addresses.map((address) => (
             <article
               key={address.id}
-              className={`relative rounded-xl border bg-white p-5 shadow-sm ${activeAddressId === address.id ? "border-primary-400 ring-2 ring-primary-100" : "border-slate-200"}`}
+              className={`relative rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-sm ${activeAddressId === address.id ? "border-primary-400 ring-2 ring-primary-100" : "border-slate-200"}`}
             >
               <div className="flex items-start gap-3">
                 <div

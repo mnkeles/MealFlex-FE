@@ -69,9 +69,9 @@ export default function StoreStaffPage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-[#e6e1d8] pb-5">
+      <div className="border-b border-[#e7e7e7] pb-5">
         <p className="customer-eyebrow">Ekip erişimi</p>
-        <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Personel ve yetkiler</h2>
+        <h2 className="mt-1 text-xl font-bold tracking-tight text-ink">Personel ve yetkiler</h2>
         <p className="mt-1 text-sm text-slate-500">
           Rol seçimi, verilebilecek temel erişimleri aşağıda açıkça gösterir.
         </p>

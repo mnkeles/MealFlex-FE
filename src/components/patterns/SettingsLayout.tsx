@@ -32,7 +32,7 @@ export default function SettingsLayout({
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex shrink-0 items-center gap-2 rounded-lg border-l-2 px-3 py-2.5 text-sm font-semibold transition ${isActive ? "border-primary-600 bg-primary-50/60 text-primary-700" : "border-transparent text-slate-600 hover:bg-[#f7f4ee] hover:text-ink"}`
+                `flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${isActive ? "bg-primary-50 text-primary-700" : "text-slate-600 hover:bg-[#f2f2f2] hover:text-ink"}`
               }
             >
               {item.icon}

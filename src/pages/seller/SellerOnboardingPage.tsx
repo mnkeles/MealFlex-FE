@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { sellerService } from "@/services/sellerService";
 import { useAuth } from "@/contexts/AuthContext";
+import PageHeader from "@/components/ui/PageHeader";
 
 export default function SellerOnboardingPage() {
   const { user } = useAuth();
@@ -26,18 +27,18 @@ export default function SellerOnboardingPage() {
       </div>
     );
   return (
-    <div className="mx-auto max-w-4xl">
-      <h1 className="text-2xl font-bold">Mağaza başvuruları</h1>
-      <p className="mt-2 text-sm text-slate-500">
-        Her şube için sözleşme, zorunlu belgeler ve yayın uygunluğunu takip
-        edin.
-      </p>
+    <div className="mf-page mx-auto max-w-4xl">
+      <PageHeader
+        eyebrow="İşletme yönetimi"
+        title="Mağaza başvuruları"
+        description="Her şube için sözleşme, zorunlu belgeler ve yayın uygunluğunu takip edin."
+      />
       <div className="mt-6 grid gap-4">
         {stores.length ? (
           stores.map((store) => (
             <article
               key={store.id}
-              className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white p-5"
+              className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e7e7e7] bg-white p-5"
             >
               <div>
                 <h2 className="font-bold">{store.name}</h2>
@@ -57,7 +58,7 @@ export default function SellerOnboardingPage() {
             </article>
           ))
         ) : (
-          <div className="rounded-xl border bg-white p-8 text-center text-slate-500">
+          <div className="rounded-2xl border border-[#e7e7e7] bg-white p-8 text-center text-slate-500">
             Henüz mağaza şubeniz bulunmuyor.
           </div>
         )}

@@ -14,9 +14,9 @@ const variants: Record<Variant, string> = {
   primary:
     "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-200",
   secondary:
-    "bg-[#263b32] text-white hover:bg-[#1b3028] focus:ring-success-200",
+    "bg-[#191919] text-white hover:bg-[#333333] focus:ring-slate-200",
   outline:
-    "border border-[#dedbd3] bg-white text-slate-700 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus:ring-primary-100",
+    "border border-[#d6d6d6] bg-white text-[#191919] hover:border-[#a8a8a8] hover:bg-[#f7f7f7] focus:ring-slate-100",
   ghost:
     "text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:ring-slate-100",
   danger:
@@ -40,7 +40,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center rounded-lg font-semibold transition focus:outline-none focus:ring-4 disabled:pointer-events-none disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center rounded-xl font-bold transition focus:outline-none focus:ring-4 disabled:pointer-events-none disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {leftIcon}

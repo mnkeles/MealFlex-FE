@@ -151,7 +151,7 @@ export default function SupportPage() {
             <Link
               key={item.title}
               to={item.to}
-              className="group rounded-xl border border-slate-200 bg-white p-5 shadow-card transition hover:border-primary-200 hover:shadow-lg"
+              className="group rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card transition hover:border-primary-200 hover:shadow-lg"
             >
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-600">
                 <Icon className="h-5 w-5" />
@@ -169,7 +169,7 @@ export default function SupportPage() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+      <section className="rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card sm:p-6">
         <div className="flex items-center gap-3">
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-600">
             <CircleHelp className="h-5 w-5" />
@@ -193,7 +193,7 @@ export default function SupportPage() {
             </button>
           ))}
         </div>
-        <label className="mt-4 flex h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 text-slate-600">
+        <label className="mt-4 flex h-11 items-center gap-3 rounded-2xl border border-[#e7e7e7] bg-white px-4 text-slate-600">
           <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span className="sr-only">Destek içeriğinde ara</span>
           <input type="search" value={search} onChange={(event) => setSearch(event.target.value)}
@@ -225,7 +225,7 @@ export default function SupportPage() {
       <section>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-ink">Destek taleplerim</h2>
+            <h2 className="text-xl font-bold text-ink">Destek taleplerim</h2>
             <p className="mt-1 text-sm leading-6 text-slate-500">
               Yeni sorun bildirmek için Aboneliklerim sayfasından ilgili teslimatı
               açın ve Destek ve işlemler bölümünü kullanın.
@@ -242,7 +242,7 @@ export default function SupportPage() {
         {isLoading ? (
           <div className="mt-5 h-40 animate-pulse rounded-xl bg-slate-200" />
         ) : !data?.content.length ? (
-          <div className="mt-5 rounded-xl border border-slate-200 bg-white p-10 text-center shadow-card">
+          <div className="mt-5 rounded-2xl border border-[#e7e7e7] bg-white p-10 text-center shadow-card">
             <MessageSquareWarning className="mx-auto h-10 w-10 text-slate-300" />
             <p className="mt-3 font-semibold">Destek talebiniz bulunmuyor.</p>
             <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-500">
@@ -255,7 +255,7 @@ export default function SupportPage() {
             {data.content.map((item) => (
               <article
                 key={item.id}
-                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                className="rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-sm"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -272,7 +272,7 @@ export default function SupportPage() {
                 <p className="mt-4 text-sm leading-6 text-slate-600">
                   {item.description}
                 </p>
-                <div className="mt-4 rounded-xl bg-slate-50 p-4 text-sm">
+                <div className="mt-4 rounded-2xl bg-[#f7f7f7] p-4 text-sm">
                   <p className="text-xs font-bold text-slate-700">
                     Durum zaman çizelgesi
                   </p>
@@ -303,7 +303,7 @@ export default function SupportPage() {
                   </div>
                 )}
                 {item.response && (
-                  <div className="mt-3 rounded-xl bg-slate-50 p-4">
+                  <div className="mt-3 rounded-2xl bg-[#f7f7f7] p-4">
                     <p className="text-xs font-bold text-slate-700">
                       Destek yanıtı
                     </p>

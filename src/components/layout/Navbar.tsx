@@ -36,7 +36,7 @@ const mobileLinks = [
 ];
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
-  `relative px-3 py-2 text-sm font-semibold transition ${isActive ? "text-ink after:absolute after:inset-x-3 after:-bottom-2 after:h-0.5 after:bg-primary-600" : "text-slate-600 hover:text-ink"}`;
+  `rounded-full px-4 py-2 text-sm font-bold transition ${isActive ? "bg-[#f2f2f2] text-ink" : "text-slate-600 hover:bg-[#f7f7f7] hover:text-ink"}`;
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -98,8 +98,8 @@ export default function Navbar() {
           İnternet bağlantısı kesildi. İşlemler yeniden bağlanınca güncellenir.
         </div>
       )}
-      <header className="sticky top-0 z-50 border-b border-[#e9e4da] bg-[#fffefa]/95 backdrop-blur">
-        <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-50 border-b border-[#e7e7e7] bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center gap-4 px-4 sm:px-6 lg:px-10">
           <Link to="/" className="shrink-0" aria-label="MealFlex ana sayfa">
             <MealFlexLogo
               iconClassName="h-8 w-8"
@@ -116,7 +116,7 @@ export default function Navbar() {
                   onChange={(event) =>
                     setActiveAddressId(Number(event.target.value))
                   }
-                  className="h-10 w-full appearance-none truncate rounded-lg border border-[#e6e1d8] bg-white pl-9 pr-9 text-sm font-medium text-ink outline-none transition hover:border-primary-300 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+                  className="h-11 w-full appearance-none truncate rounded-full border border-transparent bg-[#f2f2f2] pl-9 pr-9 text-sm font-bold text-ink outline-none transition hover:bg-[#e9e9e9] focus:border-ink focus:ring-1 focus:ring-ink"
                 >
                   {addresses.map((address) => (
                     <option key={address.id} value={address.id}>
@@ -129,7 +129,7 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/addresses"
-                className="flex h-10 items-center rounded-lg border border-primary-200 bg-primary-50 pl-9 text-sm font-semibold text-primary-700 transition hover:bg-primary-100"
+                className="flex h-11 items-center rounded-full border border-primary-200 bg-primary-50 pl-9 pr-4 text-sm font-bold text-primary-700 transition hover:bg-primary-100"
               >
                 Teslimat adresi ekle
               </Link>
@@ -153,7 +153,7 @@ export default function Navbar() {
               to="/notifications"
               aria-label="Bildirimler"
               className={({ isActive }) =>
-                `relative rounded-lg p-2 transition ${isActive ? "text-primary-700" : "text-slate-600 hover:text-ink"}`
+                `relative rounded-full p-2.5 transition ${isActive ? "bg-primary-50 text-primary-700" : "text-slate-600 hover:bg-[#f2f2f2] hover:text-ink"}`
               }
             >
               <Bell className="h-5 w-5" />
@@ -169,9 +169,9 @@ export default function Navbar() {
                 onClick={() => setProfileOpen((open) => !open)}
                 aria-expanded={profileOpen}
                 aria-haspopup="menu"
-                className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-ink hover:bg-[#f4efe7]"
+                className="flex items-center gap-2 rounded-full px-2 py-1.5 text-sm font-bold text-ink hover:bg-[#f2f2f2]"
               >
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-[#294438] text-xs text-white">
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-primary-600 text-xs font-bold text-white">
                   {user?.firstName?.[0]}
                   {user?.lastName?.[0]}
                 </span>
@@ -182,7 +182,7 @@ export default function Navbar() {
                 <div
                   role="menu"
                   aria-label="Hesap işlemleri"
-                  className="absolute right-0 mt-2 w-64 rounded-xl border border-[#e6e1d8] bg-white p-2 shadow-floating"
+                  className="absolute right-0 mt-2 w-64 rounded-2xl border border-[#e7e7e7] bg-white p-2 shadow-floating"
                 >
                   <div className="border-b border-slate-100 px-3 py-2">
                     <p className="truncate text-sm font-semibold text-ink">
@@ -251,7 +251,7 @@ export default function Navbar() {
         </div>
       </header>
       <nav
-        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-[#e6e1d8] bg-[#fffefa]/95 px-2 pb-[max(.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-[#e7e7e7] bg-white/95 px-2 pb-[max(.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur md:hidden"
         aria-label="Mobil navigasyon"
       >
         {mobileLinks.map((item) => {

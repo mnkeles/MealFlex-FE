@@ -20,7 +20,7 @@ export default function Tabs({
     <div
       role="tablist"
       aria-label={label}
-      className="flex max-w-full gap-1 overflow-x-auto border-b border-slate-200"
+      className="flex max-w-full gap-1 overflow-x-auto border-b border-[#e7e7e7]"
     >
       {tabs.map((tab) => (
         <button
@@ -29,7 +29,7 @@ export default function Tabs({
           aria-selected={value === tab.value}
           disabled={tab.disabled}
           onClick={() => onChange(tab.value)}
-          className={`inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-3 text-sm font-bold transition ${value === tab.value ? "border-primary-600 text-primary-700" : "border-transparent text-slate-500 hover:text-ink"}`}
+          className={`inline-flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-bold transition ${value === tab.value ? "border-primary-600 text-primary-700" : "border-transparent text-slate-500 hover:bg-[#f7f7f7] hover:text-ink"}`}
         >
           {tab.label}
           {tab.count !== undefined && (

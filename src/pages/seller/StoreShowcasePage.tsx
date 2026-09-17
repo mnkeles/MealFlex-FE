@@ -533,7 +533,7 @@ export default function StoreShowcasePage() {
         </div>
       )}
 
-      <section id="store-visuals" className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
+      <section id="store-visuals" className="overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white shadow-card">
         <div className="border-b border-slate-100 px-5 py-4 sm:px-6">
           <h2 className="text-base font-semibold text-slate-900">Mağaza görünümü</h2>
           <p className="mt-1 text-sm text-slate-600">
@@ -546,7 +546,7 @@ export default function StoreShowcasePage() {
         <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex items-center gap-4">
-              <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-xl border border-slate-200 bg-white">
+              <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white">
                 {store?.logoUrl ? (
                   <img src={store.logoUrl} alt={`${store.name} logosu`} className="h-full w-full object-contain" />
                 ) : (
@@ -626,14 +626,14 @@ export default function StoreShowcasePage() {
           <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">
             Müşteride önizleme
           </p>
-          <div className="mt-3 max-w-xl overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="mt-3 max-w-xl overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white shadow-sm">
             <div className="relative h-28 bg-gradient-to-br from-warning-100 via-cream to-success-100 sm:h-32">
               {store?.coverImageUrl && (
                 <img src={store.coverImageUrl} alt="" className="h-full w-full object-contain" />
               )}
             </div>
             <div className="flex items-center gap-3 p-4">
-              <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white shadow-sm">
                 {store?.logoUrl ? (
                   <img src={store.logoUrl} alt="" className="h-full w-full object-contain" />
                 ) : (
@@ -650,7 +650,7 @@ export default function StoreShowcasePage() {
       </section>
 
       {completedSetupSteps < setupSteps.length && (
-      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+      <section className="rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-base font-semibold text-ink">Mağaza kurulum özeti</h2>
@@ -722,7 +722,7 @@ export default function StoreShowcasePage() {
         <form
           onChange={() => setFormDirty(true)}
           onSubmit={handleSubmit}
-          className="rounded-xl border border-slate-200 bg-white p-6 shadow-card"
+          className="rounded-2xl border border-[#e7e7e7] bg-white p-6 shadow-card"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
@@ -905,7 +905,7 @@ export default function StoreShowcasePage() {
                 {editingPhotos.map((image, index) => (
                   <div
                     key={image.id || image.imageUrl}
-                    className="relative h-20 w-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+                    className="relative h-20 w-24 overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white shadow-sm"
                   >
                     <img
                       src={image.imageUrl}
@@ -1089,7 +1089,7 @@ export default function StoreShowcasePage() {
         />
       ) : (
         <>
-          <div className="mb-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-card sm:flex-row sm:items-center">
+          <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-[#e7e7e7] bg-white p-4 shadow-card sm:flex-row sm:items-center">
             <label className="min-w-0 flex-1">
               <span className="sr-only">Menü veya yemek çeşidi ara</span>
               <input
@@ -1111,7 +1111,7 @@ export default function StoreShowcasePage() {
                   setMenuStatusFilter(event.target.value as "ALL" | "ACTIVE" | "PASSIVE");
                   setSelectedMenus([]);
                 }}
-                className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100"
+                className="h-10 rounded-2xl border border-[#e7e7e7] bg-white px-3 text-sm font-bold text-slate-700 outline-none focus:border-primary-400 focus:ring-4 focus:ring-primary-100"
               >
                 <option value="ALL">Tüm menüler</option>
                 <option value="ACTIVE">Aktif menüler</option>
@@ -1140,7 +1140,7 @@ export default function StoreShowcasePage() {
             {filteredMenus.map((menu) => (
               <div
                 key={menu.id}
-                className="rounded-xl border border-slate-200 bg-white p-5 shadow-card"
+                className="rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex min-w-0 gap-4">
@@ -1358,14 +1358,14 @@ export default function StoreShowcasePage() {
             role="dialog"
             aria-modal="true"
             aria-label="Fiyat sürümleri"
-            className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6 shadow-floating"
+            className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-floating"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">
                   Menü fiyat geçmişi
                 </p>
-                <h3 className="mt-1 text-xl font-semibold">
+                <h3 className="mt-1 text-xl font-bold">
                   Sürümler ve gelecek fiyatlar
                 </h3>
               </div>

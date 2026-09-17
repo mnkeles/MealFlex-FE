@@ -630,7 +630,7 @@ export default function StoreSettingsPage() {
       )}
       <nav
         aria-label="Mağaza ayarları bölümleri"
-        className="sticky top-2 z-10 -mx-1 flex gap-2 overflow-x-auto rounded-xl border border-slate-200 bg-white/95 p-2 shadow-sm backdrop-blur"
+        className="sticky top-2 z-10 -mx-1 flex gap-2 overflow-x-auto rounded-2xl border border-[#e7e7e7] bg-white/95 p-2 shadow-sm backdrop-blur"
       >
         {settingsSections.map((section) => (
           <button
@@ -761,7 +761,7 @@ export default function StoreSettingsPage() {
               </div>
               <div className="mt-4 grid gap-3 md:grid-cols-2">
                 {customerTagGroups.map((group) => (
-                  <section key={group.title} className="rounded-xl border border-slate-200 bg-white p-3">
+                  <section key={group.title} className="rounded-2xl border border-[#e7e7e7] bg-white p-3">
                     <h3 className="text-xs font-bold text-slate-800">{group.title}</h3>
                     <p className="mt-1 min-h-10 text-xs leading-5 text-slate-500">{group.description}</p>
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -1009,7 +1009,7 @@ export default function StoreSettingsPage() {
         </div>
         <form
           onSubmit={handleDistanceRulesSubmit}
-          className="rounded-xl bg-white p-6 shadow-sm"
+          className="rounded-2xl bg-white p-6 shadow-sm"
         >
           <p className="mb-4 text-sm text-slate-500">
             Her satır, belirtilen mesafeye kadar geçerli minimum sipariş kişi

@@ -184,7 +184,7 @@ export default function StoreComplaintsPage() {
                         </div>
                       )}
                       {editingId === c.id ? (
-                        <div className="mt-3 rounded-lg border bg-white p-3">
+                        <div className="mt-3 rounded-xl border border-[#e7e7e7] bg-white p-3">
                           <textarea
                             value={response}
                             onChange={(e) => setResponse(e.target.value)}

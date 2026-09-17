@@ -20,7 +20,7 @@ export default function DataTable<T>({
   return (
     <div className="mf-surface overflow-x-auto">
       <table className="w-full min-w-[640px] text-left text-sm">
-        <thead className="border-b border-[#e6e1d8] bg-[#f7f4ee] text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <thead className="border-b border-[#e7e7e7] bg-[#f7f7f7] text-xs font-bold uppercase tracking-wide text-slate-500">
           <tr>
             {columns.map((column) => (
               <th
@@ -32,10 +32,10 @@ export default function DataTable<T>({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-[#eeeae2]">
+        <tbody className="divide-y divide-[#eeeeee]">
           {rows.length ? (
             rows.map((row) => (
-              <tr key={getKey(row)} className="transition hover:bg-slate-50/80">
+              <tr key={getKey(row)} className="transition hover:bg-[#fafafa]">
                 {columns.map((column) => (
                   <td
                     key={column.key}

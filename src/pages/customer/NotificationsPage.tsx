@@ -48,7 +48,7 @@ function NotificationSection({
   role: "CUSTOMER" | "ADMIN";
 }) {
   return (
-    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <section className="overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white shadow-sm">
       <h2 className="border-b border-slate-100 px-5 py-3 text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
         {title}
       </h2>

@@ -33,10 +33,10 @@ export default function StoreReviewsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e6e1d8] pb-5">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e7e7e7] pb-5">
         <div>
           <p className="customer-eyebrow">Müşteri geri bildirimi</p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Yorumlar</h2>
+          <h2 className="mt-1 text-xl font-bold tracking-tight text-ink">Yorumlar</h2>
           <p className="mt-1 text-sm text-slate-500">Puanları izleyin ve müşterilere mağaza adına yanıt verin.</p>
         </div>
         <button

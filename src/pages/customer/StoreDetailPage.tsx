@@ -47,7 +47,7 @@ function MenuCard({
   onSelect: () => void;
 }) {
   return (
-    <article className={`overflow-hidden rounded-xl border bg-white transition ${selected ? "border-primary-400" : "border-[#e6e1d8] hover:border-[#cec6b9]"}`}>
+    <article className={`overflow-hidden rounded-2xl border bg-white transition ${selected ? "border-primary-500 ring-1 ring-primary-500" : "border-[#e7e7e7] hover:border-[#bdbdbd]"}`}>
       <div className="p-5 sm:p-6">
         <div className="flex items-start gap-4">
           {menuPhotos(menu).length > 0 && (
@@ -67,8 +67,8 @@ function MenuCard({
           )}
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-semibold tracking-tight text-ink">{menu.name}</h3>
-              <span className="rounded-md bg-[#edf2ea] px-2 py-1 text-[11px] font-semibold text-[#47614d]">
+              <h3 className="text-lg font-bold tracking-tight text-ink">{menu.name}</h3>
+              <span className="rounded-full bg-[#fff1ef] px-2.5 py-1 text-[11px] font-bold text-[#c91400]">
                 Haftalık
               </span>
             </div>
@@ -82,7 +82,7 @@ function MenuCard({
                 {menu.dietTags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-md bg-[#edf2ea] px-2 py-1 text-[11px] font-semibold text-[#47614d]"
+                    className="rounded-full bg-[#fff1ef] px-2.5 py-1 text-[11px] font-bold text-[#c91400]"
                   >
                     {discoveryLabels[tag] || tag}
                   </span>
@@ -104,7 +104,7 @@ function MenuCard({
             )}
           </div>
           <div className="shrink-0 text-right">
-            <p className="text-xl font-semibold text-ink">
+            <p className="text-xl font-bold text-ink">
               {menu.pricePerPerson.toLocaleString("tr-TR")} ₺
             </p>
             <p className="text-xs text-slate-500">kişi / gün</p>
@@ -128,7 +128,7 @@ function MenuCard({
               {menu.items.map((item) => (
                 <span
                   key={item.id}
-                  className="rounded-md bg-[#f4f1eb] px-3 py-1 text-xs font-medium text-slate-700"
+                  className="rounded-full bg-[#f2f2f2] px-3 py-1 text-xs font-semibold text-slate-700"
                   title={item.description || undefined}
                 >
                   {item.name}
@@ -137,7 +137,7 @@ function MenuCard({
               ))}
             </div>
           ) : (
-            <p className="mt-3 rounded-lg bg-[#f7f4ee] px-3 py-2 text-xs text-slate-500">
+            <p className="mt-3 rounded-lg bg-[#f7f7f7] px-3 py-2 text-xs text-slate-500">
               Yemek çeşitleri henüz paylaşılmadı.
             </p>
           )}
@@ -145,7 +145,7 @@ function MenuCard({
         <div className="customer-divider mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
           <span className="text-xs font-semibold text-slate-500">Haftalık planınız için uygundur</span>
           {disabled ? (
-            <span className="rounded-lg bg-[#f4f1eb] px-5 py-2.5 text-sm font-semibold text-slate-500">
+            <span className="rounded-lg bg-[#f2f2f2] px-5 py-2.5 text-sm font-semibold text-slate-500">
               Şu anda talep alınmıyor
             </span>
           ) : (
@@ -206,7 +206,7 @@ export default function StoreDetailPage() {
   }, [storeId]);
 
   if (isLoading)
-    return <div className="h-96 animate-pulse rounded-xl bg-[#eee8dd]" />;
+    return <div className="h-96 animate-pulse rounded-xl bg-[#eeeeee]" />;
   if (isError || !store)
     return (
       <div className="mf-page">
@@ -222,8 +222,8 @@ export default function StoreDetailPage() {
       <Link to="/stores" className="text-sm font-semibold text-primary-700">
         ← İşletmelere dön
       </Link>
-      <section className="overflow-hidden rounded-xl border border-[#e6e1d8] bg-white">
-        <div className="relative h-64 bg-[#eee7db] sm:h-80">
+      <section className="overflow-hidden rounded-3xl border border-[#e7e7e7] bg-white">
+        <div className="relative h-64 bg-[#eeeeee] sm:h-80">
           <MediaPlaceholder src={store.coverImageUrl} alt="" kind="menu" fit="cover" />
           <div className="absolute right-4 top-4">
             <FavoriteButton storeId={store.id} />
@@ -260,7 +260,7 @@ export default function StoreDetailPage() {
                     {store.categories.slice(0, 5).map((value) => (
                       <span
                         key={value}
-                        className="rounded-md border border-[#e5ded2] bg-[#faf8f4] px-3 py-1 text-xs font-medium text-[#705849]"
+                        className="rounded-full border border-[#e7e7e7] bg-[#f7f7f7] px-3 py-1 text-xs font-semibold text-slate-600"
                       >
                         {discoveryLabels[value] || value}
                       </span>
@@ -304,7 +304,7 @@ export default function StoreDetailPage() {
                 value={menuSearch}
                 onChange={(event) => setMenuSearch(event.target.value)}
                 placeholder="Menüde ara"
-                className="h-10 rounded-lg border border-[#dedbd3] bg-white pl-9 pr-3 text-sm outline-none focus:border-primary-400"
+                className="h-11 rounded-xl border border-[#d6d6d6] bg-[#f7f7f7] pl-9 pr-3 text-sm outline-none hover:border-[#ababab] focus:border-ink focus:bg-white"
               />
             </label>
           </div>
@@ -320,7 +320,7 @@ export default function StoreDetailPage() {
                 />
               ))
             ) : (
-              <div className="rounded-xl border border-[#e6e1d8] bg-white p-10 text-center text-slate-500">
+              <div className="rounded-2xl border border-[#e7e7e7] bg-white p-10 text-center text-slate-500">
                 Aramanıza uygun menü bulunamadı.
               </div>
             )}
@@ -328,7 +328,7 @@ export default function StoreDetailPage() {
         </main>
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
           {selectedMenu && (
-            <div className="hidden rounded-xl border border-[#d7d1c6] bg-[#f7f4ed] p-5 lg:block">
+            <div className="hidden rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card lg:block">
               <p className="customer-eyebrow text-primary-700">
                 Abonelik özeti
               </p>
@@ -345,7 +345,7 @@ export default function StoreDetailPage() {
               </Link>
             </div>
           )}
-          <div className="rounded-xl border border-[#e6e1d8] bg-white p-5">
+          <div className="rounded-2xl border border-[#e7e7e7] bg-white p-5">
             <h3 className="flex items-center gap-2 font-semibold">
               <Clock3 className="h-5 w-5 text-primary-600" /> Çalışma saatleri
             </h3>
@@ -371,7 +371,7 @@ export default function StoreDetailPage() {
               })}
             </div>
           </div>
-          <div className="rounded-xl border border-[#e6e1d8] bg-white p-5">
+          <div className="rounded-2xl border border-[#e7e7e7] bg-white p-5">
             <h3 className="font-semibold">Teslimat bilgisi</h3>
             <p className="mt-3 flex items-start gap-2 text-sm text-slate-600">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />{" "}
@@ -384,7 +384,7 @@ export default function StoreDetailPage() {
               {store.effectiveMinPersonCount ?? store.minPersonCount} kişi
             </p>
             {store.nextAvailableDeliveryDate && (
-              <p className="mt-3 rounded-lg bg-[#edf2ea] p-3 text-sm font-semibold text-[#47614d]">
+              <p className="mt-3 rounded-lg bg-[#fff1ef] p-3 text-sm font-semibold text-[#c91400]">
                 İlk uygun teslimat:{" "}
                 {new Date(store.nextAvailableDeliveryDate).toLocaleDateString(
                   "tr-TR",
@@ -396,7 +396,7 @@ export default function StoreDetailPage() {
                 {store.availableDeliveryTimes.slice(0, 8).map((time) => (
                   <span
                     key={time}
-                    className="rounded-md bg-[#f4f1eb] px-2 py-1 text-xs font-semibold"
+                    className="rounded-full bg-[#f2f2f2] px-2.5 py-1 text-xs font-semibold"
                   >
                     {time.slice(0, 5)}
                   </span>
@@ -436,7 +436,7 @@ export default function StoreDetailPage() {
             {reviews.content.map((review) => (
               <article
                 key={review.id}
-                className="rounded-xl border border-[#e6e1d8] bg-white p-5"
+                className="rounded-2xl border border-[#e7e7e7] bg-white p-5"
               >
                 <div className="flex justify-between">
                   <span className="font-bold">{review.customerName}</span>
@@ -451,7 +451,7 @@ export default function StoreDetailPage() {
                   </p>
                 )}
                 {review.sellerReply && (
-                  <div className="mt-4 rounded-xl bg-slate-50 p-3">
+                  <div className="mt-4 rounded-2xl bg-[#f7f7f7] p-3">
                     <p className="text-xs font-bold text-slate-700">
                       İşletmenin yanıtı
                     </p>
@@ -464,7 +464,7 @@ export default function StoreDetailPage() {
             ))}
           </div>
         ) : (
-            <div className="rounded-xl border border-[#e6e1d8] bg-white p-8 text-center text-sm text-slate-500">
+            <div className="rounded-2xl border border-[#e7e7e7] bg-white p-8 text-center text-sm text-slate-500">
             Henüz değerlendirme yapılmamış.
           </div>
         )}

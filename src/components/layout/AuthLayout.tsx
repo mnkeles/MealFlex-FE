@@ -27,15 +27,15 @@ export default function AuthLayout({
 }: AuthLayoutProps) {
   if (variant === "seller-login") {
     return (
-      <main className="min-h-screen bg-[#f7f5f1] lg:grid lg:grid-cols-[minmax(34rem,1.06fr)_minmax(28rem,.94fr)]">
-        <aside className="relative hidden min-h-screen overflow-hidden bg-[#0d1d2c] text-white lg:flex lg:flex-col lg:justify-between">
+      <main className="min-h-screen bg-[#f7f7f7] lg:grid lg:grid-cols-[minmax(34rem,1.06fr)_minmax(28rem,.94fr)]">
+        <aside className="relative hidden min-h-screen overflow-hidden bg-[#191919] text-white lg:flex lg:flex-col lg:justify-between">
           <img
             src="/images/customer-access-modal-v2.jpg"
             alt="Catering mutfağında hazırlanmış kurumsal öğün"
             className="absolute inset-0 h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#091827]/80 via-[#091827]/35 to-[#091827]/95" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#091827]/40 via-transparent to-[#091827]/20" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/35 to-black/95" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/15" />
 
           <header className="relative z-10 flex items-center justify-between px-8 py-8 xl:px-12 xl:py-10">
             <MealFlexLogo
@@ -117,7 +117,7 @@ export default function AuthLayout({
             </div>
 
             <header>
-              <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+              <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
                 {title}
               </h1>
               <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -125,7 +125,7 @@ export default function AuthLayout({
               </p>
             </header>
 
-            <div className="mt-7 rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_24px_70px_rgba(15,23,42,.09)] sm:p-7">
+            <div className="mt-7 rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card sm:p-7">
               {children}
             </div>
             <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs leading-5 text-slate-500">
@@ -140,7 +140,7 @@ export default function AuthLayout({
 
   if (variant === "login") {
     return (
-      <main className="min-h-screen bg-[#f6f4ef] lg:grid lg:grid-cols-[minmax(0,1.08fr)_minmax(28rem,0.92fr)]">
+      <main className="min-h-screen bg-[#f7f7f7] lg:grid lg:grid-cols-[minmax(0,1.08fr)_minmax(28rem,0.92fr)]">
         <aside className="relative hidden min-h-screen overflow-hidden lg:flex lg:flex-col lg:justify-between">
           <img
             src="/images/login-meal-hero.jpg"
@@ -160,7 +160,7 @@ export default function AuthLayout({
             </div>
           </div>
 
-          <div className="relative z-10 m-6 max-w-2xl rounded-xl bg-slate-950/90 p-8 text-white shadow-floating xl:m-8 xl:p-10">
+          <div className="relative z-10 m-6 max-w-2xl rounded-2xl bg-[#191919]/95 p-8 text-white shadow-floating xl:m-8 xl:p-10">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-800 px-3.5 py-2 text-xs font-bold">
               <Sparkles className="h-4 w-4 text-amber-300" />
               Her gün taze, her hafta planlı
@@ -211,7 +211,7 @@ export default function AuthLayout({
             </div>
 
             <header>
-              <h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+              <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
                 {title}
               </h1>
               <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -219,7 +219,7 @@ export default function AuthLayout({
               </p>
             </header>
 
-            <div className="mt-7 rounded-xl border border-white/80 bg-white/90 p-5 shadow-[0_24px_70px_rgba(31,41,55,0.10)] backdrop-blur sm:p-7">
+            <div className="mt-7 rounded-2xl border border-[#e7e7e7] bg-white p-5 shadow-card sm:p-7">
               {children}
             </div>
             <p className="mt-6 text-center text-xs leading-5 text-slate-600">

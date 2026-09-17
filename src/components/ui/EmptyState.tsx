@@ -20,10 +20,10 @@ export default function EmptyState({
     <div
       className={`mf-surface flex min-h-56 flex-col items-center justify-center p-8 text-center ${className}`}
     >
-      <div className="grid h-11 w-11 place-items-center rounded-lg bg-[#f3e9df] text-primary-700">
+      <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary-50 text-primary-700">
         {icon || <Inbox className="h-6 w-6" />}
       </div>
-      <h2 className="mt-4 text-base font-semibold text-ink">{title}</h2>
+      <h2 className="mt-4 text-base font-bold text-ink">{title}</h2>
       {description && (
         <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
           {description}

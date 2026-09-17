@@ -419,7 +419,7 @@ export default function StoreDailyOrdersPage() {
             {menuPortions.map((menu) => (
               <article
                 key={menu.menuName}
-                className="rounded-xl bg-slate-50 px-3 py-2.5"
+                className="rounded-2xl bg-[#f7f7f7] px-3 py-2.5"
               >
                 <p className="truncate text-sm font-semibold text-slate-800">
                   {menu.menuName}
@@ -431,7 +431,7 @@ export default function StoreDailyOrdersPage() {
             ))}
           </div>
         ) : (
-          <p className="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-500">
+          <p className="mt-4 rounded-2xl bg-[#f7f7f7] p-3 text-sm text-slate-500">
             Bugün hazırlanacak menü bulunmuyor.
           </p>
         )}
@@ -637,7 +637,7 @@ export default function StoreDailyOrdersPage() {
                       columnItems.map((item) => (
                         <article
                           key={item.id}
-                          className="rounded-xl bg-white p-3 shadow-sm"
+                          className="rounded-2xl bg-white p-3 shadow-sm"
                         >
                           <p className="text-sm font-semibold">
                             {item.deliveryTime} · {item.customerName}
@@ -1080,7 +1080,7 @@ export default function StoreDailyOrdersPage() {
                               courierLatitude: event.target.value,
                             })
                           }
-                          className="mt-1 h-11 w-full rounded-xl border bg-white px-3 text-sm font-normal"
+                          className="mt-1 h-11 w-full rounded-2xl border border-[#e7e7e7] bg-white px-3 text-sm font-normal"
                         />
                       </label>
                       <label className="text-xs font-bold text-slate-600">
@@ -1095,7 +1095,7 @@ export default function StoreDailyOrdersPage() {
                               courierLongitude: event.target.value,
                             })
                           }
-                          className="mt-1 h-11 w-full rounded-xl border bg-white px-3 text-sm font-normal"
+                          className="mt-1 h-11 w-full rounded-2xl border border-[#e7e7e7] bg-white px-3 text-sm font-normal"
                         />
                       </label>
                     </div>

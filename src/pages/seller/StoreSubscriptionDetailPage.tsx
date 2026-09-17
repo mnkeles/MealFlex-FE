@@ -85,7 +85,7 @@ export default function StoreSubscriptionDetailPage() {
         ← Aboneliklere dön
       </Link>
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Abonelik #{sub.id}</h2>
+        <h2 className="text-xl font-bold">Abonelik #{sub.id}</h2>
         <div className="flex items-center gap-3">
           <StatusBadge domain="subscription" status={sub.status} />
           {["APPROVED", "ACTIVE", "PAYMENT_SUSPENDED"].includes(
@@ -108,7 +108,7 @@ export default function StoreSubscriptionDetailPage() {
       <div
         role="tablist"
         aria-label="Abonelik ayrıntı bölümleri"
-        className="flex gap-2 overflow-x-auto rounded-xl border border-slate-200 bg-white p-2"
+        className="flex gap-2 overflow-x-auto rounded-2xl border border-[#e7e7e7] bg-white p-2"
       >
         {(
           [
@@ -131,7 +131,7 @@ export default function StoreSubscriptionDetailPage() {
         ))}
       </div>
       {activeTab === "summary" && (
-        <section className="rounded-xl bg-white p-5 shadow-sm">
+        <section className="rounded-2xl bg-white p-5 shadow-sm">
           <h3 className="mb-3 font-semibold">Ödeme ve Abonelik Özeti</h3>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
@@ -160,7 +160,7 @@ export default function StoreSubscriptionDetailPage() {
         </section>
       )}
       {activeTab === "contact" && (
-        <section className="rounded-xl bg-white p-5 shadow-sm">
+        <section className="rounded-2xl bg-white p-5 shadow-sm">
           <h3 className="mb-3 font-semibold">Müşteri Bilgileri</h3>
           <dl className="space-y-2 text-sm">
             <div>
@@ -183,7 +183,7 @@ export default function StoreSubscriptionDetailPage() {
         </section>
       )}
       {activeTab === "history" && (
-        <section className="rounded-xl bg-white p-5 shadow-sm">
+        <section className="rounded-2xl bg-white p-5 shadow-sm">
         <h3 className="mb-4 font-semibold">Durum Geçmişi</h3>
         <div className="space-y-4 border-l-2 border-slate-100 pl-5">
           <div className="relative text-sm">
@@ -226,7 +226,7 @@ export default function StoreSubscriptionDetailPage() {
         </section>
       )}
       {activeTab === "deliveries" && (
-        <section className="rounded-xl bg-white p-5 shadow-sm">
+        <section className="rounded-2xl bg-white p-5 shadow-sm">
         <h3 className="mb-4 font-semibold">
           Teslimat Geçmişi ({data.deliveries.length})
         </h3>
@@ -259,8 +259,8 @@ export default function StoreSubscriptionDetailPage() {
           aria-modal="true"
           aria-labelledby="seller-cancel-title"
         >
-          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-floating">
-            <h3 id="seller-cancel-title" className="text-xl font-semibold">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-floating">
+            <h3 id="seller-cancel-title" className="text-xl font-bold">
               Aboneliği iptal et
             </h3>
             <p className="mt-2 text-sm text-slate-600">

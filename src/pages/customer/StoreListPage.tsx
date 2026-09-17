@@ -176,7 +176,7 @@ export default function StoreListPage() {
           setOpenOnly((value) => !value);
           resetPage();
         }}
-        className={`flex h-11 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold ${openOnly ? "border-primary-300 bg-primary-50 text-primary-700" : "border-[#dedbd3] bg-white text-slate-600"}`}
+        className={`flex h-11 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold ${openOnly ? "border-primary-300 bg-primary-50 text-primary-700" : "border-[#d6d6d6] bg-white text-slate-600"}`}
       >
         <SlidersHorizontal className="h-4 w-4" /> Yalnızca açık
       </button>
@@ -201,9 +201,9 @@ export default function StoreListPage() {
 
   return (
     <div className="mf-page">
-      <header className="customer-divider border-b pb-6">
+      <header className="customer-divider border-b pb-5">
         <p className="customer-eyebrow">Keşfet</p>
-        <h1 className="customer-display mt-2 text-4xl leading-tight text-ink sm:text-5xl">
+        <h1 className="customer-display mt-2 text-3xl leading-tight text-ink sm:text-4xl">
           Size hizmet veren işletmeler
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
@@ -234,7 +234,7 @@ export default function StoreListPage() {
           </section>
         )}
 
-      <div className="rounded-xl border border-[#e6e1d8] bg-[#fffefa] p-4">
+      <div className="sticky top-[4.5rem] z-20 rounded-2xl border border-[#e7e7e7] bg-white/95 p-4 shadow-mf-sm backdrop-blur">
         <div className="flex flex-col gap-3">
           <label className="relative min-w-0 flex-1">
             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
@@ -245,7 +245,7 @@ export default function StoreListPage() {
                 resetPage();
               }}
               placeholder="İşletme veya menü ara"
-              className="h-11 w-full rounded-lg border border-[#dedbd3] bg-white pl-10 pr-4 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+              className="h-12 w-full rounded-xl border border-[#d6d6d6] bg-[#f7f7f7] pl-10 pr-4 text-sm font-medium outline-none hover:border-[#ababab] focus:border-ink focus:bg-white focus:ring-1 focus:ring-ink"
             />
           </label>
           <div className="hidden grid-cols-2 gap-2 lg:grid lg:grid-cols-4">
@@ -283,7 +283,7 @@ export default function StoreListPage() {
                 else setOpenOnly(false);
                 resetPage();
               }}
-              className="inline-flex min-h-9 items-center gap-1 rounded-md border border-primary-200 bg-primary-50 px-3 text-xs font-semibold text-primary-700"
+              className="inline-flex min-h-9 items-center gap-1 rounded-full border border-primary-200 bg-primary-50 px-3 text-xs font-bold text-primary-700"
             >
               {filter.label}
               <X className="h-3.5 w-3.5" />
@@ -297,7 +297,7 @@ export default function StoreListPage() {
         loadingFallback={
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="İşletmeler yükleniyor">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-80 animate-pulse rounded-xl bg-[#eee8dd]" />
+              <div key={i} className="h-80 animate-pulse rounded-xl bg-[#eeeeee]" />
             ))}
           </div>
         }
@@ -340,7 +340,7 @@ export default function StoreListPage() {
               Adresinize göre sıralandı
             </span>
           </div>
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-x-5 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
             {result.content.map((store) => (
               <StoreCard
                 key={store.id}
@@ -362,7 +362,7 @@ export default function StoreListPage() {
           <button
             disabled={data.first}
             onClick={() => setPage((value) => value - 1)}
-            className="rounded-lg border border-[#dedbd3] bg-white px-4 py-2 text-sm font-semibold disabled:opacity-40"
+            className="rounded-lg border border-[#d6d6d6] bg-white px-4 py-2 text-sm font-semibold disabled:opacity-40"
           >
             Önceki
           </button>
@@ -372,7 +372,7 @@ export default function StoreListPage() {
           <button
             disabled={data.last}
             onClick={() => setPage((value) => value + 1)}
-            className="rounded-lg border border-[#dedbd3] bg-white px-4 py-2 text-sm font-semibold disabled:opacity-40"
+            className="rounded-lg border border-[#d6d6d6] bg-white px-4 py-2 text-sm font-semibold disabled:opacity-40"
           >
             Sonraki
           </button>

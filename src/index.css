@@ -6,12 +6,12 @@
    değerler gelecekte koyu tema için tek bir katmandan değiştirilebilir. */
 :root {
   color-scheme: light;
-  --mf-color-canvas: #faf8f4;
+  --mf-color-canvas: #f7f7f7;
   --mf-color-surface: #ffffff;
-  --mf-color-ink: #252a24;
-  --mf-color-muted: #6c7168;
-  --mf-color-border: #e6e1d8;
-  --mf-color-primary: #ad482d;
+  --mf-color-ink: #191919;
+  --mf-color-muted: #606060;
+  --mf-color-border: #e7e7e7;
+  --mf-color-primary: #eb1700;
   --mf-color-success: #027a48;
   --mf-color-warning: #b54708;
   --mf-color-danger: #d92d20;
@@ -24,21 +24,21 @@
   --mf-space-8: 2rem;
   --mf-radius-sm: 0.5rem;
   --mf-radius-md: 0.75rem;
-  --mf-radius-card: 1rem;
-  --mf-radius-surface: 1.25rem;
+  --mf-radius-card: 0.875rem;
+  --mf-radius-surface: 1rem;
   --mf-shadow-xs: 0 1px 2px rgba(16, 24, 40, .04);
-  --mf-shadow-card: 0 1px 2px rgba(44, 42, 35, .035), 0 7px 20px rgba(44, 42, 35, .045);
-  --mf-shadow-floating: 0 12px 30px rgba(44, 42, 35, .12);
+  --mf-shadow-card: 0 2px 10px rgba(0, 0, 0, .07);
+  --mf-shadow-floating: 0 12px 32px rgba(0, 0, 0, .14);
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   @apply bg-canvas text-ink antialiased;
 }
 
 @layer components {
-  .mf-page { @apply mx-auto w-full max-w-7xl space-y-6; }
-  .mf-surface { @apply rounded-xl border border-[#e6e1d8] bg-white shadow-mf-xs; }
+  .mf-page { @apply mx-auto w-full max-w-[1440px] space-y-6; }
+  .mf-surface { @apply rounded-mf-surface border border-[#e7e7e7] bg-white shadow-none; }
   .mf-display { @apply text-mf-display text-ink; }
   .mf-page-title { @apply text-mf-title text-ink; }
   .mf-heading { @apply text-mf-heading text-ink; }
@@ -47,17 +47,17 @@ body {
   .mf-section-title { @apply text-lg font-bold tracking-tight text-ink sm:text-xl; }
   .mf-muted { @apply text-sm leading-6 text-slate-500; }
   .mf-label { @apply mb-1.5 block text-sm font-semibold text-slate-700; }
-  .mf-input { @apply h-11 w-full rounded-lg border border-[#dedbd3] bg-white px-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100; }
-  .mf-textarea { @apply w-full rounded-lg border border-[#dedbd3] bg-white px-3 py-2.5 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100; }
+  .mf-input { @apply h-12 w-full rounded-xl border border-[#d6d6d6] bg-white px-4 text-sm text-ink outline-none transition placeholder:text-slate-400 hover:border-[#ababab] focus:border-ink focus:ring-1 focus:ring-ink; }
+  .mf-textarea { @apply w-full rounded-xl border border-[#d6d6d6] bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 hover:border-[#ababab] focus:border-ink focus:ring-1 focus:ring-ink; }
 }
 
-.customer-display { font-family: Georgia, 'Times New Roman', serif; font-weight: 600; letter-spacing: -.035em; }
-.customer-eyebrow { color: #85654d; font-size: .68rem; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; }
-.customer-divider { border-color: #e8e1d5; }
+.customer-display { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 800; letter-spacing: -.04em; }
+.customer-eyebrow { color: #eb1700; font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.customer-divider { border-color: #e7e7e7; }
 
 /* Klavye ile gezinmede odak her zaman görünür olmalıdır. */
 :focus-visible {
-  outline: 3px solid #ad482d;
+  outline: 3px solid #eb1700;
   outline-offset: 3px;
 }
 

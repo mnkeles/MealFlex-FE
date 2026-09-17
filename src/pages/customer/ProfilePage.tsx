@@ -111,7 +111,7 @@ export default function ProfilePage() {
             <Link
               key={String(to)}
               to={String(to)}
-              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 text-sm font-bold text-slate-700 transition hover:border-primary-300 hover:text-primary-700"
+              className="flex items-center gap-2 rounded-2xl border border-[#e7e7e7] bg-white p-3 text-sm font-bold text-slate-700 transition hover:border-primary-300 hover:text-primary-700"
             >
               <ItemIcon size={17} />
               {String(label)}

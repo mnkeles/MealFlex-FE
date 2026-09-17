@@ -25,7 +25,7 @@ export function RadioGroup({
         {options.map((option) => (
           <label
             key={option.value}
-            className={`flex cursor-pointer gap-3 rounded-xl border p-3 ${value === option.value ? "border-primary-400 bg-primary-50" : "border-slate-200"} ${option.disabled ? "cursor-not-allowed opacity-50" : ""}`}
+            className={`flex cursor-pointer gap-3 rounded-2xl border p-4 ${value === option.value ? "border-primary-500 bg-primary-50 ring-1 ring-primary-500" : "border-[#e7e7e7] hover:border-[#bdbdbd]"} ${option.disabled ? "cursor-not-allowed opacity-50" : ""}`}
           >
             <input
               className="mt-0.5"
@@ -67,7 +67,7 @@ export function Toggle({
 }) {
   return (
     <label
-      className={`flex items-center justify-between gap-4 rounded-xl border border-slate-200 p-3 ${disabled ? "opacity-50" : ""}`}
+      className={`flex items-center justify-between gap-4 rounded-2xl border border-[#e7e7e7] p-4 ${disabled ? "opacity-50" : ""}`}
     >
       <span>
         <span className="block text-sm font-bold text-ink">{label}</span>
@@ -98,14 +98,14 @@ export function SegmentControl({
   return (
     <fieldset>
       <legend className="sr-only">{label}</legend>
-      <div className="inline-flex rounded-xl bg-slate-100 p-1">
+      <div className="inline-flex rounded-full bg-[#f2f2f2] p-1">
         {options.map((option) => (
           <button
             key={option.value}
             type="button"
             disabled={option.disabled}
             onClick={() => onChange(option.value)}
-            className={`rounded-lg px-3 py-2 text-sm font-bold transition ${value === option.value ? "bg-white text-primary-700 shadow-sm" : "text-slate-600 hover:text-ink"}`}
+            className={`rounded-full px-4 py-2 text-sm font-bold transition ${value === option.value ? "bg-white text-primary-700 shadow-sm" : "text-slate-600 hover:text-ink"}`}
           >
             {option.label}
           </button>

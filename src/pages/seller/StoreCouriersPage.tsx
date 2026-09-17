@@ -110,7 +110,7 @@ export default function StoreCouriersPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl font-semibold">Kurye çalışma alanı</h2>
+        <h2 className="text-xl font-bold">Kurye çalışma alanı</h2>
         <p className="mt-1 text-sm text-slate-500">
           Kurye atamalarını ve mobil rota görünümünü yönetin. Telefon numaraları
           operasyon için maskeli gösterilir.
@@ -133,7 +133,7 @@ export default function StoreCouriersPage() {
           event.preventDefault();
           create.mutate();
         }}
-        className="flex flex-wrap gap-2 rounded-xl border bg-white p-4"
+        className="flex flex-wrap gap-2 rounded-2xl border border-[#e7e7e7] bg-white p-4"
       >
         <input
           aria-label="Kurye adı"
@@ -172,7 +172,7 @@ export default function StoreCouriersPage() {
         </p>
       </form>
       <div className="grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <section className="rounded-xl border bg-white p-5">
+        <section className="rounded-2xl border border-[#e7e7e7] bg-white p-5">
           <h3 className="font-semibold">Kuryeler</h3>
           <div className="mt-3 space-y-2">
             {couriers.data?.map((courier) => (
@@ -195,7 +195,7 @@ export default function StoreCouriersPage() {
             )) || <p className="py-3 text-sm text-slate-500">Kurye yok.</p>}
           </div>
         </section>
-        <section className="rounded-xl border bg-white p-5">
+        <section className="rounded-2xl border border-[#e7e7e7] bg-white p-5">
           <h3 className="font-semibold">
             {activeCourier
               ? `${activeCourier.fullName} için mobil rota`
@@ -207,7 +207,7 @@ export default function StoreCouriersPage() {
                 route.map((delivery, index) => (
                   <article
                     key={delivery.id}
-                    className="rounded-xl bg-slate-50 p-4"
+                    className="rounded-2xl bg-[#f7f7f7] p-4"
                   >
                     <div className="flex items-center justify-between">
                       <strong>
@@ -247,7 +247,7 @@ export default function StoreCouriersPage() {
               {deliveries.data?.map((delivery, index) => (
                 <div
                   key={delivery.id}
-                  className="flex flex-wrap items-center gap-2 rounded-xl bg-slate-50 p-3 text-sm"
+                  className="flex flex-wrap items-center gap-2 rounded-2xl bg-[#f7f7f7] p-3 text-sm"
                 >
                   <b>
                     {delivery.deliveryTime.slice(0, 5)} ·{" "}

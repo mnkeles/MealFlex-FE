@@ -32,10 +32,10 @@ export default function StoreAnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e6e1d8] pb-5">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e7e7e7] pb-5">
         <div>
           <p className="customer-eyebrow">Performans</p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Analitik</h2>
+          <h2 className="mt-1 text-xl font-bold tracking-tight text-ink">Analitik</h2>
           <p className="text-sm text-slate-500">
             Teslim edilen siparişler ve müşteri değerlendirmeleri
           </p>

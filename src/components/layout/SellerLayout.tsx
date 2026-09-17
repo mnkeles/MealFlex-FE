@@ -188,36 +188,36 @@ export default function SellerLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-canvas flex">
+    <div className="flex min-h-screen bg-[#f7f7f7]">
       {!online && (
         <div className="fixed inset-x-0 top-0 z-[100] bg-warning-600 px-4 py-2 text-center text-sm font-bold text-white">
           Bağlantı kesildi. İşlemler yeniden bağlanınca güncellenir.
         </div>
       )}
       <aside
-        className={`fixed z-40 hidden min-h-screen overflow-visible border-r border-[#e6e1d8] bg-[#fdfcf9] transition-[width] duration-300 ease-in-out md:block ${isSidebarCollapsed ? "w-20" : "w-72"}`}
+        className={`fixed z-40 hidden min-h-screen overflow-visible border-r border-[#e7e7e7] bg-white transition-[width] duration-300 ease-in-out md:block ${isSidebarCollapsed ? "w-20" : "w-64"}`}
       >
         <div
-          className={`relative flex h-[89px] items-center border-b border-slate-100 ${isSidebarCollapsed ? "justify-center px-3" : "justify-between px-6"}`}
+          className={`relative flex h-[73px] items-center border-b border-[#eeeeee] ${isSidebarCollapsed ? "justify-center px-3" : "justify-between px-5"}`}
         >
           <div>
             <Link to="/seller/stores" onClick={guardNavigation}>
               <MealFlexLogo
                 showWordmark={!isSidebarCollapsed}
                 iconClassName="h-9 w-9"
-                wordmarkClassName="text-xl font-semibold tracking-tight text-primary-600"
+                wordmarkClassName="text-xl font-bold tracking-tight text-primary-600"
               />
             </Link>
             {!isSidebarCollapsed && (
-              <p className="mt-1 text-xs font-semibold text-slate-500">
-                Satıcı operasyon merkezi
+              <p className="mt-0.5 text-[11px] font-semibold text-slate-500">
+                İşletme yönetimi
               </p>
             )}
           </div>
           <button
             type="button"
             onClick={() => setIsSidebarCollapsed((value) => !value)}
-            className={`rounded-xl p-2 text-slate-500 transition-colors hover:bg-primary-50 hover:text-primary-600 ${isSidebarCollapsed ? "absolute -right-4 top-7 border border-slate-200 bg-white shadow-card" : ""}`}
+            className={`rounded-xl p-2 text-slate-500 transition-colors hover:bg-[#f2f2f2] hover:text-primary-600 ${isSidebarCollapsed ? "absolute -right-4 top-5 border border-slate-200 bg-white shadow-card" : ""}`}
             aria-label={
               isSidebarCollapsed ? "Menüyü genişlet" : "Menüyü daralt"
             }
@@ -230,16 +230,16 @@ export default function SellerLayout() {
             )}
           </button>
         </div>
-        <nav className={`space-y-1 ${isSidebarCollapsed ? "p-2" : "p-4"}`}>
+        <nav className={`space-y-1 ${isSidebarCollapsed ? "p-2" : "p-3"}`}>
           {menuItems.map(({ icon: Icon, ...item }) => (
             <Link
               key={item.path}
               to={item.path}
               onClick={guardNavigation}
-              className={`flex items-center rounded-lg py-2.5 text-sm font-medium transition-colors ${isSidebarCollapsed ? "justify-center px-2" : "gap-3 px-4"} ${
+              className={`flex items-center rounded-xl py-2.5 text-sm font-semibold transition-colors ${isSidebarCollapsed ? "justify-center px-2" : "gap-3 px-3"} ${
                 location.pathname.startsWith(item.path)
-                  ? "border-l-2 border-primary-600 bg-white text-primary-700"
-                  : "border-l-2 border-transparent text-slate-600 hover:bg-white hover:text-slate-900"
+                  ? "bg-primary-50 text-primary-700"
+                  : "text-slate-600 hover:bg-[#f2f2f2] hover:text-slate-900"
               }`}
               title={isSidebarCollapsed ? item.label : undefined}
             >
@@ -270,7 +270,7 @@ export default function SellerLayout() {
             <div
               role="menu"
               aria-label="Hesap işlemleri"
-              className={`absolute bottom-full mb-2 overflow-hidden rounded-xl border border-[#e6e1d8] bg-white p-2 text-left shadow-floating ${isSidebarCollapsed ? "left-2 w-64" : "left-4 right-4"}`}
+              className={`absolute bottom-full mb-2 overflow-hidden rounded-2xl border border-[#e7e7e7] bg-white p-2 text-left shadow-floating ${isSidebarCollapsed ? "left-2 w-64" : "left-4 right-4"}`}
             >
               <div className="border-b border-slate-100 px-3 py-2">
               <p className="truncate text-sm font-semibold text-ink">
@@ -337,7 +337,7 @@ export default function SellerLayout() {
             title={isSidebarCollapsed ? "Hesap menüsü" : undefined}
             className={`flex w-full items-center rounded-xl text-left transition hover:bg-slate-50 ${isSidebarCollapsed ? "h-11 justify-center" : "gap-3 px-2 py-2"}`}
           >
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-900 text-xs font-semibold text-white">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary-600 text-xs font-bold text-white">
               {user?.firstName?.[0]}
               {user?.lastName?.[0]}
             </span>
@@ -358,7 +358,7 @@ export default function SellerLayout() {
         </div>
       </aside>
       <div
-        className={`min-w-0 flex-1 overflow-x-hidden transition-[margin] duration-300 ease-in-out ${isSidebarCollapsed ? "md:ml-20" : "md:ml-72"}`}
+        className={`min-w-0 flex-1 overflow-x-hidden transition-[margin] duration-300 ease-in-out ${isSidebarCollapsed ? "md:ml-20" : "md:ml-64"}`}
       >
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:hidden">
           <Link to="/seller/stores" onClick={guardNavigation}>
@@ -375,7 +375,7 @@ export default function SellerLayout() {
             {user?.firstName}
           </Link>
         </header>
-        <header className="sticky top-0 z-30 hidden h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-6 backdrop-blur md:flex lg:px-8">
+        <header className="sticky top-0 z-30 hidden h-[73px] items-center justify-between border-b border-[#e7e7e7] bg-white/95 px-6 backdrop-blur md:flex lg:px-8">
           <label className="flex min-w-0 items-center gap-2 text-sm font-bold text-slate-600">
             <Store className="h-4 w-4 shrink-0 text-primary-600" />
             <span className="sr-only">Aktif mağaza</span>
@@ -387,7 +387,7 @@ export default function SellerLayout() {
                 if (id && confirmSellerStoreNavigation())
                   navigate(`/seller/stores/${id}/${activeStoreSection}`);
               }}
-              className="h-10 min-w-48 max-w-sm rounded-lg border border-[#ddd7cc] bg-white px-3 text-sm font-semibold text-ink outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+              className="h-11 min-w-48 max-w-sm rounded-xl border border-[#d6d6d6] bg-white px-3 text-sm font-bold text-ink outline-none hover:border-[#ababab] focus:border-ink focus:ring-1 focus:ring-ink"
             >
               <option value="">Mağaza seçin</option>
               {stores.map((store) => (
@@ -402,7 +402,7 @@ export default function SellerLayout() {
               to="/seller/notifications"
               onClick={guardNavigation}
               aria-label="Bildirimler"
-              className="relative grid h-10 w-10 place-items-center rounded-lg text-slate-600 hover:bg-[#f3efe8]"
+              className="relative grid h-10 w-10 place-items-center rounded-full text-slate-600 hover:bg-[#f2f2f2]"
             >
               <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
@@ -414,9 +414,9 @@ export default function SellerLayout() {
             <Link
               to="/seller/profile"
               onClick={guardNavigation}
-              className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-semibold text-slate-700 hover:bg-[#f3efe8]"
+              className="flex items-center gap-2 rounded-full px-2 py-1.5 text-sm font-semibold text-slate-700 hover:bg-[#f2f2f2]"
             >
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-slate-900 text-xs text-white">
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-primary-600 text-xs font-bold text-white">
                 {user?.firstName?.[0]}
                 {user?.lastName?.[0]}
               </span>
@@ -424,7 +424,7 @@ export default function SellerLayout() {
             </Link>
           </div>
         </header>
-        <main className="p-4 pb-24 md:p-8">
+        <main className="p-4 pb-24 md:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

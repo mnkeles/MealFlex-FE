@@ -28,7 +28,7 @@ export function AlertCard({
     danger: "border-danger-100 bg-danger-50 text-danger-700",
   };
   return (
-    <section className={`rounded-xl border p-4 ${styles[tone]} ${className}`}>
+    <section className={`rounded-2xl border p-4 ${styles[tone]} ${className}`}>
       <h3 className="text-sm font-semibold">{title}</h3>
       <div className="mt-1 text-sm leading-6">{children}</div>
     </section>

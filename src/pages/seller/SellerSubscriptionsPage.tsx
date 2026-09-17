@@ -55,13 +55,13 @@ export default function SellerSubscriptionsPage() {
 
   return (
     <div className="mf-page">
-      <div className="border-b border-[#e6e1d8] pb-5">
+      <div className="border-b border-[#e7e7e7] pb-5">
         <p className="customer-eyebrow">Talep yönetimi</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink">Abonelikler</h1>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-ink">Abonelikler</h1>
         <p className="mt-1 text-sm text-slate-500">Yeni talepleri değerlendirin ve aktif anlaşmaları durumlarına göre izleyin.</p>
       </div>
 
-      <div className="flex gap-1 overflow-x-auto border-b border-[#e6e1d8]">
+      <div className="flex gap-1 overflow-x-auto border-b border-[#e7e7e7]">
         {tabs.map((t) => (
           <button
             key={t.label}

@@ -62,43 +62,43 @@ export default function HomePage() {
     navigate(`/stores${search.trim() ? `?search=${encodeURIComponent(search.trim())}` : ""}`);
   };
 
-  if (addressLoading) return <div className="h-80 animate-pulse rounded-xl bg-[#eee8dd]" />;
+  if (addressLoading) return <div className="h-80 animate-pulse rounded-2xl bg-[#eeeeee]" />;
 
   return (
     <div className="space-y-10 lg:space-y-14">
-      <section className="grid overflow-hidden rounded-xl bg-[#243d32] text-white lg:min-h-[440px] lg:grid-cols-[1.04fr_.96fr]">
+      <section className="grid overflow-hidden rounded-3xl bg-[#fff0ed] text-ink lg:min-h-[430px] lg:grid-cols-[1.04fr_.96fr]">
         <div className="flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
-          <p className="text-xs font-semibold uppercase tracking-[.18em] text-[#e3c99f]">
+          <p className="text-xs font-bold uppercase tracking-[.12em] text-primary-600">
             Haftalık yemek, iyi plan
           </p>
           <h1 className="customer-display mt-4 max-w-xl text-[2.45rem] leading-[1.07] sm:text-[3.6rem] lg:text-[4rem]">
             Öğle arası için iyi bir plan.
           </h1>
-          <p className="mt-5 max-w-md text-sm leading-7 text-[#e7e9e1] sm:text-base">
+          <p className="mt-5 max-w-md text-sm leading-7 text-slate-600 sm:text-base">
             Yakınınızdaki mutfakları keşfedin. Haftalık menünüzü seçin; yemeğiniz
             her gün iş yerinize gelsin.
           </p>
-          <form onSubmit={submitSearch} className="mt-7 flex max-w-xl items-center gap-2 rounded-lg bg-white p-1.5 text-ink">
-            <Search className="ml-3 h-5 w-5 shrink-0 text-[#777d74]" />
+          <form onSubmit={submitSearch} className="mt-7 flex max-w-xl items-center gap-2 rounded-2xl border border-[#e7e7e7] bg-white p-1.5 text-ink shadow-card">
+            <Search className="ml-3 h-5 w-5 shrink-0 text-slate-500" />
             <input
               aria-label="İşletme veya menü ara"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Bugün ne yemek istersiniz?"
-              className="min-w-0 flex-1 bg-transparent px-1 py-2 text-sm outline-none placeholder:text-[#81867d] sm:text-base"
+              className="min-w-0 flex-1 bg-transparent px-1 py-2 text-sm outline-none placeholder:text-slate-400 sm:text-base"
             />
-            <button className="inline-flex h-10 items-center gap-2 rounded-md bg-primary-600 px-4 text-sm font-semibold text-white transition hover:bg-primary-700">
+            <button className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary-600 px-5 text-sm font-bold text-white transition hover:bg-primary-700">
               Ara <ArrowRight className="h-4 w-4" />
             </button>
           </form>
-          <p className="mt-4 flex items-center gap-1.5 text-xs text-[#e1dfd1]">
+          <p className="mt-4 flex items-center gap-1.5 text-xs font-medium text-slate-500">
             <MapPin className="h-3.5 w-3.5" />
             {activeAddress
               ? `${activeAddress.title} · ${activeAddress.district} için gösteriliyor`
               : "Yakınınızdaki mutfaklar için teslimat adresi ekleyin"}
           </p>
         </div>
-        <div className="relative min-h-56 overflow-hidden bg-[#ddd0bb] lg:min-h-full">
+        <div className="relative min-h-56 overflow-hidden bg-[#eeeeee] lg:min-h-full">
           <img
             src="/images/login-meal-hero.jpg"
             alt="Hazırlanmış yemekler ve salata"
@@ -112,7 +112,7 @@ export default function HomePage() {
       </section>
 
       {!activeAddress && (
-        <section className="flex flex-col gap-4 rounded-xl border border-[#e6e1d8] bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
+        <section className="flex flex-col gap-4 rounded-2xl border border-[#e7e7e7] bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-ink">Önce teslimat adresinizi ekleyin</h2>
             <p className="mt-1 text-sm text-slate-600">Size hizmet veren işletmeleri adresinize göre göstereceğiz.</p>
@@ -126,13 +126,13 @@ export default function HomePage() {
       {ongoing && (
         <Link
           to={`/subscriptions/${ongoing.id}`}
-          className="group flex flex-col gap-4 rounded-xl border border-[#d9dfd5] bg-[#f0f4ed] px-5 py-4 transition hover:border-[#a6b6a0] sm:flex-row sm:items-center"
+          className="group flex flex-col gap-4 rounded-2xl border border-primary-100 bg-primary-50 px-5 py-4 transition hover:border-primary-300 sm:flex-row sm:items-center"
         >
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[#294438] text-white">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-600 text-white">
             <CalendarDays className="h-5 w-5" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="customer-eyebrow block text-[#4d6754]">Planınız devam ediyor</span>
+            <span className="customer-eyebrow block">Planınız devam ediyor</span>
             <span className="mt-1 block text-base font-semibold text-ink">
               {ongoing.storeName} · {ongoing.menuName}
             </span>
@@ -142,7 +142,7 @@ export default function HomePage() {
                 : "Teslimat planınızı görüntüleyin"}
             </span>
           </span>
-          <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#294438]">
+          <span className="inline-flex items-center gap-1 text-sm font-bold text-primary-700">
             Planı gör <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
           </span>
         </Link>
@@ -151,7 +151,7 @@ export default function HomePage() {
       {completed && (
         <Link
           to={`/subscriptions/${completed.id}`}
-          className="flex flex-wrap items-center gap-4 rounded-xl border border-[#e6e1d8] bg-white px-5 py-4 transition hover:border-primary-300"
+          className="flex flex-wrap items-center gap-4 rounded-2xl border border-[#e7e7e7] bg-white px-5 py-4 transition hover:border-primary-300"
         >
           <RefreshCw className="h-5 w-5 text-primary-700" />
           <span className="min-w-0 flex-1">
@@ -182,7 +182,7 @@ export default function HomePage() {
                 <Link
                   key={category}
                   to={`/stores?category=${category}`}
-                  className="inline-flex min-h-12 shrink-0 items-center gap-2.5 rounded-lg border border-[#e3ded3] bg-white px-4 text-sm font-medium text-ink transition hover:border-primary-300 hover:bg-primary-50"
+                  className="inline-flex min-h-12 shrink-0 items-center gap-2.5 rounded-full border border-[#e7e7e7] bg-white px-5 text-sm font-bold text-ink transition hover:border-primary-300 hover:bg-primary-50"
                 >
                   <Icon className="h-4 w-4 text-primary-600" />
                   {discoveryLabels[category] || category}
@@ -209,14 +209,14 @@ export default function HomePage() {
           </div>
           {storesLoading ? (
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((i) => <div key={i} className="h-80 animate-pulse rounded-xl bg-[#eee8dd]" />)}
+              {[1, 2, 3].map((i) => <div key={i} className="h-80 animate-pulse rounded-2xl bg-[#eeeeee]" />)}
             </div>
           ) : stores?.content.length ? (
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {stores.content.map((store) => <StoreCard key={store.id} store={store} addressId={activeAddressId} />)}
             </div>
           ) : (
-            <div className="rounded-xl border border-[#e6e1d8] bg-white p-10 text-center text-slate-600">
+            <div className="rounded-2xl border border-[#e7e7e7] bg-white p-10 text-center text-slate-600">
               Bu adrese hizmet veren aktif işletme bulunamadı.
             </div>
           )}

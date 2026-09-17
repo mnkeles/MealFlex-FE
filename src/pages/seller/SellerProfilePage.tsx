@@ -103,9 +103,9 @@ export default function SellerProfilePage() {
 
   return (
     <div className="mf-page">
-      <div className="border-b border-[#e6e1d8] pb-5">
+      <div className="border-b border-[#e7e7e7] pb-5">
         <p className="customer-eyebrow">Kurumsal bilgiler</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink">Satıcı profili</h1>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-ink">Satıcı profili</h1>
         <p className="mt-1 text-sm text-slate-500">Firma, yetkili ve ödeme aktarım bilgilerinizi güncel tutun.</p>
       </div>
       <form

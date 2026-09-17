@@ -75,10 +75,10 @@ export default function StoreDocumentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e6e1d8] pb-5">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#e7e7e7] pb-5">
         <div>
           <p className="customer-eyebrow">Uyumluluk</p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Belgeler ve mağaza onayı</h2>
+          <h2 className="mt-1 text-xl font-bold tracking-tight text-ink">Belgeler ve mağaza onayı</h2>
           <p className="mt-1 text-sm text-slate-500">Geçerlilik tarihlerini ve inceleme durumlarını tek listede takip edin.</p>
         </div>
         <button
