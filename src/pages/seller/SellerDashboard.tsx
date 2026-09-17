@@ -177,31 +177,6 @@ export default function SellerDashboard() {
         ) : null}
       </section>
 
-      <section className="mf-surface p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="mf-section-title">Günlük operasyon özeti</h2>
-            <p className="mf-muted mt-1">
-              Bugünkü teslimat ve talep işlemlerine hızlıca ulaşın.
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Link
-              to={`/seller/stores/${storeId}/pending`}
-              className="rounded-lg border border-primary-200 px-3 py-2 text-xs font-bold text-primary-700"
-            >
-              Talepleri aç
-            </Link>
-            <Link
-              to={`/seller/stores/${storeId}/operations`}
-              className="rounded-lg bg-primary-600 px-3 py-2 text-xs font-bold text-white"
-            >
-              Teslimatları yönet
-            </Link>
-          </div>
-        </div>
-      </section>
-
       <section>
         <div className="mf-surface overflow-hidden">
           <div className="flex items-center justify-between border-b border-slate-100 p-5">
