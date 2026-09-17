@@ -186,6 +186,7 @@ export interface CustomerSubscriptionDetail {
   subscription: Subscription;
   addressTitle?: string;
   deliveryAddress?: string;
+  changeCutoffTime?: string;
   deliveries: Delivery[];
   reviewed: boolean;
 }

@@ -23,6 +23,10 @@ import { paymentService } from "@/services/paymentService";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
+import {
+  deliveryChangeCutoffLabel,
+  isDeliveryChangeWindowOpen,
+} from "@/utils/deliveryChangeWindow";
 
 const eventLabels: Record<string, string> = {
   SUBSCRIPTION_APPROVED: "Abonelik onaylandı",
@@ -470,6 +474,17 @@ export default function SubscriptionDetailPage() {
       );
       return;
     }
+    if (
+      !isDeliveryChangeWindowOpen(
+        delivery.deliveryDate,
+        data?.changeCutoffTime,
+      )
+    ) {
+      setMessage(
+        `Bu teslimat için talep süresi doldu. Son talep zamanı bir önceki gün ${deliveryChangeCutoffLabel(data?.changeCutoffTime)} idi.`,
+      );
+      return;
+    }
     setActionDeliveryId(undefined);
     setModifyDeliveryId(delivery.id);
     setModifyForm({
@@ -910,6 +925,12 @@ export default function SubscriptionDetailPage() {
                   Tarih üzerindeki iki işlem de satıcı onayına gönderilir.
                   Satıcı kararını size bildirim olarak iletir.
                 </p>
+                <p className="mt-2 text-xs font-medium text-slate-500">
+                  Teslimat değişikliği veya yemek servisi iptal talebi,
+                  teslimattan bir gün önce saat{" "}
+                  {deliveryChangeCutoffLabel(data.changeCutoffTime)}’e kadar
+                  gönderilebilir.
+                </p>
                 {pendingChangeDeliveryIds.size > 0 && (
                   <p className="mt-3 rounded-xl bg-warning-50 p-3 text-sm font-semibold text-warning-700">
                     Onay bekleyen bir teslimata ikinci talep gönderilemez.
@@ -933,26 +954,40 @@ export default function SubscriptionDetailPage() {
                         ) > new Date(),
                     )
                     .slice(0, 8)
-                    .map((delivery) => (
-                      <button
-                        key={delivery.id}
-                        onClick={() => setActionDeliveryId(delivery.id)}
-                        disabled={pendingChangeDeliveryIds.has(delivery.id)}
-                        title={
-                          pendingChangeDeliveryIds.has(delivery.id)
-                            ? "Bu teslimat için satıcı onayı bekleniyor."
-                            : undefined
-                        }
-                        className="rounded-xl border border-info-200 px-3 py-2 text-xs font-bold text-info-700 hover:bg-info-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
-                      >
-                        {new Date(delivery.deliveryDate).toLocaleDateString(
-                          "tr-TR",
-                        )}{" "}
-                        {pendingChangeDeliveryIds.has(delivery.id)
-                          ? "için talep onayı bekleniyor"
-                            : "teslimatı"}
-                      </button>
-                    ))}
+                    .map((delivery) => {
+                      const isWindowOpen = isDeliveryChangeWindowOpen(
+                        delivery.deliveryDate,
+                        data.changeCutoffTime,
+                      );
+                      const isPending = pendingChangeDeliveryIds.has(
+                        delivery.id,
+                      );
+                      const isDisabled = isPending || !isWindowOpen;
+                      return (
+                        <button
+                          key={delivery.id}
+                          onClick={() => setActionDeliveryId(delivery.id)}
+                          disabled={isDisabled}
+                          title={
+                            isPending
+                              ? "Bu teslimat için satıcı onayı bekleniyor."
+                              : !isWindowOpen
+                                ? `Talep süresi bir önceki gün ${deliveryChangeCutoffLabel(data.changeCutoffTime)}’de sona erdi.`
+                                : undefined
+                          }
+                          className="rounded-xl border border-info-200 px-3 py-2 text-xs font-bold text-info-700 hover:bg-info-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
+                        >
+                          {new Date(delivery.deliveryDate).toLocaleDateString(
+                            "tr-TR",
+                          )}{" "}
+                          {isPending
+                            ? "için talep onayı bekleniyor"
+                            : !isWindowOpen
+                              ? "için talep süresi doldu"
+                              : "teslimatı"}
+                        </button>
+                      );
+                    })}
                 </div>
               </div>
             </details>
